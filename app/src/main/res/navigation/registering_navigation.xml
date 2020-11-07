@@ -3,20 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/registering_navigation"
-    app:startDestination="@id/splashActivity">
+    app:startDestination="@id/userNameFragment">
 
-    <activity
-        android:id="@+id/splashActivity"
-        android:name="com.example.facebook_clone.ui.activity.SplashActivity"
-        android:label="activity_splash"
-        tools:layout="@layout/activity_splash" />
     <fragment
         android:id="@+id/birthdayFragment"
         android:name="com.example.facebook_clone.ui.fragment.signupflow.BirthdayFragment"
-        android:label="BirthdayFragment" >
+        android:label="Birthday">
         <action
             android:id="@+id/action_birthdayFragment_to_genderFragment"
             app:destination="@id/genderFragment" />
+        <argument
+            android:name="firstName"
+            app:argType="string" />
+        <argument
+            android:name="lastName"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/forgetPasswordFragment"
@@ -33,6 +34,21 @@
         <action
             android:id="@+id/action_genderFragment_to_userMailFragment"
             app:destination="@id/userMailFragment" />
+        <argument
+            android:name="firstName"
+            app:argType="string" />
+        <argument
+            android:name="lastName"
+            app:argType="string" />
+        <argument
+            android:name="day"
+            app:argType="string" />
+        <argument
+            android:name="month"
+            app:argType="string" />
+        <argument
+            android:name="year"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
@@ -44,27 +60,46 @@
         <action
             android:id="@+id/action_loginFragment_to_newsFeedActivity"
             app:destination="@id/newsFeedActivity" />
+        <action
+            android:id="@+id/action_loginFragment_to_userNameFragment"
+            app:destination="@id/userNameFragment" />
     </fragment>
     <fragment
         android:id="@+id/newPasswordFragment"
         android:name="com.example.facebook_clone.ui.fragment.signupflow.NewPasswordFragment"
         android:label="NewPasswordFragment" >
-        <action
-            android:id="@+id/action_newPasswordFragment_to_profilePictureFragment"
-            app:destination="@id/profilePictureFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/profilePictureFragment"
-        android:name="com.example.facebook_clone.ui.fragment.signupflow.ProfilePictureFragment"
-        android:label="ProfilePictureFragment" >
-        <action
-            android:id="@+id/action_profilePictureFragment_to_newsFeedActivity"
-            app:destination="@id/newsFeedActivity" />
+
+        <argument
+            android:name="firstName"
+            app:argType="string" />
+        <argument
+            android:name="lastName"
+            app:argType="string" />
+        <argument
+            android:name="day"
+            app:argType="string" />
+        <argument
+            android:name="month"
+            app:argType="string" />
+        <argument
+            android:name="year"
+            app:argType="string" />
+        <argument
+            android:name="gender"
+            app:argType="string" />
+        <argument
+            android:name="email"
+            app:argType="string"
+            android:defaultValue=" " />
+        <argument
+            android:name="phone"
+            app:argType="string"
+            android:defaultValue=" " />
     </fragment>
     <fragment
         android:id="@+id/userNameFragment"
         android:name="com.example.facebook_clone.ui.fragment.signupflow.UserNameFragment"
-        android:label="UserNameFragment" >
+        android:label="Name">
         <action
             android:id="@+id/action_userNameFragment_to_birthdayFragment"
             app:destination="@id/birthdayFragment" />
@@ -79,6 +114,24 @@
         <action
             android:id="@+id/action_userMailFragment_to_newPasswordFragment"
             app:destination="@id/newPasswordFragment" />
+        <argument
+            android:name="firstName"
+            app:argType="string" />
+        <argument
+            android:name="lastName"
+            app:argType="string" />
+        <argument
+            android:name="day"
+            app:argType="string" />
+        <argument
+            android:name="month"
+            app:argType="string" />
+        <argument
+            android:name="year"
+            app:argType="string" />
+        <argument
+            android:name="gender"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/userPhoneFragment"
@@ -90,21 +143,36 @@
         <action
             android:id="@+id/action_userPhoneFragment_to_newPasswordFragment"
             app:destination="@id/newPasswordFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/recentUsersFragment"
-        android:name="com.example.facebook_clone.ui.fragment.RecentUsersFragment"
-        android:label="RecentUsersFragment" >
-        <action
-            android:id="@+id/action_recentUsersFragment_to_userNameFragment"
-            app:destination="@id/userNameFragment" />
-        <action
-            android:id="@+id/action_recentUsersFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
+
+
+        <argument
+            android:name="firstName"
+            app:argType="string" />
+        <argument
+            android:name="lastName"
+            app:argType="string" />
+        <argument
+            android:name="day"
+            app:argType="string" />
+        <argument
+            android:name="month"
+            app:argType="string" />
+        <argument
+            android:name="year"
+            app:argType="string" />
+        <argument
+            android:name="gender"
+            app:argType="string" />
+
     </fragment>
     <activity
         android:id="@+id/newsFeedActivity"
         android:name="com.example.facebook_clone.ui.activity.NewsFeedActivity"
         android:label="activity_news_feed"
         tools:layout="@layout/activity_news_feed" />
+    <activity
+        android:id="@+id/recentUsersActivity"
+        android:name="com.example.facebook_clone.ui.activity.RecentUsersActivity"
+        android:label="activity_recent_users"
+        tools:layout="@layout/activity_recent_users" />
 </navigation>

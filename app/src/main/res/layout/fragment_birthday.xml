@@ -5,12 +5,42 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <include layout="@layout/toolbar_layout" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="64dp"
+        android:layout_height="?android:attr/actionBarSize"
+        android:orientation="horizontal"
+        android:elevation="12dp"
+        >
+
+        <ImageView
+            android:layout_width="28dp"
+            android:layout_height="match_parent"
+            android:id="@+id/upButtonImageView"
+            android:layout_gravity="center"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_up_button" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginStart="16dp"
+            android:gravity="center|start"
+            android:text="Birthday"
+            android:textColor="@color/black"
+            android:textSize="21sp" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="36dp"
+        android:padding="16dp"
         android:orientation="vertical">
 
         <TextView
@@ -43,20 +73,22 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:calendarViewShown="false"
-            android:layout_marginBottom="64dp"
+            android:layout_marginBottom="8dp"
             android:datePickerMode="spinner" />
 
-        <Button
-            android:id="@+id/nextButtonInNameFragment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:background="@color/medium_blue"
-            android:text="Next"
-            android:textAllCaps="false"
-            android:textColor="@color/white" />
 
     </LinearLayout>
+
+
+    <Button
+        android:id="@+id/nextButtonInBirthdayFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:background="@color/medium_blue"
+        android:text="Next"
+        android:textAllCaps="false"
+        android:textColor="@color/white" />
 
 
 </LinearLayout>

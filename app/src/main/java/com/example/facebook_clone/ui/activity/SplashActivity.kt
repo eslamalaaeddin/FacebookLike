@@ -11,9 +11,8 @@ import com.example.facebook_clone.R
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_splash)
-
         makeFullScreen()
+        setContentView(R.layout.activity_splash)
 
         Handler().postDelayed({
 //            if (currentUser == null){
@@ -22,7 +21,8 @@ class SplashActivity : AppCompatActivity() {
 //                startActivity(Intent(this, WelcomeActivity::class.java))
 //            }
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-            finish()
+            navigateToRecentUsersActivity()
+            //finish()
 
         }, 3000)
     }
@@ -34,5 +34,11 @@ class SplashActivity : AppCompatActivity() {
             WindowManager.LayoutParams.FLAG_FULLSCREEN
         )
         supportActionBar?.hide()
+    }
+
+    private fun navigateToRecentUsersActivity(){
+        val intent = Intent(this, RecentUsersActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }

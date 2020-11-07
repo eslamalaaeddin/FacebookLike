@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:padding="24dp"
+    >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Do your want to stop creating\nyour account?"
+        android:gravity="center|start"
+        android:textColor="@color/black"
+        android:layout_marginBottom="16dp"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="If you stop now, you'll lose any progress you've made"
+        android:gravity="center|start"
+        android:textColor="@color/medium_gray"
+        android:layout_marginBottom="16dp"
+        android:textSize="16sp"/>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/continueCreatingAccount"
+        android:text="Continue creating account"
+        android:gravity="center|end"
+        android:textColor="@color/black"
+        android:layout_marginBottom="16dp"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/stopCreatingAccount"
+        android:text="Stop creating account"
+        android:gravity="center|end"
+        android:textColor="@color/dark_blue"
+        android:layout_marginBottom="16dp"
+        android:textSize="16sp"/>
+</LinearLayout>
