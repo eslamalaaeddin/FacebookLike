@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/registering_navigation"
+    app:startDestination="@id/splashActivity">
+
+    <activity
+        android:id="@+id/splashActivity"
+        android:name="com.example.facebook_clone.ui.activity.SplashActivity"
+        android:label="activity_splash"
+        tools:layout="@layout/activity_splash" />
+    <fragment
+        android:id="@+id/birthdayFragment"
+        android:name="com.example.facebook_clone.ui.fragment.signupflow.BirthdayFragment"
+        android:label="BirthdayFragment" >
+        <action
+            android:id="@+id/action_birthdayFragment_to_genderFragment"
+            app:destination="@id/genderFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/forgetPasswordFragment"
+        android:name="com.example.facebook_clone.ui.fragment.signinflow.ForgetPasswordFragment"
+        android:label="ForgetPasswordFragment" >
+        <action
+            android:id="@+id/action_forgetPasswordFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/genderFragment"
+        android:name="com.example.facebook_clone.ui.fragment.signupflow.GenderFragment"
+        android:label="GenderFragment" >
+        <action
+            android:id="@+id/action_genderFragment_to_userMailFragment"
+            app:destination="@id/userMailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.facebook_clone.ui.fragment.signinflow.LoginFragment"
+        android:label="LoginFragment" >
+        <action
+            android:id="@+id/action_loginFragment_to_forgetPasswordFragment"
+            app:destination="@id/forgetPasswordFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_newsFeedActivity"
+            app:destination="@id/newsFeedActivity" />
+    </fragment>
+    <fragment
+        android:id="@+id/newPasswordFragment"
+        android:name="com.example.facebook_clone.ui.fragment.signupflow.NewPasswordFragment"
+        android:label="NewPasswordFragment" >
+        <action
+            android:id="@+id/action_newPasswordFragment_to_profilePictureFragment"
+            app:destination="@id/profilePictureFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/profilePictureFragment"
+        android:name="com.example.facebook_clone.ui.fragment.signupflow.ProfilePictureFragment"
+        android:label="ProfilePictureFragment" >
+        <action
+            android:id="@+id/action_profilePictureFragment_to_newsFeedActivity"
+            app:destination="@id/newsFeedActivity" />
+    </fragment>
+    <fragment
+        android:id="@+id/userNameFragment"
+        android:name="com.example.facebook_clone.ui.fragment.signupflow.UserNameFragment"
+        android:label="UserNameFragment" >
+        <action
+            android:id="@+id/action_userNameFragment_to_birthdayFragment"
+            app:destination="@id/birthdayFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/userMailFragment"
+        android:name="com.example.facebook_clone.ui.fragment.signupflow.UserMailFragment"
+        android:label="UserMailFragment" >
+        <action
+            android:id="@+id/action_userMailFragment_to_userPhoneFragment"
+            app:destination="@id/userPhoneFragment" />
+        <action
+            android:id="@+id/action_userMailFragment_to_newPasswordFragment"
+            app:destination="@id/newPasswordFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/userPhoneFragment"
+        android:name="com.example.facebook_clone.ui.fragment.signupflow.UserPhoneFragment"
+        android:label="UserPhoneFragment" >
+        <action
+            android:id="@+id/action_userPhoneFragment_to_userMailFragment"
+            app:destination="@id/userMailFragment" />
+        <action
+            android:id="@+id/action_userPhoneFragment_to_newPasswordFragment"
+            app:destination="@id/newPasswordFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/recentUsersFragment"
+        android:name="com.example.facebook_clone.ui.fragment.RecentUsersFragment"
+        android:label="RecentUsersFragment" >
+        <action
+            android:id="@+id/action_recentUsersFragment_to_userNameFragment"
+            app:destination="@id/userNameFragment" />
+        <action
+            android:id="@+id/action_recentUsersFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+    <activity
+        android:id="@+id/newsFeedActivity"
+        android:name="com.example.facebook_clone.ui.activity.NewsFeedActivity"
+        android:label="activity_news_feed"
+        tools:layout="@layout/activity_news_feed" />
+</navigation>
