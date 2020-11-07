@@ -1,7 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="32dp"
+    >
+
+    <ImageView
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:src="@drawable/ic_facebook_circular_logo"
+        android:layout_margin="32dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:id="@+id/recentUsersRecyclerView"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/logIntoAnotherAccount"
+        android:text="Log into another account"
+        android:textAllCaps="false"
+        android:layout_margin="16dp"
+        style="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
+        android:background="@android:color/transparent"
+        android:textColor="@color/dark_blue"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/createNewFacebookAccount"
+        android:text="Create new Facebook account"
+        android:textAllCaps="false"
+        style="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
+        android:background="@color/dark_blue"
+        android:textColor="@color/white"/>
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</LinearLayout>
