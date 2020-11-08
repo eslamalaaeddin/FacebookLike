@@ -5,11 +5,17 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.facebook_clone.R
+import com.example.facebook_clone.helper.Util
 import com.example.facebook_clone.ui.activity.RegisteringActivity
+import com.example.facebook_clone.viewmodel.LoginFragmentViewModel
 import kotlinx.android.synthetic.main.fragment_login.*
 import kotlinx.android.synthetic.main.fragment_user_name.*
+import org.koin.android.ext.android.inject
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
+
+    private val loginFragmentViewModel by inject<LoginFragmentViewModel>()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -57,12 +63,19 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 passwordTextInputInLoginFragment.error = "Enter your password"
             }
         } else {
-            //First check if it is mail
-            //else it is phone
-            //TODO
             phoneOrEmailTextInputInLoginFragment.error = null
             passwordTextInputInLoginFragment.error = null
-            navigateToNewsFeedActivity()
+            signInAndNavigate(mailOrPhone, password)
+        }
+    }
+
+    private fun signInAndNavigate(mailOrPhone: String, password: String){
+        loginFragmentViewModel.signIn(mailOrPhone, password).addOnCompleteListener {task ->
+            if (task.isSuccessful){
+                navigateToNewsFeedActivity()
+            }else{
+                Util.toastMessage(requireContext(), task.exception?.message.toString())
+            }
         }
     }
 
