@@ -4,6 +4,7 @@ import android.app.Application
 import com.example.facebook_clone.di.databaseModule
 import com.example.facebook_clone.di.firebaseAuthModule
 import com.example.facebook_clone.di.firebaseStorageModule
+import com.example.facebook_clone.di.passFragViewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -20,7 +21,8 @@ class BaseApplication : Application() {
                 listOf(
                     databaseModule,
                     firebaseAuthModule,
-                    firebaseStorageModule
+                    firebaseStorageModule,
+                    passFragViewModelModule
                 )
             )
         }

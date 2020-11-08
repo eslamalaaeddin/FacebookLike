@@ -5,17 +5,23 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.facebook_clone.R
+import com.example.facebook_clone.helper.Util
 import com.example.facebook_clone.ui.activity.ProfilePictureActivity
-import kotlinx.android.synthetic.main.fragment_password_new.*
+import com.example.facebook_clone.viewmodel.PasswordFragmentViewModel
+import kotlinx.android.synthetic.main.fragment_password.*
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 private const val TAG = "NewPasswordFragment"
-class NewPasswordFragment : Fragment(R.layout.fragment_password_new) {
-    private val args : NewPasswordFragmentArgs by navArgs()
+
+class NewPasswordFragment : Fragment(R.layout.fragment_password) {
+    private val args: NewPasswordFragmentArgs by navArgs()
+    private val passFragViewModel by viewModel<PasswordFragmentViewModel>()
+//    private val auth : FirebaseAuth by inject()
+//    private val currentUser = auth.currentUser!!
 
     private lateinit var firstName: String
     private lateinit var lastName: String
@@ -23,41 +29,79 @@ class NewPasswordFragment : Fragment(R.layout.fragment_password_new) {
     private lateinit var month: String
     private lateinit var year: String
     private lateinit var gender: String
-    private lateinit var email:String
-    private lateinit var phone:String
+    private lateinit var email: String
+    private lateinit var phone: String
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        firstName = args.firstName
+        lastName = args.lastName
+        day = args.day
+        month = args.month
+        year = args.year
+        gender = args.gender
+        email = args.email
+        phone = args.phone
 
-        Log.i(TAG, "ISLAM onViewCreated: $args")
-
-        //firstName = args.firstName.... and so on
-        
         nextButtonInPasswordFragment.setOnClickListener {
             val password = passwordTextInputInPasswordFragment.editText?.text.toString()
             validateUserInputAndCreateAccount(password)
         }
 
-        val upButtonImageView : ImageView = view.findViewById(R.id.upButtonImageView)
+        val upButtonImageView: ImageView = view.findViewById(R.id.upButtonImageView)
 
         upButtonImageView.setOnClickListener {
-            activity?.onBackPressed()
+            navigateToMailFragment(firstName, lastName, day, month,year, gender, email, phone)
         }
+
+        showData.setOnClickListener {
+            Log.i(TAG, "AHMED onViewCreated: $args")
+        }
+
+
     }
 
-    private fun validateUserInputAndCreateAccount(password:String){
-        if (password.isEmpty()){
+    private fun navigateToMailFragment(
+        firstName: String,
+        lastName: String,
+        day: String,
+        month: String,
+        year: String,
+        gender: String,
+        email: String,
+        phone: String
+    ) {
+        val action = NewPasswordFragmentDirections.actionNewPasswordFragmentToUserMailFragment2(firstName, lastName, day, month, year, gender)
+        findNavController().navigate(action)
+
+    }
+
+    private fun validateUserInputAndCreateAccount(password: String) {
+        if (password.isEmpty()) {
             passwordTextInputInPasswordFragment.error = "You must enter a password"
-        }else{
-            passwordTextInputInPasswordFragment.error = null
-            //create account and navigate to profile picture activity
-            navigateToProfilePictureActivity()
-
         }
+        else{
+            passwordTextInputInPasswordFragment.error = null
+
+            passFragViewModel.createAccountWithMailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Util.toastMessage(requireContext(), "Account created successfully")
+                        navigateToProfilePictureActivity()
+                    } else {
+                        Util.toastMessage(requireContext(), task.exception?.message.toString())
+                    }
+                }
+        }
+
     }
 
-    private fun navigateToProfilePictureActivity(){
+    private fun navigateToProfilePictureActivity() {
         val intent = Intent(requireContext(), ProfilePictureActivity::class.java)
         startActivity(intent)
         activity?.finish()
     }
+
+
 }

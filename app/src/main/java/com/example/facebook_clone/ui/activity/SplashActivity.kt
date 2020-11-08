@@ -4,24 +4,32 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.Window
 import android.view.WindowManager
 import com.example.facebook_clone.R
+import com.google.firebase.auth.FirebaseAuth
+import org.koin.android.ext.android.inject
 
+private const val TAG = "SplashActivity"
 class SplashActivity : AppCompatActivity() {
+   // private val auth: FirebaseAuth by inject()
+//    private val currentUser = auth.currentUser!!
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         makeFullScreen()
         setContentView(R.layout.activity_splash)
 
         Handler().postDelayed({
-//            if (currentUser == null){
-//                startActivity(Intent(this, RegisterActivity::class.java))
-//            }else{
-//                startActivity(Intent(this, WelcomeActivity::class.java))
-//            }
+            if (FirebaseAuth.getInstance().currentUser == null) {
+                navigateToRecentUsersActivity()
+            } else {
+                Log.i(TAG, "ISLAM onCreate: ${FirebaseAuth.getInstance().currentUser?.uid.toString()}")
+                navigateToNewsFeedActivity()
+            }
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-            navigateToRecentUsersActivity()
+            //navigateToRecentUsersActivity()
             //finish()
 
         }, 3000)
@@ -36,8 +44,13 @@ class SplashActivity : AppCompatActivity() {
         supportActionBar?.hide()
     }
 
-    private fun navigateToRecentUsersActivity(){
+    private fun navigateToRecentUsersActivity() {
         val intent = Intent(this, RecentUsersActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+    private fun navigateToNewsFeedActivity() {
+        val intent = Intent(this, NewsFeedActivity::class.java)
         startActivity(intent)
         finish()
     }

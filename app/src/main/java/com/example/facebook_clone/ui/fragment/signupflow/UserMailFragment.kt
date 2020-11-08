@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.facebook_clone.R
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_mail_user.*
 import kotlinx.android.synthetic.main.fragment_mail_user.signUpWithMobileNumberButton
 import kotlinx.android.synthetic.main.fragment_phone_user.*

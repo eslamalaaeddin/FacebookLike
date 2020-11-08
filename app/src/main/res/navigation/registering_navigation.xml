@@ -87,7 +87,7 @@
     <fragment
         android:id="@+id/newPasswordFragment"
         android:name="com.example.facebook_clone.ui.fragment.signupflow.NewPasswordFragment"
-        android:label="NewPasswordFragment" >
+        android:label="newPasswordFragment">
 
         <argument
             android:name="firstName"
@@ -109,12 +109,20 @@
             app:argType="string" />
         <argument
             android:name="email"
-            app:argType="string"
-            android:defaultValue=" " />
+            android:defaultValue=" "
+            app:argType="string" />
         <argument
             android:name="phone"
-            app:argType="string"
-            android:defaultValue=" " />
+            android:defaultValue=" "
+            app:argType="string" />
+        <action
+            android:id="@+id/action_newPasswordFragment_to_userMailFragment2"
+            app:destination="@id/userMailFragment"
+            app:enterAnim="@anim/fragment_fade_enter"
+            app:exitAnim="@anim/fragment_fade_exit"
+            app:popEnterAnim="@anim/fragment_fade_enter"
+            app:popExitAnim="@anim/fragment_fade_exit"
+            />
     </fragment>
     <fragment
         android:id="@+id/userNameFragment"
