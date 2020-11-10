@@ -69,8 +69,8 @@ dependencies {
 
     //Circular image
     implementation 'de.hdodenhof:circleimageview:3.1.0'
-//    //Picasso
-//    implementation 'com.squareup.picasso:picasso:2.71828'
+    //Picasso
+    implementation 'com.squareup.picasso:picasso:2.71828'
 //    //Image viewer
 //    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 //    //Kotlin coroutines
