@@ -96,16 +96,7 @@
         android:text="Next"
         android:textAllCaps="false"
         android:textColor="@color/white" />
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:id="@+id/signUpWithMobileNumberButton"
-        android:text="Sign up with mobile number"
-        android:gravity="center"
-        android:textColor="@color/dark_blue"
-        android:textStyle="bold"
-        android:textSize="18sp"/>
+
 
 
 </LinearLayout>

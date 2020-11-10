@@ -5,11 +5,10 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.facebook_clone.R
-import com.example.facebook_clone.helper.Util
+import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.ui.activity.RegisteringActivity
 import com.example.facebook_clone.viewmodel.LoginFragmentViewModel
 import kotlinx.android.synthetic.main.fragment_login.*
-import kotlinx.android.synthetic.main.fragment_user_name.*
 import org.koin.android.ext.android.inject
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
@@ -74,7 +73,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             if (task.isSuccessful){
                 navigateToNewsFeedActivity()
             }else{
-                Util.toastMessage(requireContext(), task.exception?.message.toString())
+                Utils.toastMessage(requireContext(), task.exception?.message.toString())
             }
         }
     }

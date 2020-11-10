@@ -9,12 +9,13 @@ import android.view.Window
 import android.view.WindowManager
 import com.example.facebook_clone.R
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import org.koin.android.ext.android.inject
 
 private const val TAG = "SplashActivity"
 class SplashActivity : AppCompatActivity() {
-   // private val auth: FirebaseAuth by inject()
-//    private val currentUser = auth.currentUser!!
+    private val auth: FirebaseAuth by inject()
+    private val currentUser: FirebaseUser? = auth.currentUser
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,11 +23,11 @@ class SplashActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splash)
 
         Handler().postDelayed({
-            if (FirebaseAuth.getInstance().currentUser == null) {
+            if (currentUser == null) {
                 navigateToRecentUsersActivity()
             } else {
-                Log.i(TAG, "ISLAM onCreate: ${FirebaseAuth.getInstance().currentUser?.uid.toString()}")
-                navigateToNewsFeedActivity()
+//                navigateToNewsFeedActivity()
+                navigateToProfileActivity()
             }
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             //navigateToRecentUsersActivity()
@@ -51,6 +52,12 @@ class SplashActivity : AppCompatActivity() {
     }
     private fun navigateToNewsFeedActivity() {
         val intent = Intent(this, NewsFeedActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun navigateToProfileActivity() {
+        val intent = Intent(this, ProfileActivity::class.java)
         startActivity(intent)
         finish()
     }

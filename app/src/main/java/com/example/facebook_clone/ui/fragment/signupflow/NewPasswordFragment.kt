@@ -1,5 +1,6 @@
 package com.example.facebook_clone.ui.fragment.signupflow
 
+import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -9,10 +10,13 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.facebook_clone.R
-import com.example.facebook_clone.helper.Util
+import com.example.facebook_clone.helper.Utils
+import com.example.facebook_clone.model.User
 import com.example.facebook_clone.ui.activity.ProfilePictureActivity
 import com.example.facebook_clone.viewmodel.PasswordFragmentViewModel
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_password.*
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 private const val TAG = "NewPasswordFragment"
@@ -20,8 +24,8 @@ private const val TAG = "NewPasswordFragment"
 class NewPasswordFragment : Fragment(R.layout.fragment_password) {
     private val args: NewPasswordFragmentArgs by navArgs()
     private val passFragViewModel by viewModel<PasswordFragmentViewModel>()
-//    private val auth : FirebaseAuth by inject()
-//    private val currentUser = auth.currentUser!!
+    private val auth: FirebaseAuth by inject()
+    private var progressDialog: ProgressDialog? = null
 
     private lateinit var firstName: String
     private lateinit var lastName: String
@@ -52,11 +56,7 @@ class NewPasswordFragment : Fragment(R.layout.fragment_password) {
         val upButtonImageView: ImageView = view.findViewById(R.id.upButtonImageView)
 
         upButtonImageView.setOnClickListener {
-            navigateToMailFragment(firstName, lastName, day, month,year, gender, email, phone)
-        }
-
-        showData.setOnClickListener {
-            Log.i(TAG, "AHMED onViewCreated: $args")
+            navigateToMailFragment(firstName, lastName, day, month, year, gender, email, phone)
         }
 
 
@@ -72,7 +72,14 @@ class NewPasswordFragment : Fragment(R.layout.fragment_password) {
         email: String,
         phone: String
     ) {
-        val action = NewPasswordFragmentDirections.actionNewPasswordFragmentToUserMailFragment2(firstName, lastName, day, month, year, gender)
+        val action = NewPasswordFragmentDirections.actionNewPasswordFragmentToUserMailFragment2(
+            firstName,
+            lastName,
+            day,
+            month,
+            year,
+            gender
+        )
         findNavController().navigate(action)
 
     }
@@ -80,17 +87,27 @@ class NewPasswordFragment : Fragment(R.layout.fragment_password) {
     private fun validateUserInputAndCreateAccount(password: String) {
         if (password.isEmpty()) {
             passwordTextInputInPasswordFragment.error = "You must enter a password"
-        }
-        else{
+        } else {
             passwordTextInputInPasswordFragment.error = null
-
+            progressDialog = Utils.showProgressDialog(requireContext(), "Please wait...")
             passFragViewModel.createAccountWithMailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Util.toastMessage(requireContext(), "Account created successfully")
-                        navigateToProfilePictureActivity()
+                        val user = createUser()
+                        passFragViewModel.uploadUserDataToDB(user).addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                progressDialog?.dismiss()
+                                navigateToProfilePictureActivity()
+                            } else {
+                                Utils.toastMessage(
+                                    requireContext(),
+                                    task.exception?.message.toString()
+                                )
+                            }
+                        }
+
                     } else {
-                        Util.toastMessage(requireContext(), task.exception?.message.toString())
+                        Utils.toastMessage(requireContext(), task.exception?.message.toString())
                     }
                 }
         }
@@ -103,5 +120,13 @@ class NewPasswordFragment : Fragment(R.layout.fragment_password) {
         activity?.finish()
     }
 
+    private fun createUser(): User {
+        return User(
+            id = auth.currentUser?.uid.toString(),
+            name = "$firstName $lastName",
+            gender = gender,
+            birthDay = "$day/$month/$year",
+        )
+    }
 
 }

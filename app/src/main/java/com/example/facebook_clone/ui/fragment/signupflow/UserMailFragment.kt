@@ -4,16 +4,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.facebook_clone.R
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_mail_user.*
-import kotlinx.android.synthetic.main.fragment_mail_user.signUpWithMobileNumberButton
-import kotlinx.android.synthetic.main.fragment_phone_user.*
-import kotlinx.android.synthetic.main.fragment_user_name.*
 
 private const val TAG = "UserMailFragment"
 class UserMailFragment : Fragment(R.layout.fragment_mail_user) {
@@ -41,10 +36,6 @@ class UserMailFragment : Fragment(R.layout.fragment_mail_user) {
              validateUserInputAndNavigateToPasswordFragment(email)
         }
 
-        signUpWithMobileNumberButton.setOnClickListener{
-            navigateToUserPhoneFragment()
-        }
-
         val upButtonImageView : ImageView = view.findViewById(R.id.upButtonImageView)
 
         upButtonImageView.setOnClickListener {
@@ -56,12 +47,6 @@ class UserMailFragment : Fragment(R.layout.fragment_mail_user) {
     private fun navigateToPasswordFragment(firstName:String, lastName:String, day:String, month:String,year:String, gender: String, email: String, phone:String ) {
         val action =
             UserMailFragmentDirections.actionUserMailFragmentToNewPasswordFragment(firstName, lastName, day, month, year, gender, email,"")
-        findNavController().navigate(action)
-    }
-
-    private fun navigateToUserPhoneFragment(){
-        val action =
-            UserMailFragmentDirections.actionUserMailFragmentToUserPhoneFragment(firstName, lastName, day, month, year, gender)
         findNavController().navigate(action)
     }
 

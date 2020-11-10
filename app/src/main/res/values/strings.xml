@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Facebook-Clone</string>
+    <string-array name="visibility_options">
+        <item>Public</item>
+        <item>Friends</item>
+        <item>Private</item>
+    </string-array>
 </resources>

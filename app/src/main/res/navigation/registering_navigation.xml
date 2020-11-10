@@ -142,14 +142,6 @@
         android:name="com.example.facebook_clone.ui.fragment.signupflow.UserMailFragment"
         android:label="UserMailFragment" >
         <action
-            android:id="@+id/action_userMailFragment_to_userPhoneFragment"
-            app:destination="@id/userPhoneFragment"
-            app:enterAnim="@anim/fragment_fade_enter"
-            app:exitAnim="@anim/fragment_fade_exit"
-            app:popEnterAnim="@anim/fragment_fade_enter"
-            app:popExitAnim="@anim/fragment_fade_exit"
-            />
-        <action
             android:id="@+id/action_userMailFragment_to_newPasswordFragment"
             app:destination="@id/newPasswordFragment"
             app:enterAnim="@anim/fragment_fade_enter"
@@ -175,48 +167,6 @@
         <argument
             android:name="gender"
             app:argType="string" />
-    </fragment>
-    <fragment
-        android:id="@+id/userPhoneFragment"
-        android:name="com.example.facebook_clone.ui.fragment.signupflow.UserPhoneFragment"
-        android:label="UserPhoneFragment" >
-        <action
-            android:id="@+id/action_userPhoneFragment_to_userMailFragment"
-            app:destination="@id/userMailFragment"
-            app:enterAnim="@anim/fragment_fade_enter"
-            app:exitAnim="@anim/fragment_fade_exit"
-            app:popEnterAnim="@anim/fragment_fade_enter"
-            app:popExitAnim="@anim/fragment_fade_exit"
-            />
-        <action
-            android:id="@+id/action_userPhoneFragment_to_newPasswordFragment"
-            app:destination="@id/newPasswordFragment"
-            app:enterAnim="@anim/fragment_fade_enter"
-            app:exitAnim="@anim/fragment_fade_exit"
-            app:popEnterAnim="@anim/fragment_fade_enter"
-            app:popExitAnim="@anim/fragment_fade_exit"
-            />
-
-
-        <argument
-            android:name="firstName"
-            app:argType="string" />
-        <argument
-            android:name="lastName"
-            app:argType="string" />
-        <argument
-            android:name="day"
-            app:argType="string" />
-        <argument
-            android:name="month"
-            app:argType="string" />
-        <argument
-            android:name="year"
-            app:argType="string" />
-        <argument
-            android:name="gender"
-            app:argType="string" />
-
     </fragment>
     <activity
         android:id="@+id/newsFeedActivity"
