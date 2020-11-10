@@ -1,10 +1,7 @@
 package com.example.facebook_clone.helper
 
 import android.app.Application
-import com.example.facebook_clone.di.databaseModule
-import com.example.facebook_clone.di.firebaseAuthModule
-import com.example.facebook_clone.di.firebaseStorageModule
-import com.example.facebook_clone.di.passFragViewModelModule
+import com.example.facebook_clone.di.*
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -22,7 +19,14 @@ class BaseApplication : Application() {
                     databaseModule,
                     firebaseAuthModule,
                     firebaseStorageModule,
-                    passFragViewModelModule
+                    passFragViewModelModule,
+                    loginFragViewModelModule,
+                    forgetPasswordFragViewModelModule,
+                    usersRepositoryModule,
+                    profileActivityViewModelModule,
+                    profilePictureActivityViewModelModule,
+                    postsRepositoryModule,
+                    postCreatorViewModelModule
                 )
             )
         }
