@@ -1,6 +1,8 @@
 package com.example.facebook_clone.di
 
-import com.example.facebook_clone.viewmodel.PasswordFragmentViewModel
+import com.example.facebook_clone.repository.PostsRepository
+import com.example.facebook_clone.repository.UsersRepository
+import com.example.facebook_clone.viewmodel.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -29,11 +31,20 @@ val firebaseStorageModule = module {
     single { provideStorage() }
 }
 
-////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////VIEW MODELS///////////////////////////////////////
 //Password fragment view model
-val passFragViewModelModule = module {
-    viewModel {
-        PasswordFragmentViewModel(get())
-    }
+val passFragViewModelModule = module { viewModel { PasswordFragmentViewModel(get(),get()) }}
 
-}
+val loginFragViewModelModule = module {viewModel { LoginFragmentViewModel(get()) } }
+
+val forgetPasswordFragViewModelModule = module { viewModel { ForgetPasswordFragmentViewModel(get()) } }
+
+val profileActivityViewModelModule = module { viewModel { ProfileActivityViewModel(get()) } }
+
+val profilePictureActivityViewModelModule = module { viewModel { ProfilePictureActivityViewModel(get()) } }
+val postCreatorViewModelModule = module { viewModel { PostViewModel(get()) } }
+
+/////////////////////////////////////////////////REPOSITORIES///////////////////////////////////////
+
+val usersRepositoryModule = module { single { UsersRepository(get(),get(), get()) } }
+val postsRepositoryModule = module { single { PostsRepository(get(),get(), get()) } }
