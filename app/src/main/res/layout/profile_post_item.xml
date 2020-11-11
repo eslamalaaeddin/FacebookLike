@@ -127,16 +127,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        app:layout_constraintBottom_toBottomOf="@+id/textView10"
-        app:layout_constraintEnd_toStartOf="@+id/textView12"
+        app:layout_constraintBottom_toBottomOf="@+id/addCommentTextView"
+        app:layout_constraintEnd_toStartOf="@+id/addShareTextView"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/textView10"
-        app:layout_constraintTop_toTopOf="@+id/textView10"
+        app:layout_constraintStart_toEndOf="@+id/addCommentTextView"
+        app:layout_constraintTop_toTopOf="@+id/addCommentTextView"
         app:srcCompat="@drawable/ic_share"
         app:tint="@color/medium_gray" />
 
     <TextView
-        android:id="@+id/textView12"
+        android:id="@+id/addShareTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
@@ -149,7 +149,7 @@
         app:layout_constraintTop_toTopOf="@+id/imageView8" />
 
     <TextView
-        android:id="@+id/textView11"
+        android:id="@+id/addReactTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Like"
@@ -166,7 +166,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="4dp"
-        app:layout_constraintEnd_toStartOf="@+id/textView11"
+        app:layout_constraintEnd_toStartOf="@+id/addReactTextView"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view3"
@@ -174,7 +174,7 @@
         app:tint="@color/medium_gray" />
 
     <TextView
-        android:id="@+id/textView10"
+        android:id="@+id/addCommentTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Comment"
@@ -190,11 +190,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        app:layout_constraintBottom_toBottomOf="@+id/textView11"
-        app:layout_constraintEnd_toStartOf="@+id/textView10"
+        app:layout_constraintBottom_toBottomOf="@+id/addReactTextView"
+        app:layout_constraintEnd_toStartOf="@+id/addCommentTextView"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/textView11"
-        app:layout_constraintTop_toTopOf="@+id/textView11"
+        app:layout_constraintStart_toEndOf="@+id/addReactTextView"
+        app:layout_constraintTop_toTopOf="@+id/addReactTextView"
         app:srcCompat="@drawable/ic_comment"
         app:tint="@color/medium_gray" />
 

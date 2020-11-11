@@ -49,6 +49,8 @@ class PostCreatorDialog : DialogFragment(), AdapterView.OnItemSelectedListener, 
         postVisibilitySpinner.onItemSelectedListener = this
 
         Picasso.get().load(userProfileImageUrl).into(smallProfileImageView)
+        userNameTextView.text = userName
+
 
         ArrayAdapter.createFromResource(
             requireContext(),
@@ -120,7 +122,8 @@ class PostCreatorDialog : DialogFragment(), AdapterView.OnItemSelectedListener, 
                 "GoodPost",
                 "text"
             )
-        ))
+        )
+        )
     }
 
     override fun setUserNameAndProfileImageUrl(name: String, url: String) {
