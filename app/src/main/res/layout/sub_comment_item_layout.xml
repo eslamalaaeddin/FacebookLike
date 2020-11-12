@@ -9,8 +9,8 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/commenterImageView"
-        android:layout_width="36dp"
-        android:layout_height="48dp"
+        android:layout_width="24dp"
+        android:layout_height="36sp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:src="@drawable/sengab"

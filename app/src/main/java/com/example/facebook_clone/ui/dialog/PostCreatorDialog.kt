@@ -11,9 +11,9 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.DialogFragment
 import com.example.facebook_clone.R
-import com.example.facebook_clone.helper.Callback
+import com.example.facebook_clone.helper.provider.NameImageProvider
 import com.example.facebook_clone.helper.Utils
-import com.example.facebook_clone.model.post.Comment
+import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.viewmodel.PostViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -22,7 +22,7 @@ import kotlinx.android.synthetic.main.post_creator_dialog.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class PostCreatorDialog : DialogFragment(), AdapterView.OnItemSelectedListener, Callback {
+class PostCreatorDialog : DialogFragment(), AdapterView.OnItemSelectedListener, NameImageProvider {
     private val auth: FirebaseAuth by inject()
     private val postCreatorViewModel by viewModel<PostViewModel>()
     private var progressDialog: ProgressDialog? = null
@@ -115,7 +115,8 @@ class PostCreatorDialog : DialogFragment(), AdapterView.OnItemSelectedListener, 
             visibility = postVisibility,
             publisherName = userName,
             publisherImageUrl = userProfileImageUrl,
-            comments = listOf(Comment(
+            comments = listOf(
+                Comment(
                 "123",
                 "fawzy",
                 "google.com",

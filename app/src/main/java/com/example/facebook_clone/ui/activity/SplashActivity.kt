@@ -7,6 +7,7 @@ import android.os.Handler
 import android.util.Log
 import android.view.Window
 import android.view.WindowManager
+import com.example.facebook_clone.OthersProfileActivity
 import com.example.facebook_clone.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -27,7 +28,8 @@ class SplashActivity : AppCompatActivity() {
                 navigateToRecentUsersActivity()
             } else {
 //                navigateToNewsFeedActivity()
-                navigateToProfileActivity()
+                //navigateToProfileActivity()
+                navigateToOthersProfileActivity()
             }
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             //navigateToRecentUsersActivity()
@@ -35,6 +37,8 @@ class SplashActivity : AppCompatActivity() {
 
         }, 3000)
     }
+
+
 
     private fun makeFullScreen() {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -58,6 +62,12 @@ class SplashActivity : AppCompatActivity() {
 
     private fun navigateToProfileActivity() {
         val intent = Intent(this, ProfileActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun navigateToOthersProfileActivity() {
+        val intent = Intent(this, OthersProfileActivity::class.java)
         startActivity(intent)
         finish()
     }

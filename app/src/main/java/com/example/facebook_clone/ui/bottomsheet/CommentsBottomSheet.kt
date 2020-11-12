@@ -1,28 +1,25 @@
 package com.example.facebook_clone.ui.bottomsheet
 
-import android.app.Activity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.DisplayMetrics
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.Toast
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.CommentsAdapter
-import com.example.facebook_clone.helper.CommentClickListener
+import com.example.facebook_clone.helper.listener.CommentClickListener
+import com.example.facebook_clone.helper.listener.ReactClickListener
 import com.example.facebook_clone.helper.Utils
-import com.example.facebook_clone.model.post.Comment
-import com.example.facebook_clone.model.post.CommentDocument
+import com.example.facebook_clone.model.post.comment.Comment
+import com.example.facebook_clone.model.post.comment.CommentDocument
+import com.example.facebook_clone.model.post.react.React
+import com.example.facebook_clone.model.post.react.ReactDocument
 import com.example.facebook_clone.viewmodel.PostViewModel
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.comments_bottom_sheet.*
-import okhttp3.internal.Util
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 private const val TAG = "CommentsBottomSheet"
@@ -33,10 +30,13 @@ class CommentsBottomSheet(
     private val commenterId: String,
     private val commenterName: String,
     private val imageUrl: String
-) : BottomSheetDialogFragment(), CommentClickListener{
+) : BottomSheetDialogFragment(), CommentClickListener, ReactClickListener {
     private val postViewModel by viewModel<PostViewModel>()
-    private var commentsAdapter: CommentsAdapter = CommentsAdapter(emptyList(),this)
+    private val auth: FirebaseAuth by inject()
+    private var commentsAdapter: CommentsAdapter =
+        CommentsAdapter(auth, commenterName, imageUrl, emptyList(),emptyList(), this, this)
 
+    private var reactClicked = false
     //private lateinit var comments: List<Comment>
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,7 +49,7 @@ class CommentsBottomSheet(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        updateComments()
+        updateCommentsUI()
 
         commentEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -69,7 +69,6 @@ class CommentsBottomSheet(
         })
 
         sendCommentImageView.setOnClickListener {
-            //
             //ADD COMMENT TO DATABASE VV//
             //SHOW IT IN RECYCLER VIEW VV//
             //NOTIFY THE USER
@@ -96,7 +95,7 @@ class CommentsBottomSheet(
 
     }
 
-    private fun updateComments() {
+    private fun updateCommentsUI() {
         postViewModel.getCommentsByPostId(postPublisherId, postId).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 task.result?.reference?.addSnapshotListener { snapshot, error ->
@@ -105,9 +104,27 @@ class CommentsBottomSheet(
                         return@addSnapshotListener
                     }
 
-                    val commentsList = snapshot?.toObject(CommentDocument::class.java)?.comments
-                    commentsAdapter = CommentsAdapter(commentsList!!,this)
-                    commentsRecyclerView.adapter = commentsAdapter
+                    val commentsResult = snapshot?.toObject(CommentDocument::class.java)?.comments
+                    val reactsResult =   snapshot?.toObject(ReactDocument::class.java)?.reacts
+
+                    val commentsList = commentsResult.orEmpty()
+                    val reactsList = reactsResult.orEmpty()
+
+
+                    commentsAdapter =
+                        CommentsAdapter(
+                            auth,
+                            commenterName,
+                            imageUrl,
+                            commentsList,
+                            reactsList,
+                            this,
+                            this
+                        )
+                    //i don't know why it becomes null ==> almost because comments bottom sheet is not vivsible
+                    if (commentsRecyclerView != null) {
+                        commentsRecyclerView.adapter = commentsAdapter
+                    }
                 }
             } else {
                 Utils.toastMessage(requireContext(), task.exception?.message.toString())
@@ -117,8 +134,51 @@ class CommentsBottomSheet(
     }
 
     override fun onCommentLongClicked(comment: Comment) {
-        val longClickedCommentBottomSheet = LongClickedCommentBottomSheet(comment, postId, postPublisherId)
+        val longClickedCommentBottomSheet =
+            LongClickedCommentBottomSheet(comment, postId, postPublisherId)
         longClickedCommentBottomSheet.show(activity?.supportFragmentManager!!, "signature")
+    }
+
+    override fun onReactButtonLongClicked() {
+
+    }
+
+    //adding react
+    override fun onReactButtonClicked() {
+           // createReact()
+    }
+
+    //removing react
+    override fun onReactButtonClicked(react: React?) {
+           // deleteReact(react!!)
+    }
+
+    private fun createReact(){
+        val react = React(
+            reactorId = auth.currentUser?.uid.toString(),
+            reactorName = commenterName,
+            reactorImageUrl = imageUrl,
+            react = 0
+        )
+
+        postViewModel.createReact(react, postId, postPublisherId)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Utils.toastMessage(requireContext(), "React added")
+                } else {
+                    Utils.toastMessage(requireContext(), task.exception?.message.toString())
+                }
+            }
+    }
+
+    private fun deleteReact(react: React){
+        postViewModel.deleteReact(react, postId, postPublisherId).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Utils.toastMessage(requireContext(), "React deleted")
+            } else {
+                Utils.toastMessage(requireContext(), task.exception?.message.toString())
+            }
+        }
     }
 
 

@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
+import com.example.facebook_clone.OthersProfileActivity
 import com.example.facebook_clone.R
 import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.viewmodel.ProfilePictureActivityViewModel
@@ -32,7 +33,8 @@ class ProfilePictureActivity : AppCompatActivity() {
         setContentView(R.layout.activity_profile_picture)
 
         skipProfilePictureActivity.setOnClickListener {
-            val intent = Intent(this, ProfileActivity::class.java)
+//            val intent = Intent(this, ProfileActivity::class.java)
+            val intent = Intent(this, OthersProfileActivity::class.java)
             startActivity(intent)
             finish()
         }

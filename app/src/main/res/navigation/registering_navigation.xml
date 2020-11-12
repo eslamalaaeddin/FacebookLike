@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/birthdayFragment"
-        android:name="com.example.facebook_clone.ui.fragment.signupflow.BirthdayFragment"
+        android:name="com.example.facebook_clone.ui.fragment.signup.BirthdayFragment"
         android:label="Birthday">
         <action
             android:id="@+id/action_birthdayFragment_to_genderFragment"
@@ -26,7 +26,7 @@
     </fragment>
     <fragment
         android:id="@+id/forgetPasswordFragment"
-        android:name="com.example.facebook_clone.ui.fragment.signinflow.ForgetPasswordFragment"
+        android:name="com.example.facebook_clone.ui.fragment.signin.ForgetPasswordFragment"
         android:label="ForgetPasswordFragment" >
         <action
             android:id="@+id/action_forgetPasswordFragment_to_loginFragment"
@@ -34,7 +34,7 @@
     </fragment>
     <fragment
         android:id="@+id/genderFragment"
-        android:name="com.example.facebook_clone.ui.fragment.signupflow.GenderFragment"
+        android:name="com.example.facebook_clone.ui.fragment.signup.GenderFragment"
         android:label="GenderFragment" >
         <action
             android:id="@+id/action_genderFragment_to_userMailFragment"
@@ -62,7 +62,7 @@
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.example.facebook_clone.ui.fragment.signinflow.LoginFragment"
+        android:name="com.example.facebook_clone.ui.fragment.signin.LoginFragment"
         android:label="LoginFragment" >
         <action
             android:id="@+id/action_loginFragment_to_forgetPasswordFragment"
@@ -86,7 +86,7 @@
     </fragment>
     <fragment
         android:id="@+id/newPasswordFragment"
-        android:name="com.example.facebook_clone.ui.fragment.signupflow.NewPasswordFragment"
+        android:name="com.example.facebook_clone.ui.fragment.signup.NewPasswordFragment"
         android:label="newPasswordFragment">
 
         <argument
@@ -126,7 +126,7 @@
     </fragment>
     <fragment
         android:id="@+id/userNameFragment"
-        android:name="com.example.facebook_clone.ui.fragment.signupflow.UserNameFragment"
+        android:name="com.example.facebook_clone.ui.fragment.signup.UserNameFragment"
         android:label="Name">
         <action
             android:id="@+id/action_userNameFragment_to_birthdayFragment"
@@ -139,7 +139,7 @@
     </fragment>
     <fragment
         android:id="@+id/userMailFragment"
-        android:name="com.example.facebook_clone.ui.fragment.signupflow.UserMailFragment"
+        android:name="com.example.facebook_clone.ui.fragment.signup.UserMailFragment"
         android:label="UserMailFragment" >
         <action
             android:id="@+id/action_userMailFragment_to_newPasswordFragment"

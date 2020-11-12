@@ -12,10 +12,7 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.profile_post_item.view.*
 import android.text.format.DateFormat.format
 import android.util.Log
-import android.widget.Toast
-import com.example.facebook_clone.helper.Callback
-import com.example.facebook_clone.helper.PostListener
-import com.example.facebook_clone.ui.bottomsheet.CommentsBottomSheet
+import com.example.facebook_clone.helper.listener.PostListener
 import com.google.firebase.auth.FirebaseAuth
 
 private const val TAG = "ProfilePostsAdapter"
@@ -26,13 +23,13 @@ class ProfilePostsAdapter(
     private val auth: FirebaseAuth,
     private val options: FirestoreRecyclerOptions<Post>,
     private val postListener: PostListener,
-    private val userName:String,
-    private val userImageUrl:String
+    private val interactorName:String,
+    private val interactorImageUrl:String
 ) :
     FirestoreRecyclerAdapter<Post, ProfilePostsAdapter.ProfilePostsViewHolder>(options) {
     private val picasso = Picasso.get()
     private lateinit var listener: PostListener
-
+    private var reacted = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProfilePostsViewHolder {
         val view =
@@ -50,14 +47,39 @@ class ProfilePostsAdapter(
             listener = postListener
 
             itemView.addCommentTextView.setOnClickListener {
-                val commenterId = auth.currentUser?.uid.toString()
+                val interactorId = auth.currentUser?.uid.toString()
                 val post = getItem(adapterPosition)
                 val postId = post.id.toString()
                 val postPublisherId = post.publisherId.toString()
-                listener.onCommentClicked(postPublisherId,postId, commenterId, userName, userImageUrl)
+                listener.onCommentButtonClicked(postPublisherId,postId, interactorId, interactorName, interactorImageUrl)
             }
-        }
 
+            itemView.addReactTextView.setOnClickListener {
+                val interactorId = auth.currentUser?.uid.toString()
+                val post = getItem(adapterPosition)
+                val postId = post.id.toString()
+                val postPublisherId = post.publisherId.toString()
+                listener.onReactButtonClicked(postPublisherId,postId, interactorId, interactorName, interactorImageUrl, reacted)
+            }
+
+//            itemView.addReactTextView.setOnLongClickListener {
+//                val interactorId = auth.currentUser?.uid.toString()
+//                val post = getItem(adapterPosition)
+//                val postId = post.id.toString()
+//                val postPublisherId = post.publisherId.toString()
+//                listener.onReactButtonClicked(postPublisherId,postId, interactorId, interactorName, interactorImageUrl, reacted)
+//                true
+//            }
+
+            itemView.addShareTextView.setOnClickListener {
+                val interactorId = auth.currentUser?.uid.toString()
+                val post = getItem(adapterPosition)
+                val postId = post.id.toString()
+                val postPublisherId = post.publisherId.toString()
+                listener.onShareButtonClicked(postPublisherId,postId, interactorId, interactorName, interactorImageUrl)
+            }
+
+        }
 
         fun bind(post: Post) {
             picasso.load(post.publisherImageUrl).into(itemView.circleImageView)
@@ -77,10 +99,17 @@ class ProfilePostsAdapter(
             Log.i(TAG, "ISLAM bind: ${post.content}")
             //Content
             itemView.postContentTextView.text = post.content
+
+//            post.reacts?.forEach { react ->
+//                if (react.reactorId == auth.currentUser?.uid.toString() || post.reacts?.isEmpty()!!){
+//                    reacted = true
+//                    itemView.addReactTextView.setTextColor(itemView.context.resources.getColor(R.color.dark_blue))
+//                    itemView.reactImageView.setBackgroundResource(R.drawable.ic_thumb_up)
+//                }else{
+//                    reacted = false
+//                }
+//            }
         }
-
     }
-
-
 
 }

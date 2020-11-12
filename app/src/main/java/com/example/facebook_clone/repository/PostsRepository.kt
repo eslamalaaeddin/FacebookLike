@@ -2,8 +2,10 @@ package com.example.facebook_clone.repository
 
 import com.example.facebook_clone.helper.Utils.POSTS_COLLECTION
 import com.example.facebook_clone.helper.Utils.PROFILE_POSTS_COLLECTION
-import com.example.facebook_clone.model.post.Comment
+import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.Post
+import com.example.facebook_clone.model.post.react.React
+import com.example.facebook_clone.model.post.share.Share
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
@@ -22,13 +24,10 @@ class PostsRepository(
     }
 
     fun getPostsByUserId(userId: String): FirestoreRecyclerOptions<Post> {
-        //1 creating the query
         val query = database.collection(POSTS_COLLECTION).document(userId)
             .collection(PROFILE_POSTS_COLLECTION)
-//            .whereEqualTo("publisherId", userId)
             .orderBy("creationTime", Query.Direction.DESCENDING)
 
-        //2 creating the options
         return FirestoreRecyclerOptions
             .Builder<Post>()
             .setQuery(query, Post::class.java)
@@ -57,5 +56,27 @@ class PostsRepository(
         return database.collection(POSTS_COLLECTION).document(postPublisherId).collection(
             PROFILE_POSTS_COLLECTION).document(postId).update("comments", FieldValue.arrayUnion(comment))
     }
+
+    fun createReact(react: React, postId: String, postPublisherId: String): Task<Void>{
+        return database.collection(POSTS_COLLECTION).document(postPublisherId).collection(
+            PROFILE_POSTS_COLLECTION).document(postId).update("reacts", FieldValue.arrayUnion(react))
+    }
+
+    fun deleteReact(react: React, postId: String, postPublisherId: String): Task<Void>{
+        return database.collection(POSTS_COLLECTION).document(postPublisherId).collection(
+            PROFILE_POSTS_COLLECTION).document(postId).update("reacts", FieldValue.arrayRemove(react))
+    }
+
+    fun getReact(react: React, postId: String, postPublisherId: String): Task<Void>{
+        return database.collection(POSTS_COLLECTION).document(postPublisherId).collection(
+            PROFILE_POSTS_COLLECTION).document(postId).update("reacts", FieldValue.arrayRemove(react))
+    }
+
+    fun createShare(share: Share, postId: String, postPublisherId: String): Task<Void>{
+        return database.collection(POSTS_COLLECTION).document(postPublisherId).collection(
+            PROFILE_POSTS_COLLECTION).document(postId).update("shares", FieldValue.arrayUnion(share))
+    }
+
+
 
 }

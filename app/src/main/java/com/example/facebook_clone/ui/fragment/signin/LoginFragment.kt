@@ -1,4 +1,4 @@
-package com.example.facebook_clone.ui.fragment.signinflow
+package com.example.facebook_clone.ui.fragment.signin
 
 import android.os.Bundle
 import android.view.View

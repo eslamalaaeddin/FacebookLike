@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import com.example.facebook_clone.R
-import com.example.facebook_clone.helper.ImageUrlsListener
+import com.example.facebook_clone.helper.provider.ImageUrlsProvider
 import com.github.chrisbanes.photoview.PhotoView
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.image_viewer_dialog.*
@@ -14,7 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class ImageViewerDialog() : DialogFragment(), ImageUrlsListener {
+class ImageViewerDialog() : DialogFragment(), ImageUrlsProvider {
 
     private val scope = CoroutineScope(Dispatchers.IO)
     private lateinit var imageUrl: String

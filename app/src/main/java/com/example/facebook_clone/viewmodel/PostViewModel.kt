@@ -1,8 +1,10 @@
 package com.example.facebook_clone.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.example.facebook_clone.model.post.Comment
+import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.Post
+import com.example.facebook_clone.model.post.react.React
+import com.example.facebook_clone.model.post.share.Share
 import com.example.facebook_clone.repository.PostsRepository
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.gms.tasks.Task
@@ -32,6 +34,18 @@ class PostViewModel(private val repository: PostsRepository): ViewModel() {
 
     fun updateComment(comment: Comment, postId: String, postPublisherId: String): Task<Void>{
         return repository.updateComment(comment, postId, postPublisherId)
+    }
+
+    fun createReact(react: React, postId: String, postPublisherId: String): Task<Void>{
+        return repository.createReact(react, postId, postPublisherId)
+    }
+
+    fun deleteReact(react: React, postId: String, postPublisherId: String): Task<Void>{
+        return repository.deleteReact(react, postId, postPublisherId)
+    }
+
+    fun createShare(share: Share, postId: String, postPublisherId: String): Task<Void>{
+        return repository.createShare(share, postId, postPublisherId)
     }
 
 }

@@ -9,16 +9,18 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.ProfilePostsAdapter
-import com.example.facebook_clone.helper.Callback
-import com.example.facebook_clone.helper.PostListener
+import com.example.facebook_clone.helper.listener.PostListener
 import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.model.User
+import com.example.facebook_clone.model.post.react.React
+import com.example.facebook_clone.model.post.share.Share
 import com.example.facebook_clone.ui.bottomsheet.CommentsBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.ProfileCoverBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.ProfileImageBottomSheet
 import com.example.facebook_clone.ui.dialog.PostCreatorDialog
 import com.example.facebook_clone.viewmodel.PostViewModel
 import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_profile.*
@@ -31,12 +33,15 @@ private const val REQUEST_CODE_PROFILE_IMAGE = 456
 
 class ProfileActivity() : AppCompatActivity(), PostListener {
     private val profileActivityViewModel by viewModel<ProfileActivityViewModel>()
-    private val postsViewModel by viewModel<PostViewModel>()
+    private val postViewModel by viewModel<PostViewModel>()
     private val auth: FirebaseAuth by inject()
     private var progressDialog: ProgressDialog? = null
     private lateinit var currentUser: User
     private lateinit var picasso: Picasso
     private var profilePostsAdapter: ProfilePostsAdapter? = null
+
+    private var reactClicked = false
+    private var mySingleReact: React? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +49,7 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
 
         picasso = Picasso.get()
 //        profilePostsRecyclerView.isNestedScrollingEnabled = false;
-        val userLiveDate = profileActivityViewModel.getUser(auth.currentUser?.uid.toString())
+        val userLiveDate = profileActivityViewModel.getMe(auth.currentUser?.uid.toString())
         userLiveDate?.observe(this, { user ->
             user?.let {
                 currentUser = user
@@ -84,14 +89,17 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
             val postCreatorDialog = PostCreatorDialog()
             postCreatorDialog.show(supportFragmentManager, "signature")
             postCreatorDialog
-                .setUserNameAndProfileImageUrl(currentUser.name.toString(), currentUser.profileImageUrl.toString())
+                .setUserNameAndProfileImageUrl(
+                    currentUser.name.toString(),
+                    currentUser.profileImageUrl.toString()
+                )
         }
 
     }
 
     override fun onStop() {
         super.onStop()
-        if (profilePostsAdapter != null){
+        if (profilePostsAdapter != null) {
             profilePostsAdapter?.stopListening()
         }
 
@@ -116,11 +124,12 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
 
     }
 
-    private fun updateUserPosts(userId: String){
-        val options = postsViewModel.getPostsByUserId(userId)
+    private fun updateUserPosts(userId: String) {
+        val options = postViewModel.getPostsByUserId(userId)
 
         //3 initializing the adapter
-        profilePostsAdapter = ProfilePostsAdapter(auth,
+        profilePostsAdapter = ProfilePostsAdapter(
+            auth,
             options,
             this,
             currentUser.name.toString(),
@@ -137,7 +146,7 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         //Cover image
-        if (requestCode == REQUEST_CODE_COVER_IMAGE) {
+        if (requestCode == REQUEST_CODE_COVER_IMAGE && resultCode == RESULT_OK) {
             val bitmap = data?.extras?.get("data") as Bitmap
             progressDialog = Utils.showProgressDialog(this, "Please wait...")
             profileActivityViewModel.uploadCoverImageToCloudStorage(bitmap)
@@ -151,7 +160,7 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
                 }
         }
         //Profile image
-        if (requestCode == REQUEST_CODE_PROFILE_IMAGE) {
+        if (requestCode == REQUEST_CODE_PROFILE_IMAGE && resultCode == RESULT_OK) {
             val bitmap = data?.extras?.get("data") as Bitmap
             progressDialog = Utils.showProgressDialog(this, "Please wait...")
             profileActivityViewModel.uploadProfileImageToCloudStorage(bitmap)
@@ -188,13 +197,109 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
             }
     }
 
-    override fun onCommentClicked(postPublisherId:String,postId: String,commenterId: String, commenterName: String, imageUrl: String) {
+    override fun onReactButtonClicked(
+        postPublisherId: String,
+        postId: String,
+        interactorId: String,
+        interactorName: String,
+        interactorImageUrl: String,
+        reacted: Boolean
+    ) {
+        //reactClicked ==> has to be got from backend
+        if (!reactClicked) {
+            val react = React(
+                reactorId = interactorId,
+                reactorName = interactorName,
+                reactorImageUrl = interactorImageUrl,
+                react = 0
+            )
+            mySingleReact = react
+            createReact(react, postId, postPublisherId).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(this, "React added", Toast.LENGTH_SHORT).show()
+                    reactClicked = true
+                  //  mTextView.setTextColor(getResources().getColor(R.color.<name_of_color>));
+                } else {
+                    Utils.toastMessage(this, task.exception?.message.toString())
+                }
+            }
+
+        } else {
+            deleteReact(mySingleReact!!, postId, postPublisherId).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Utils.toastMessage(this, "React deleted")
+                    reactClicked = false
+                } else {
+                    Utils.toastMessage(this, task.exception?.message.toString())
+                }
+            }
+        }
+    }
+
+    override fun onReactButtonLongClicked(
+        postPublisherId: String,
+        postId: String,
+        interactorId: String,
+        interactorName: String,
+        interactorImageUrl: String,
+        reacted: Boolean
+    ) {
+        //SHOW THE DIALOG WITH DIFFERENT REACTIONS
+    }
+
+    override fun onCommentButtonClicked(
+        postPublisherId: String,
+        postId: String,
+        interactorId: String,
+        interactorName: String,
+        interactorImageUrl: String
+    ) {
         //Open comment bottom sheet
-        CommentsBottomSheet(postPublisherId,postId,commenterId, commenterName, imageUrl).apply {
+        CommentsBottomSheet(
+            postPublisherId,
+            postId,
+            interactorId,
+            interactorName,
+            interactorImageUrl
+        ).apply {
             show(supportFragmentManager, tag)
         }
     }
 
+    override fun onShareButtonClicked(
+        postPublisherId: String,
+        postId: String,
+        interactorId: String,
+        interactorName: String,
+        interactorImageUrl: String
+    ) {
+        val share = Share(
+            sharerId = interactorId,
+            sharerName = interactorName,
+            sharerImageUrl = interactorImageUrl,
+        )
+
+        createShare(share, postId, postPublisherId).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Toast.makeText(this, "You shared this post", Toast.LENGTH_SHORT).show()
+            } else {
+                Utils.toastMessage(this, task.exception?.message.toString())
+            }
+        }
+    }
+
+    private fun createReact(react: React, postId: String, postPublisherId: String): Task<Void> {
+        return postViewModel.createReact(react, postId, postPublisherId)
+
+    }
+
+    private fun deleteReact(react: React, postId: String, postPublisherId: String): Task<Void> {
+        return postViewModel.deleteReact(react, postId, postPublisherId)
+    }
+
+    private fun createShare(share: Share, postId: String, postPublisherId: String): Task<Void>{
+        return postViewModel.createShare(share, postId, postPublisherId)
+    }
 
 
 }

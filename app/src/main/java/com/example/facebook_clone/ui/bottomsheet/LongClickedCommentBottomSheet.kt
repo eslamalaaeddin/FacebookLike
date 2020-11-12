@@ -9,7 +9,7 @@ import android.view.Window
 import android.widget.TextView
 import com.example.facebook_clone.R
 import com.example.facebook_clone.helper.Utils
-import com.example.facebook_clone.model.post.Comment
+import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.viewmodel.PostViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.long_clicked_comment_bottom_sheet.*

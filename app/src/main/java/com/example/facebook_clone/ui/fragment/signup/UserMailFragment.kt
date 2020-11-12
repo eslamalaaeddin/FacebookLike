@@ -1,4 +1,4 @@
-package com.example.facebook_clone.ui.fragment.signupflow
+package com.example.facebook_clone.ui.fragment.signup
 
 import android.os.Bundle
 import android.util.Log

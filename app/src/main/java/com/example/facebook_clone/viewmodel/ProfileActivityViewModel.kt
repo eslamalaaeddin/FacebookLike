@@ -9,7 +9,11 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.storage.UploadTask
 
 class ProfileActivityViewModel(private val usersRepository: UsersRepository) : ViewModel() {
-    fun getUser(userId: String): LiveData<User>? {
+    fun getMe(userId: String): LiveData<User>? {
+        return usersRepository.getUser(userId)
+    }
+
+    fun getAnotherUser(userId: String): LiveData<User>? {
         return usersRepository.getUser(userId)
     }
 

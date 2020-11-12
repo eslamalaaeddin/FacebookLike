@@ -52,4 +52,6 @@ class UsersRepository(
         val userId = auth.currentUser?.uid.toString()
         return database.collection(USERS_COLLECTION).document(userId).update("coverImageUrl",photoUrl)
     }
+
+
 }

@@ -1,11 +1,8 @@
-package com.example.facebook_clone.ui.fragment.signupflow
+package com.example.facebook_clone.ui.fragment.signup
 
-import android.media.Image
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.facebook_clone.R

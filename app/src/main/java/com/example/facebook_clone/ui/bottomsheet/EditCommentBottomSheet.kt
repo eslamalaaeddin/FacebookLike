@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.facebook_clone.R
-import com.example.facebook_clone.model.post.Comment
+import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.viewmodel.PostViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.squareup.picasso.Picasso

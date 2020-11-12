@@ -19,7 +19,7 @@
         android:id="@+id/userNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="8dp"
         android:text="أسير الأناناس"
         android:textColor="@color/black"
         android:textSize="18sp"
@@ -30,6 +30,7 @@
         android:id="@+id/postTimeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
         android:text="22h"
         app:layout_constraintBottom_toBottomOf="@+id/circleImageView"
         app:layout_constraintStart_toStartOf="@+id/userNameTextView"
@@ -88,7 +89,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView10" />
+        app:layout_constraintTop_toBottomOf="@+id/reactImageView" />
 
     <TextView
         android:id="@+id/textView9"
@@ -154,14 +155,14 @@
         android:layout_height="wrap_content"
         android:text="Like"
         android:textColor="@color/medium_gray"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView10"
+        app:layout_constraintBottom_toBottomOf="@+id/reactImageView"
         app:layout_constraintEnd_toStartOf="@+id/imageView9"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/imageView10"
-        app:layout_constraintTop_toTopOf="@+id/imageView10" />
+        app:layout_constraintStart_toEndOf="@+id/reactImageView"
+        app:layout_constraintTop_toTopOf="@+id/reactImageView" />
 
     <ImageView
-        android:id="@+id/imageView10"
+        android:id="@+id/reactImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -170,8 +171,8 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view3"
-        app:srcCompat="@drawable/ic_like"
-        app:tint="@color/medium_gray" />
+        app:srcCompat="@drawable/ic_outline_thumb_up_24"
+        app:tint="#939393" />
 
     <TextView
         android:id="@+id/addCommentTextView"
