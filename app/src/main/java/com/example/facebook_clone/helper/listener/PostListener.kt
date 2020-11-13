@@ -36,4 +36,12 @@ interface PostListener{
         interactorName: String,
         interactorImageUrl: String
     )
+
+    fun onReactLayoutClicked(
+        postPublisherId:String,
+        postId:String,
+        interactorId: String,
+        interactorName: String,
+        interactorImageUrl: String
+    )
 }

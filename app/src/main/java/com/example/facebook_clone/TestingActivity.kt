@@ -24,41 +24,41 @@ class TestingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_testing)
 
-        chooseButton.setOnClickListener {
-            val imageIntent = Intent(Intent.ACTION_GET_CONTENT)
-            imageIntent.type = "image/*"
-            startActivityForResult(
-                Intent.createChooser(imageIntent, "Choose an image"),
-                IMAGE_REQUEST_CODE
-            )
-        }
+//        chooseButton.setOnClickListener {
+//            val imageIntent = Intent(Intent.ACTION_GET_CONTENT)
+//            imageIntent.type = "image/*"
+//            startActivityForResult(
+//                Intent.createChooser(imageIntent, "Choose an image"),
+//                IMAGE_REQUEST_CODE
+//            )
+//        }
 
-        uploadButton.setOnClickListener {
-            val storageReference =
-                FirebaseStorage.getInstance().reference.child("DUMMY").child("Dummy1")
-
-            val byteArrayOutputStream = ByteArrayOutputStream()
-
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
-
-            storageReference.putBytes(byteArrayOutputStream.toByteArray()).addOnSuccessListener {
-                Toast.makeText(this, "${it.storage.downloadUrl}", Toast.LENGTH_LONG).show()
-            }
-
-
-        }
+//        uploadButton.setOnClickListener {
+//            val storageReference =
+//                FirebaseStorage.getInstance().reference.child("DUMMY").child("Dummy1")
+//
+//            val byteArrayOutputStream = ByteArrayOutputStream()
+//
+//            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+//
+//            storageReference.putBytes(byteArrayOutputStream.toByteArray()).addOnSuccessListener {
+//                Toast.makeText(this, "${it.storage.downloadUrl}", Toast.LENGTH_LONG).show()
+//            }
+//
+//
+//        }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == IMAGE_REQUEST_CODE && resultCode == RESULT_OK && data != null && data.data != null) {
-            path = data.data!!
-            try {
-                 bitmap = MediaStore.Images.Media.getBitmap(contentResolver, path)
-                imageView.setImageBitmap(bitmap)
-            } catch (ex: IOException) {
-                Log.e(TAG, "onActivityResult: ${ex.message}", ex)
-            }
-        }
-    }
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//        if (requestCode == IMAGE_REQUEST_CODE && resultCode == RESULT_OK && data != null && data.data != null) {
+//            path = data.data!!
+//            try {
+//                 bitmap = MediaStore.Images.Media.getBitmap(contentResolver, path)
+//                imageView.setImageBitmap(bitmap)
+//            } catch (ex: IOException) {
+//                Log.e(TAG, "onActivityResult: ${ex.message}", ex)
+//            }
+//        }
+//    }
 }

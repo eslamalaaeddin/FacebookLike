@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.facebook_clone.R
@@ -12,8 +13,12 @@ import com.example.facebook_clone.adapter.ProfilePostsAdapter
 import com.example.facebook_clone.helper.listener.PostListener
 import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.model.User
+import com.example.facebook_clone.model.post.Post
+import com.example.facebook_clone.model.post.comment.CommentDocument
 import com.example.facebook_clone.model.post.react.React
+import com.example.facebook_clone.model.post.react.ReactDocument
 import com.example.facebook_clone.model.post.share.Share
+import com.example.facebook_clone.model.post.share.ShareDocument
 import com.example.facebook_clone.ui.bottomsheet.CommentsBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.ProfileCoverBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.ProfileImageBottomSheet
@@ -48,15 +53,23 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
         setContentView(R.layout.activity_profile)
 
         picasso = Picasso.get()
-//        profilePostsRecyclerView.isNestedScrollingEnabled = false;
         val userLiveDate = profileActivityViewModel.getMe(auth.currentUser?.uid.toString())
         userLiveDate?.observe(this, { user ->
             user?.let {
                 currentUser = user
                 updateUserInfo(user)
-                updateUserPosts(user.id.toString())
+
+                //nested to get current user
+                val postsLiveData =
+                    postViewModel.getPostsWithoutOptions(auth.currentUser?.uid.toString())
+                postsLiveData.observe(this, { posts ->
+                    updateUserPosts(posts)
+                })
             }
         })
+
+
+
 
         profileImageView.setOnClickListener {
             ProfileImageBottomSheet(currentUser.profileImageUrl.toString()).apply {
@@ -97,14 +110,6 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
 
     }
 
-    override fun onStop() {
-        super.onStop()
-        if (profilePostsAdapter != null) {
-            profilePostsAdapter?.stopListening()
-        }
-
-
-    }
 
     private fun updateUserInfo(user: User) {
         if (user.coverImageUrl != null) {
@@ -124,13 +129,10 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
 
     }
 
-    private fun updateUserPosts(userId: String) {
-        val options = postViewModel.getPostsByUserId(userId)
-
-        //3 initializing the adapter
+    private fun updateUserPosts(posts: List<Post>) {
         profilePostsAdapter = ProfilePostsAdapter(
             auth,
-            options,
+            posts,
             this,
             currentUser.name.toString(),
             currentUser.profileImageUrl.toString()
@@ -139,8 +141,6 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
         //4 attaching the adapter to recycler view
         profilePostsRecyclerView.adapter = profilePostsAdapter
 
-        //5 listening to the adapter
-        profilePostsAdapter?.startListening()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -211,14 +211,14 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
                 reactorId = interactorId,
                 reactorName = interactorName,
                 reactorImageUrl = interactorImageUrl,
-                react = 0
+                react = 1
             )
             mySingleReact = react
             createReact(react, postId, postPublisherId).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Toast.makeText(this, "React added", Toast.LENGTH_SHORT).show()
                     reactClicked = true
-                  //  mTextView.setTextColor(getResources().getColor(R.color.<name_of_color>));
+                    //  mTextView.setTextColor(getResources().getColor(R.color.<name_of_color>));
                 } else {
                     Utils.toastMessage(this, task.exception?.message.toString())
                 }
@@ -288,6 +288,25 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
         }
     }
 
+    override fun onReactLayoutClicked(
+        postPublisherId: String,
+        postId: String,
+        interactorId: String,
+        interactorName: String,
+        interactorImageUrl: String
+    ) {
+        //Open comment bottom sheet
+        CommentsBottomSheet(
+            postPublisherId,
+            postId,
+            interactorId,
+            interactorName,
+            interactorImageUrl
+        ).apply {
+            show(supportFragmentManager, tag)
+        }
+    }
+
     private fun createReact(react: React, postId: String, postPublisherId: String): Task<Void> {
         return postViewModel.createReact(react, postId, postPublisherId)
 
@@ -297,8 +316,37 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
         return postViewModel.deleteReact(react, postId, postPublisherId)
     }
 
-    private fun createShare(share: Share, postId: String, postPublisherId: String): Task<Void>{
+    private fun createShare(share: Share, postId: String, postPublisherId: String): Task<Void> {
         return postViewModel.createShare(share, postId, postPublisherId)
+    }
+
+    private fun updatePostUI(postPublisherId: String, postId: String) {
+        postViewModel.getPostById(postPublisherId, postId).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                task.result?.reference?.addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        Utils.toastMessage(this, error.message.toString())
+                        return@addSnapshotListener
+                    }
+
+                    val commentsResult = snapshot?.toObject(CommentDocument::class.java)?.comments
+                    val reactsResult = snapshot?.toObject(ReactDocument::class.java)?.reacts
+                    val sharesResult = snapshot?.toObject(ShareDocument::class.java)?.shares
+
+                    val commentsList = commentsResult.orEmpty()
+                    val reactsList = reactsResult.orEmpty()
+                    val sharesList = sharesResult.orEmpty()
+
+                    Log.i(TAG, "HHHH updatePostUI: $commentsList")
+                    Log.i(TAG, "HHHH updatePostUI: $reactsList")
+                    Log.i(TAG, "HHHH updatePostUI: $sharesList")
+
+                }
+            } else {
+                Utils.toastMessage(this, task.exception?.message.toString())
+            }
+        }
+
     }
 
 

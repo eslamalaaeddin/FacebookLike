@@ -115,15 +115,6 @@ class PostCreatorDialog : DialogFragment(), AdapterView.OnItemSelectedListener, 
             visibility = postVisibility,
             publisherName = userName,
             publisherImageUrl = userProfileImageUrl,
-            comments = listOf(
-                Comment(
-                "123",
-                "fawzy",
-                "google.com",
-                "GoodPost",
-                "text"
-            )
-        )
         )
     }
 

@@ -42,7 +42,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
             user?.let {
                 //currentUser = user
                 updateUserInfo(user)
-                updateUserPosts(user.id.toString())
+                //updateUserPosts(user.id.toString())
             }
         })
     }
@@ -65,24 +65,24 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
 
     }
 
-    private fun updateUserPosts(userId: String) {
-        val options = postViewModel.getPostsByUserId(userId)
-
-        //3 initializing the adapter
-        profilePostsAdapter = ProfilePostsAdapter(
-            auth,
-            options,
-            this,
-            currentUser.name.toString(),
-            currentUser.profileImageUrl.toString()
-        )
-
-        //4 attaching the adapter to recycler view
-        profilePostsRecyclerView.adapter = profilePostsAdapter
-
-        //5 listening to the adapter
-        profilePostsAdapter?.startListening()
-    }
+//    private fun updateUserPosts(userId: String) {
+//        val options = postViewModel.getPostsByUserId(userId)
+//
+//        //3 initializing the adapter
+//        profilePostsAdapter = ProfilePostsAdapter(
+//            auth,
+//            options,
+//            this,
+//            currentUser.name.toString(),
+//            currentUser.profileImageUrl.toString()
+//        )
+//
+//        //4 attaching the adapter to recycler view
+//        profilePostsRecyclerView.adapter = profilePostsAdapter
+//
+//        //5 listening to the adapter
+//        profilePostsAdapter?.startListening()
+//    }
 
     override fun onReactButtonClicked(
         postPublisherId: String,
@@ -131,5 +131,15 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
         interactorName: String,
         interactorImageUrl: String
     ) {
+    }
+
+    override fun onReactLayoutClicked(
+        postPublisherId: String,
+        postId: String,
+        interactorId: String,
+        interactorName: String,
+        interactorImageUrl: String
+    ) {
+
     }
 }

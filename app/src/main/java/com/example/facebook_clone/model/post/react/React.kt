@@ -9,6 +9,6 @@ data class React
     var reactorId: String? = null,
     var reactorName: String? = null,
     var reactorImageUrl: String? = null,
-    var react: Int? = 0,
+    var react: Int? = null,
     val reactTime: Timestamp = Timestamp(Date())
 )

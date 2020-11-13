@@ -1,5 +1,6 @@
 package com.example.facebook_clone.viewmodel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.Post
@@ -20,12 +21,16 @@ class PostViewModel(private val repository: PostsRepository): ViewModel() {
         return repository.getPostsByUserId(userId)
     }
 
+    fun getPostsWithoutOptions(userId: String) : LiveData<List<Post>> {
+        return repository.getPostsWithoutOptions(userId)
+    }
+
     fun createComment(postId: String,postPublisherId: String, comment: Comment): Task<Void>{
         return repository.createComment(postId,postPublisherId, comment)
     }
 
-    fun getCommentsByPostId(publisherId: String, postId: String): Task<DocumentSnapshot>{
-        return repository.getCommentsByPostId(publisherId, postId)
+    fun getPostById(publisherId: String, postId: String): Task<DocumentSnapshot>{
+        return repository.getPostById(publisherId, postId)
     }
 
     fun deleteComment(comment: Comment, postId: String, postPublisherId: String): Task<Void>{
