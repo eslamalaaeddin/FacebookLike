@@ -6,6 +6,7 @@ import android.util.Log
 import com.example.facebook_clone.adapter.ProfilePostsAdapter
 import com.example.facebook_clone.helper.listener.PostListener
 import com.example.facebook_clone.model.User
+import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.ui.bottomsheet.CommentsBottomSheet
 import com.example.facebook_clone.viewmodel.PostViewModel
 import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
@@ -65,24 +66,6 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
 
     }
 
-//    private fun updateUserPosts(userId: String) {
-//        val options = postViewModel.getPostsByUserId(userId)
-//
-//        //3 initializing the adapter
-//        profilePostsAdapter = ProfilePostsAdapter(
-//            auth,
-//            options,
-//            this,
-//            currentUser.name.toString(),
-//            currentUser.profileImageUrl.toString()
-//        )
-//
-//        //4 attaching the adapter to recycler view
-//        profilePostsRecyclerView.adapter = profilePostsAdapter
-//
-//        //5 listening to the adapter
-//        profilePostsAdapter?.startListening()
-//    }
 
     override fun onReactButtonClicked(
         postPublisherId: String,
@@ -90,7 +73,8 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
-        reacted: Boolean
+        postReacts: List<React>?,
+        postPosition: Int
     ) {
     }
 
@@ -100,7 +84,8 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
-        reacted: Boolean
+        postReacts: List<React>?,
+        postPosition: Int
     ) {
 
     }
@@ -110,7 +95,8 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
         postId: String,
         interactorId: String,
         interactorName: String,
-        interactorImageUrl: String
+        interactorImageUrl: String,
+        postPosition: Int
     ) {
         //Open comment bottom sheet
         CommentsBottomSheet(
@@ -129,7 +115,8 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
         postId: String,
         interactorId: String,
         interactorName: String,
-        interactorImageUrl: String
+        interactorImageUrl: String,
+        postPosition: Int
     ) {
     }
 
@@ -138,7 +125,8 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
         postId: String,
         interactorId: String,
         interactorName: String,
-        interactorImageUrl: String
+        interactorImageUrl: String,
+        postPosition: Int
     ) {
 
     }

@@ -60,6 +60,7 @@ class ProfileImageBottomSheet(private val profileImageUrl:String) : BottomSheetD
         if (requestCode == IMAGE_REQUEST_CODE && resultCode == AppCompatActivity.RESULT_OK && data != null && data.data != null) {
             progressDialog = Utils.showProgressDialog(requireContext(), "Please wait...")
             val imagePath = data.data!!
+
             try {
                 val bitmap = MediaStore.Images.Media.getBitmap(activity?.contentResolver, imagePath)
                 profileActivityViewModel.uploadProfileImageToCloudStorage(bitmap)
@@ -68,6 +69,7 @@ class ProfileImageBottomSheet(private val profileImageUrl:String) : BottomSheetD
                             task.result?.storage?.downloadUrl?.addOnSuccessListener { photoUrl ->
                                 progressDialog?.dismiss()
                                 uploadProfileImageToUserCollection(photoUrl.toString())
+//                                dismiss()
                             }
                         }
                     }
@@ -81,9 +83,7 @@ class ProfileImageBottomSheet(private val profileImageUrl:String) : BottomSheetD
     private fun uploadProfileImageToUserCollection(photoUrl: String) {
         profileActivityViewModel.uploadProfileImageToUserCollection(photoUrl)
             .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Utils.toastMessage(requireContext(), "Image uploaded successfully")
-                } else {
+                if (!task.isSuccessful) {
                     Utils.toastMessage(requireContext(), task.exception?.message.toString())
                 }
             }

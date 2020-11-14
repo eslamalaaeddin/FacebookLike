@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
 
     <LinearLayout
@@ -28,26 +27,26 @@
 
         <TextView
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_marginStart="16dp"
+            android:layout_weight="1"
             android:gravity="center|start"
             android:text="Create post"
             android:textColor="@color/black"
             android:textSize="21sp" />
 
         <Button
+            android:id="@+id/createPostButton"
+            style="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:id="@+id/createPostButton"
-            style="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
             android:layout_marginStart="16dp"
+            android:background="@android:color/transparent"
+            android:enabled="false"
             android:gravity="center"
             android:text="Post"
-            android:enabled="false"
-            android:background="@android:color/transparent"
             android:textColor="@color/dark_blue"
             android:textSize="18sp" />
     </LinearLayout>
@@ -78,8 +77,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:textColor="@color/black"
         android:text="Islam AlaaEddin"
+        android:textColor="@color/black"
         app:layout_constraintStart_toEndOf="@+id/smallProfileImageView"
         app:layout_constraintTop_toTopOf="@+id/smallProfileImageView" />
 
@@ -92,28 +91,28 @@
         app:layout_constraintTop_toBottomOf="@+id/userNameTextView" />
 
     <EditText
-        android:id="@+id/postContentTextView"
+        android:id="@+id/postContentEditText"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
-        android:hint="What is in your mind?"
+        android:background="@null"
         android:gravity="top"
+        android:hint="What is in your mind?"
         android:textColor="@color/black"
         android:textSize="16sp"
-        android:background="@null"
-        app:layout_constraintBottom_toTopOf="@+id/view7"
+        app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/smallProfileImageView" />
 
     <LinearLayout
+        android:id="@+id/addToPostButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="8dp"
-        android:id="@+id/addToPostButton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -156,7 +155,25 @@
         android:background="@color/gray"
         app:layout_constraintBottom_toTopOf="@+id/addToPostButton"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/postAtachmentImageView"
+        android:layout_width="0dp"
+        android:layout_height="360dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/view7"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="@+id/guideline"
+        app:srcCompat="@drawable/cover" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="224dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,6 +1,7 @@
 package com.example.facebook_clone.repository
 
-import android.util.Log
+import android.graphics.Bitmap
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.facebook_clone.helper.Utils.POSTS_COLLECTION
@@ -14,6 +15,9 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.UploadTask
+import java.io.ByteArrayOutputStream
+import java.util.*
 
 private const val TAG = "PostsRepository"
 
@@ -104,6 +108,30 @@ class PostsRepository(
         return database.collection(POSTS_COLLECTION).document(postPublisherId).collection(
             PROFILE_POSTS_COLLECTION
         ).document(postId).update("shares", FieldValue.arrayUnion(share))
+    }
+
+    fun uploadPostImageToCloudStorage(bitmap: Bitmap): UploadTask {
+        val userId = auth.currentUser?.uid.toString()
+
+        val firebaseStorageRef =
+            storage.reference.child(userId).child("Post images").child("${UUID.randomUUID()}.jpeg")
+
+        val byteArrayOutputStream = ByteArrayOutputStream()
+
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+
+        return firebaseStorageRef.putBytes(byteArrayOutputStream.toByteArray())
+
+    }
+
+    fun uploadPostVideoToCloudStorage(videoUri: Uri): UploadTask {
+        val userId = auth.currentUser?.uid.toString()
+
+        val firebaseStorageRef =
+            storage.reference.child(userId).child("Post videos").child("${UUID.randomUUID()}.mp4")
+
+        return firebaseStorageRef.putFile(videoUri)
+
     }
 
 

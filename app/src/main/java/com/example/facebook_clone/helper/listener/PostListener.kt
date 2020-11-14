@@ -1,5 +1,7 @@
 package com.example.facebook_clone.helper.listener
 
+import com.example.facebook_clone.model.post.react.React
+
 
 interface PostListener{
 
@@ -9,7 +11,8 @@ interface PostListener{
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
-        reacted: Boolean
+        postReacts: List<React>?,
+        postPosition: Int
     )
 
     fun onReactButtonLongClicked(
@@ -18,7 +21,8 @@ interface PostListener{
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
-        reacted: Boolean
+        postReacts: List<React>?,
+        postPosition: Int
     )
 
     fun onCommentButtonClicked(
@@ -26,7 +30,8 @@ interface PostListener{
         postId:String,
         interactorId: String,
         interactorName: String,
-        interactorImageUrl: String
+        interactorImageUrl: String,
+        postPosition: Int
     )
 
     fun onShareButtonClicked(
@@ -34,7 +39,8 @@ interface PostListener{
         postId:String,
         interactorId: String,
         interactorName: String,
-        interactorImageUrl: String
+        interactorImageUrl: String,
+        postPosition: Int
     )
 
     fun onReactLayoutClicked(
@@ -42,6 +48,7 @@ interface PostListener{
         postId:String,
         interactorId: String,
         interactorName: String,
-        interactorImageUrl: String
+        interactorImageUrl: String,
+        postPosition: Int
     )
 }

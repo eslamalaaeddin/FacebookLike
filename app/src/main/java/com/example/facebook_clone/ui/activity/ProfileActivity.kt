@@ -1,11 +1,14 @@
 package com.example.facebook_clone.ui.activity
 
+import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.view.Window
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.facebook_clone.R
@@ -29,6 +32,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_profile.*
+import kotlinx.android.synthetic.main.long_clicked_reacts_button.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -42,15 +46,15 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
     private val auth: FirebaseAuth by inject()
     private var progressDialog: ProgressDialog? = null
     private lateinit var currentUser: User
+    private lateinit var currentPosts: List<Post>
     private lateinit var picasso: Picasso
     private var profilePostsAdapter: ProfilePostsAdapter? = null
-
-    private var reactClicked = false
-    private var mySingleReact: React? = null
-
+    private var currentEditedPostPosition: Int = -1
+    private var choice: Int? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
+
 
         picasso = Picasso.get()
         val userLiveDate = profileActivityViewModel.getMe(auth.currentUser?.uid.toString())
@@ -63,7 +67,9 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
                 val postsLiveData =
                     postViewModel.getPostsWithoutOptions(auth.currentUser?.uid.toString())
                 postsLiveData.observe(this, { posts ->
+                    currentPosts = posts
                     updateUserPosts(posts)
+
                 })
             }
         })
@@ -130,23 +136,32 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
     }
 
     private fun updateUserPosts(posts: List<Post>) {
-        profilePostsAdapter = ProfilePostsAdapter(
-            auth,
-            posts,
-            this,
-            currentUser.name.toString(),
-            currentUser.profileImageUrl.toString()
-        )
+        //this check is to prevent recycler view from auto scrolling
+        //so, the ui have to be updated first from client side in addition to updating it from the server side
 
-        //4 attaching the adapter to recycler view
-        profilePostsRecyclerView.adapter = profilePostsAdapter
-
+//        if (profilePostsAdapter == null) {
+            profilePostsAdapter = ProfilePostsAdapter(
+                auth,
+                posts,
+                this,
+                currentUser.name.toString(),
+                currentUser.profileImageUrl.toString()
+            )
+            profilePostsRecyclerView.adapter = profilePostsAdapter
+            //position has to be changed post
+        if (currentEditedPostPosition != -1){
+            profilePostsRecyclerView.scrollToPosition(currentEditedPostPosition)
+        }
+//        }else{
+//            profilePostsAdapter?.notifyDataSetChanged()
+//        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         //Cover image
         if (requestCode == REQUEST_CODE_COVER_IMAGE && resultCode == RESULT_OK) {
+
             val bitmap = data?.extras?.get("data") as Bitmap
             progressDialog = Utils.showProgressDialog(this, "Please wait...")
             profileActivityViewModel.uploadCoverImageToCloudStorage(bitmap)
@@ -161,6 +176,7 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
         }
         //Profile image
         if (requestCode == REQUEST_CODE_PROFILE_IMAGE && resultCode == RESULT_OK) {
+
             val bitmap = data?.extras?.get("data") as Bitmap
             progressDialog = Utils.showProgressDialog(this, "Please wait...")
             profileActivityViewModel.uploadProfileImageToCloudStorage(bitmap)
@@ -203,37 +219,42 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
-        reacted: Boolean
+        postReacts: List<React>?,
+        postPosition: Int
     ) {
-        //reactClicked ==> has to be got from backend
-        if (!reactClicked) {
-            val react = React(
-                reactorId = interactorId,
-                reactorName = interactorName,
-                reactorImageUrl = interactorImageUrl,
-                react = 1
-            )
-            mySingleReact = react
-            createReact(react, postId, postPublisherId).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Toast.makeText(this, "React added", Toast.LENGTH_SHORT).show()
-                    reactClicked = true
-                    //  mTextView.setTextColor(getResources().getColor(R.color.<name_of_color>));
-                } else {
+        currentEditedPostPosition = postPosition
+        if (postReacts?.isEmpty()!!){
+            val myReact = createReact(interactorId, interactorName, interactorImageUrl,1)
+            addReactToDb(myReact, postId, postPublisherId).addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
                     Utils.toastMessage(this, task.exception?.message.toString())
                 }
-            }
+                //profilePostsRecyclerView.scrollToPosition(10)
 
-        } else {
-            deleteReact(mySingleReact!!, postId, postPublisherId).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Utils.toastMessage(this, "React deleted")
-                    reactClicked = false
+            }
+        }
+        else {
+            postReacts.forEach lit@{ react ->
+                if (react.reactorId == interactorId) {
+                    deleteReact(react, postId, postPublisherId).addOnCompleteListener { task ->
+                        if (!task.isSuccessful) {
+                            Utils.toastMessage(this, task.exception?.message.toString())
+                        }
+                        //profilePostsRecyclerView.scrollToPosition(10)
+                    }
+                    return@lit
                 } else {
-                    Utils.toastMessage(this, task.exception?.message.toString())
+                    val myReact = createReact(interactorId, interactorName, interactorImageUrl, 1)
+                    addReactToDb(myReact, postId, postPublisherId).addOnCompleteListener { task ->
+                        if (!task.isSuccessful) {
+                            Utils.toastMessage(this, task.exception?.message.toString())
+                        }
+                        //profilePostsRecyclerView.scrollToPosition(10)
+                    }
                 }
             }
         }
+
     }
 
     override fun onReactButtonLongClicked(
@@ -242,9 +263,27 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
-        reacted: Boolean
+        postReacts: List<React>?,
+        postPosition: Int
     ) {
-        //SHOW THE DIALOG WITH DIFFERENT REACTIONS
+        currentEditedPostPosition = postPosition
+        if (postReacts?.isEmpty()!!){
+           showReactsChooserDialog(interactorId, interactorName, interactorImageUrl, postId, postPublisherId)
+        }
+        else {
+            postReacts.forEach lit@{ react ->
+                if (react.reactorId == interactorId) {
+                    deleteReact(react, postId, postPublisherId).addOnCompleteListener { task ->
+                        if (!task.isSuccessful) {
+                            Utils.toastMessage(this, task.exception?.message.toString())
+                        }
+                    }
+                    return@lit
+                } else {
+                    showReactsChooserDialog(interactorId, interactorName, interactorImageUrl, postId, postPublisherId)
+                }
+            }
+        }
     }
 
     override fun onCommentButtonClicked(
@@ -252,8 +291,10 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
         postId: String,
         interactorId: String,
         interactorName: String,
-        interactorImageUrl: String
+        interactorImageUrl: String,
+        postPosition: Int
     ) {
+        currentEditedPostPosition = postPosition
         //Open comment bottom sheet
         CommentsBottomSheet(
             postPublisherId,
@@ -271,8 +312,10 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
         postId: String,
         interactorId: String,
         interactorName: String,
-        interactorImageUrl: String
+        interactorImageUrl: String,
+        postPosition: Int
     ) {
+        currentEditedPostPosition = postPosition
         val share = Share(
             sharerId = interactorId,
             sharerName = interactorName,
@@ -293,8 +336,10 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
         postId: String,
         interactorId: String,
         interactorName: String,
-        interactorImageUrl: String
+        interactorImageUrl: String,
+        postPosition: Int
     ) {
+        currentEditedPostPosition = postPosition
         //Open comment bottom sheet
         CommentsBottomSheet(
             postPublisherId,
@@ -307,10 +352,20 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
         }
     }
 
-    private fun createReact(react: React, postId: String, postPublisherId: String): Task<Void> {
+    private fun addReactToDb(react: React, postId: String, postPublisherId: String): Task<Void> {
         return postViewModel.createReact(react, postId, postPublisherId)
 
     }
+
+    private fun createReact(interactorId: String, interactorName: String, interactorImageUrl: String,reactType: Int): React{
+        return React(
+            reactorId = interactorId,
+            reactorName = interactorName,
+            reactorImageUrl = interactorImageUrl,
+            react = reactType
+        )
+    }
+
 
     private fun deleteReact(react: React, postId: String, postPublisherId: String): Task<Void> {
         return postViewModel.deleteReact(react, postId, postPublisherId)
@@ -346,6 +401,106 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
                 Utils.toastMessage(this, task.exception?.message.toString())
             }
         }
+
+    }
+
+    private fun showReactsChooserDialog(interactorId: String, interactorName: String, interactorImageUrl: String, postId: String, postPublisherId: String) {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.long_clicked_reacts_button)
+
+        dialog.loveReactButton.setOnClickListener {
+            choice = 2
+            val react =  React(
+                reactorId = interactorId,
+                reactorName = interactorName,
+                reactorImageUrl = interactorImageUrl,
+                react = choice
+            )
+            addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Utils.toastMessage(this, task.exception?.message.toString())
+                }
+            }
+            dialog.dismiss()
+        }
+        dialog.careReactButton.setOnClickListener {
+            choice = 3
+            val react =  React(
+                reactorId = interactorId,
+                reactorName = interactorName,
+                reactorImageUrl = interactorImageUrl,
+                react = choice
+            )
+            addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Utils.toastMessage(this, task.exception?.message.toString())
+                }
+            }
+            dialog.dismiss()
+        }
+        dialog.hahaReactButton.setOnClickListener {
+            choice = 4
+            val react =  React(
+                reactorId = interactorId,
+                reactorName = interactorName,
+                reactorImageUrl = interactorImageUrl,
+                react = choice
+            )
+            addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Utils.toastMessage(this, task.exception?.message.toString())
+                }
+            }
+            dialog.dismiss()
+        }
+        dialog.wowReactButton.setOnClickListener {
+            choice = 5
+            val react =  React(
+                reactorId = interactorId,
+                reactorName = interactorName,
+                reactorImageUrl = interactorImageUrl,
+                react = choice
+            )
+            addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Utils.toastMessage(this, task.exception?.message.toString())
+                }
+            }
+            dialog.dismiss()
+        }
+        dialog.sadReactButton.setOnClickListener {
+            choice = 6
+            val react =  React(
+                reactorId = interactorId,
+                reactorName = interactorName,
+                reactorImageUrl = interactorImageUrl,
+                react = choice
+            )
+            addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Utils.toastMessage(this, task.exception?.message.toString())
+                }
+            }
+            dialog.dismiss()
+        }
+        dialog.angryReactButton.setOnClickListener {
+            choice = 7
+            val react =  React(
+                reactorId = interactorId,
+                reactorName = interactorName,
+                reactorImageUrl = interactorImageUrl,
+                react = choice
+            )
+            addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Utils.toastMessage(this, task.exception?.message.toString())
+                }
+            }
+            dialog.dismiss()
+        }
+        dialog.show()
 
     }
 

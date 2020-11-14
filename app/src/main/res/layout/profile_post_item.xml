@@ -47,11 +47,12 @@
         app:srcCompat="@drawable/ic_public_visibility" />
 
     <TextView
-        android:id="@+id/postContentTextView"
+        android:id="@+id/postContentEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
+        android:textSize="16sp"
         android:layout_marginEnd="8dp"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
@@ -69,7 +70,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/reactImageView" />
+        app:layout_constraintTop_toBottomOf="@+id/reactImageViewGrey" />
 
 
 
@@ -84,7 +85,7 @@
         app:layout_constraintStart_toEndOf="@+id/addCommentTextView"
         app:layout_constraintTop_toTopOf="@+id/addCommentTextView"
         app:srcCompat="@drawable/ic_share"
-        app:tint="@color/medium_gray" />
+         />
 
     <TextView
         android:id="@+id/addShareTextView"
@@ -92,7 +93,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:text="Share"
-        android:textColor="@color/medium_gray"
+        android:textColor="@color/gray"
         app:layout_constraintBottom_toBottomOf="@+id/imageView8"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -104,32 +105,45 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Like"
-        android:textColor="@color/medium_gray"
-        app:layout_constraintBottom_toBottomOf="@+id/reactImageView"
+        android:textColor="@color/gray"
+        app:layout_constraintBottom_toBottomOf="@+id/reactImageViewGrey"
         app:layout_constraintEnd_toStartOf="@+id/imageView9"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/reactImageView"
-        app:layout_constraintTop_toTopOf="@+id/reactImageView" />
+        app:layout_constraintStart_toEndOf="@+id/reactImageViewGrey"
+        app:layout_constraintTop_toTopOf="@+id/reactImageViewGrey" />
 
     <ImageView
-        android:id="@+id/reactImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/reactImageViewGrey"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="4dp"
         app:layout_constraintEnd_toStartOf="@+id/addReactTextView"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view3"
-        app:srcCompat="@drawable/ic_outline_thumb_up_24"
-        app:tint="#939393" />
+        app:srcCompat="@drawable/ic_thumb_up_grey"
+         />
+
+    <ImageView
+        android:id="@+id/reactImageViewBlue"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toStartOf="@+id/addReactTextView"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view3"
+        />
 
     <TextView
         android:id="@+id/addCommentTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Comment"
-        android:textColor="@color/medium_gray"
+        android:textColor="@color/gray"
         app:layout_constraintBottom_toBottomOf="@+id/imageView9"
         app:layout_constraintEnd_toStartOf="@+id/imageView8"
         app:layout_constraintHorizontal_bias="0.5"
@@ -147,7 +161,7 @@
         app:layout_constraintStart_toEndOf="@+id/addReactTextView"
         app:layout_constraintTop_toTopOf="@+id/addReactTextView"
         app:srcCompat="@drawable/ic_comment"
-        app:tint="@color/medium_gray" />
+         />
 
     <View
         android:id="@+id/view3"
@@ -160,16 +174,16 @@
         app:layout_constraintTop_toBottomOf="@+id/reactsLayout" />
 
     <ImageView
-        android:id="@+id/mediaContentImageView"
+        android:id="@+id/attachmentImageView"
         android:layout_width="0dp"
         android:layout_height="256dp"
         android:layout_marginTop="4dp"
         android:scaleType="fitXY"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/postContentTextView"
-        app:srcCompat="@drawable/sarhan" />
+        app:layout_constraintTop_toBottomOf="@+id/postContentEditText"
+        app:srcCompat="@drawable/mansour" />
 
     <LinearLayout
         android:id="@+id/reactsLayout"
@@ -181,7 +195,7 @@
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mediaContentImageView">
+        app:layout_constraintTop_toBottomOf="@+id/attachmentImageView">
 
 
         <ImageView
@@ -191,7 +205,7 @@
             android:layout_gravity="center"
             android:visibility="invisible"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/mediaContentImageView"
+            app:layout_constraintTop_toBottomOf="@+id/attachmentImageView"
             app:srcCompat="@drawable/ic_like_react" />
 
         <ImageView
@@ -280,7 +294,7 @@
             android:layout_marginEnd="4dp"
             android:textSize="12sp"
             app:layout_constraintEnd_toStartOf="@+id/sharesCountTextView"
-            app:layout_constraintTop_toBottomOf="@+id/postContentTextView"
+            app:layout_constraintTop_toBottomOf="@+id/postContentEditText"
             tools:text="600 Comments" />
 
         <TextView
@@ -297,6 +311,16 @@
 
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/playButtonImageView"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        app:layout_constraintBottom_toBottomOf="@+id/attachmentImageView"
+        app:layout_constraintEnd_toEndOf="@+id/attachmentImageView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/attachmentImageView"
+        app:srcCompat="@drawable/ic_baseline_play_arrow_24"
+        tools:visibility="gone" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

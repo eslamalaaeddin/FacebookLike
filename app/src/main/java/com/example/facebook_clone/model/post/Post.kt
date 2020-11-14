@@ -9,8 +9,8 @@ import java.util.*
 data class Post(
     val id: String? = UUID.randomUUID().toString(),
     var content: String? = null,
-    var mediaContent: String? = null,//it will hold urls for media as images, videos, and docs
-    var mediaType: String? = null,//video, or image.....
+    var attachmentUrl: String? = null,//it will hold urls for media as images, videos, and docs
+    var attachmentType: String? = null,//video, or image.....
     var comments: List<Comment>? = null,
     var reacts: List<React>? = null,
     var shares: List<Share>? = null,

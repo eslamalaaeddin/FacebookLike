@@ -33,7 +33,7 @@ class UsersRepository(
         val userId = auth.currentUser?.uid.toString()
 
         val firebaseStorageRef =
-            storage.reference.child("Profile images").child(profileOrCover).child("${userId}.jpeg")
+            storage.reference.child(userId).child("Profile images").child(profileOrCover).child("${userId}.jpeg")
 
         val byteArrayOutputStream = ByteArrayOutputStream()
 
