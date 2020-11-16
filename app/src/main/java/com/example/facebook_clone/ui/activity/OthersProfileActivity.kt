@@ -10,11 +10,13 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.example.facebook_clone.R
+import com.example.facebook_clone.adapter.FriendsAdapter
 import com.example.facebook_clone.adapter.ProfilePostsAdapter
 import com.example.facebook_clone.helper.BaseApplication
 import com.example.facebook_clone.helper.listener.PostListener
 import com.example.facebook_clone.model.notification.Notification
 import com.example.facebook_clone.model.notification.Notifier
+import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.model.user.friendrequest.FriendRequest
@@ -25,6 +27,9 @@ import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_others_profile.*
+import kotlinx.android.synthetic.main.activity_others_profile.friendsRecyclerView
+import kotlinx.android.synthetic.main.activity_others_profile.profilePostsRecyclerView
+import kotlinx.android.synthetic.main.activity_profile.*
 import kotlinx.android.synthetic.main.activity_profile.bioTextView
 import kotlinx.android.synthetic.main.activity_profile.coverImageView
 import kotlinx.android.synthetic.main.activity_profile.joinDateTextView
@@ -42,10 +47,13 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
     private val postViewModel by viewModel<PostViewModel>()
     private val auth: FirebaseAuth by inject()
     private lateinit var currentUser: User
+    private lateinit var userIAmViewing: User
     private var currentFriendRequest: FriendRequest? = null
     private lateinit var userIdIAmViewing: String
     private lateinit var picasso: Picasso
+    private var currentEditedPostPosition: Int = -1
     private var profilePostsAdapter: ProfilePostsAdapter? = null
+    private lateinit var friendsAdapter: FriendsAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_others_profile)
@@ -57,28 +65,41 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
         myLiveData?.observe(this, { user ->
             user?.let {
                 currentUser = user
+                Log.i(TAG, "FAWZY onCreate: $currentUser")
                 //Check for friend requests
                 if (!currentUser.friendRequests.isNullOrEmpty()) {
                     currentUser.friendRequests?.forEach { friendRequest ->
-                        if (friendRequest.fromId == currentUser.id){
+                        if (friendRequest.fromId == currentUser.id) {
                             addFriendButton.visibility = View.INVISIBLE
                             addFriendButton.isEnabled = false
                             cancelRequestButton.isEnabled = true
                             cancelRequestButton.visibility = View.VISIBLE
                             currentFriendRequest = friendRequest
-                        }else{
+                        } else {
                             addFriendButton.isEnabled = true
                             cancelRequestButton.isEnabled = false
                             addFriendButton.visibility = View.VISIBLE
                             cancelRequestButton.visibility = View.INVISIBLE
                         }
                     }
-                }else{
-                    addFriendButton.isEnabled = true
-                    cancelRequestButton.isEnabled = false
-                    addFriendButton.visibility = View.VISIBLE
-                    cancelRequestButton.visibility = View.INVISIBLE
                 }
+
+//                if there is a friendship
+                else if (currentUser.friends != null) {
+                currentUser.friends?.forEach { friend ->
+                    if (friend.id == userIdIAmViewing) {
+                        addFriendButton.isEnabled = false
+                        cancelRequestButton.isEnabled = false
+                        addFriendButton.visibility = View.INVISIBLE
+                        cancelRequestButton.visibility = View.INVISIBLE
+                    }
+                }
+            } else {
+                addFriendButton.isEnabled = true
+                cancelRequestButton.isEnabled = false
+                addFriendButton.visibility = View.VISIBLE
+                cancelRequestButton.visibility = View.INVISIBLE
+            }
             }
         })
 
@@ -86,11 +107,21 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
         val userLiveDate = profileActivityViewModel.getAnotherUser(userIdIAmViewing)
         userLiveDate?.observe(this, { user ->
             user?.let {
-                //currentUser = user
+                userIAmViewing = user
                 updateUserInfo(user)
-                //updateUserPosts(user.id.toString())
+                if (!user.friends.isNullOrEmpty()){
+                    friendsAdapter = FriendsAdapter(user.friends!!)
+                    friendsRecyclerView.adapter = friendsAdapter
+                }
+                val postsLiveData =
+                    postViewModel.getPostsWithoutOptions(userIdIAmViewing)
+                postsLiveData.observe(this, { posts ->
+                    updateUserPosts(posts)
+                })
             }
         })
+
+
 
 
 
@@ -143,8 +174,23 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
                 //Update ui
                 othersProfileActivityViewModel.addFriendRequestToMyDocument(friendRequest).addOnCompleteListener{task2 ->
                     if (task2.isSuccessful){
-                        //fireFriendRequestNotification()
-                        Toast.makeText(this, "Friend request sent successfully", Toast.LENGTH_SHORT).show()
+                        val notifier = Notifier(
+                            id = currentUser.id,
+                            imageUrl = currentUser.profileImageUrl,
+                            name = currentUser.name
+                        )
+                        val notification = Notification("friendRequest", notifier)
+
+                        othersProfileActivityViewModel
+                            .addNotificationToNotificationsCollection(notification,userIdIAmViewing)
+                            .addOnCompleteListener { task3 ->
+                            if (task3.isSuccessful){
+                                Toast.makeText(this, "Friend request sent successfully", Toast.LENGTH_SHORT).show()
+                                //fireFriendRequestNotification(notification)
+                            }else{
+                                Toast.makeText(this, task3.exception?.message, Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     }else{
                         Toast.makeText(this, task2.exception?.message, Toast.LENGTH_SHORT).show()
                     }
@@ -155,9 +201,8 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
         }
     }
 
-    private fun fireFriendRequestNotification(){
+    private fun fireFriendRequestNotification(notification: Notification){
         var bitmap : Bitmap? = null
-        var notification : Notification? = null
         Glide.with(this)
             .asBitmap()
             .load(currentUser.profileImageUrl)
@@ -165,12 +210,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
             .into(object : SimpleTarget<Bitmap>() {
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                     bitmap = resource
-                    val notifier = Notifier(
-                        id = "xVfyUJlnN9RQpBwvN5KZuYdQKcl2",
-                        bitmap,
-                        name = "Islam AlaaEddin"
-                    )
-                    notification = Notification("comment", notifier)
+                    notification.notifier?.imageBitmap = bitmap
                 }
             })
 
@@ -179,8 +219,26 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
 //        }
     }
 
-    private fun removeFriendRequestNotification(){
+    private fun updateUserPosts(posts: List<Post>) {
+        //this check is to prevent recycler view from auto scrolling
+        //so, the ui have to be updated first from client side in addition to updating it from the server side
 
+//        if (profilePostsAdapter == null) {
+        profilePostsAdapter = ProfilePostsAdapter(
+            auth,
+            posts,
+            this,
+            currentUser.name.toString(),
+            currentUser.profileImageUrl.toString()
+        )
+        profilePostsRecyclerView.adapter = profilePostsAdapter
+        //position has to be changed post
+        if (currentEditedPostPosition != -1){
+            profilePostsRecyclerView.scrollToPosition(currentEditedPostPosition)
+        }
+//        }else{
+//            profilePostsAdapter?.notifyDataSetChanged()
+//        }
     }
 
     override fun onReactButtonClicked(

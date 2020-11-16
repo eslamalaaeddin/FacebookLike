@@ -48,6 +48,8 @@ val searchActivityViewModelModule = module { viewModel { SearchActivityViewModel
 
 val othersProfileActivityViewModelModule = module { viewModel { OthersProfileActivityViewModel(get()) } }
 
+val notificationsFragmentViewModelModule = module { viewModel { NotificationsFragmentViewModel(get()) } }
+
 /////////////////////////////////////////////////REPOSITORIES///////////////////////////////////////
 
 val usersRepositoryModule = module { single { UsersRepository(get(),get(), get()) } }

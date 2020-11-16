@@ -1,16 +1,23 @@
 package com.example.facebook_clone.repository
 
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.facebook_clone.helper.Utils
+import com.example.facebook_clone.helper.Utils.MY_NOTIFICATIONS_COLLECTION
 import com.example.facebook_clone.helper.Utils.USERS_COLLECTION
 import com.example.facebook_clone.livedata.UserLiveData
+import com.example.facebook_clone.model.notification.Notification
+import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.user.User
+import com.example.facebook_clone.model.user.friend.Friend
 import com.example.facebook_clone.model.user.friendrequest.FriendRequest
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import java.io.ByteArrayOutputStream
@@ -97,6 +104,48 @@ class UsersRepository(
     fun removeFriendRequestFromHisDocument(friendRequest: FriendRequest): Task<Void> {
         return database.collection(USERS_COLLECTION).document(friendRequest.toId.toString())
             .update("friendRequests", FieldValue.arrayRemove(friendRequest))
+    }
+
+    fun addNotificationToNotificationsCollection(notification: Notification, userToBeNotifiedId: String): Task<Void>{
+        return database.collection(Utils.NOTIFICATIONS_COLLECTION).document(userToBeNotifiedId)
+            .collection(Utils.MY_NOTIFICATIONS_COLLECTION).document(notification.id.toString()).set(notification)
+    }
+
+    fun getNotificationsLiveData(userId: String): LiveData<List<Notification>>{
+        var notifications: MutableList<Notification>?
+        val liveData = MutableLiveData<List<Notification>>()
+        database.collection(Utils.NOTIFICATIONS_COLLECTION).document(userId)
+            .collection(Utils.MY_NOTIFICATIONS_COLLECTION)
+            .orderBy("notificationTime", Query.Direction.DESCENDING)
+            .addSnapshotListener { notificationsSnapshot, error ->
+                if (error != null) {
+                    return@addSnapshotListener
+                } else {
+                    notifications = notificationsSnapshot?.toObjects(Notification::class.java)
+                    liveData.postValue(notifications)
+
+                }
+            }
+        return liveData
+    }
+
+    fun createFriendshipBetweenMeAndHim( meAsFriend: Friend, himAsFriend: Friend): Task<Void>{
+
+        return database.collection(USERS_COLLECTION).document(meAsFriend.id.toString()).
+        update("friends", FieldValue.arrayUnion(himAsFriend)).addOnCompleteListener {
+            if (it.isSuccessful){
+                database.collection(USERS_COLLECTION).document(himAsFriend.id.toString()).
+                update("friends", FieldValue.arrayUnion(meAsFriend))
+            }
+        }
+    }
+
+    fun deleteNotificationById(notificationId: String): Task<Void>{
+        return  database
+            .collection(Utils.NOTIFICATIONS_COLLECTION)
+            .document(auth.currentUser?.uid.toString())
+            .collection(MY_NOTIFICATIONS_COLLECTION)
+            .document(notificationId).delete()
     }
 
 

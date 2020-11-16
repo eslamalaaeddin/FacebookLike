@@ -11,6 +11,7 @@ import android.view.Window
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.facebook_clone.R
+import com.example.facebook_clone.adapter.FriendsAdapter
 import com.example.facebook_clone.adapter.ProfilePostsAdapter
 import com.example.facebook_clone.helper.listener.PostListener
 import com.example.facebook_clone.helper.Utils
@@ -30,7 +31,17 @@ import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.activity_others_profile.*
 import kotlinx.android.synthetic.main.activity_profile.*
+import kotlinx.android.synthetic.main.activity_profile.bioTextView
+import kotlinx.android.synthetic.main.activity_profile.coverImageView
+import kotlinx.android.synthetic.main.activity_profile.friendsRecyclerView
+import kotlinx.android.synthetic.main.activity_profile.joinDateTextView
+import kotlinx.android.synthetic.main.activity_profile.profileImageView
+import kotlinx.android.synthetic.main.activity_profile.profilePostsRecyclerView
+import kotlinx.android.synthetic.main.activity_profile.smallProfileImageView
+import kotlinx.android.synthetic.main.activity_profile.userNameTextView
+import kotlinx.android.synthetic.main.activity_profile.whatIsInYourMindTextView
 import kotlinx.android.synthetic.main.long_clicked_reacts_button.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -48,6 +59,7 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
     private lateinit var currentPosts: List<Post>
     private lateinit var picasso: Picasso
     private var profilePostsAdapter: ProfilePostsAdapter? = null
+    private lateinit var friendsAdapter: FriendsAdapter
     private var currentEditedPostPosition: Int = -1
     private var choice: Int? = null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,12 +73,15 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
             user?.let {
                 currentUser = user
                 updateUserInfo(user)
-
+                if (!user.friends.isNullOrEmpty()){
+                    friendsAdapter = FriendsAdapter(user.friends!!)
+                    friendsRecyclerView.adapter = friendsAdapter
+                }
                 //nested to get current user
                 val postsLiveData =
                     postViewModel.getPostsWithoutOptions(auth.currentUser?.uid.toString())
                 postsLiveData.observe(this, { posts ->
-                    currentPosts = posts
+                    //currentPosts = posts
                     updateUserPosts(posts)
 
                 })

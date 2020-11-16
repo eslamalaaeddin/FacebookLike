@@ -1,6 +1,7 @@
 package com.example.facebook_clone.model.notification
 
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.Exclude
 import java.util.*
 
 data class Notification(

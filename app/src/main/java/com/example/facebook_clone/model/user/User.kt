@@ -1,5 +1,6 @@
 package com.example.facebook_clone.model.user
 
+import com.example.facebook_clone.model.user.friend.Friend
 import com.example.facebook_clone.model.user.friendrequest.FriendRequest
 import com.example.facebook_clone.model.user.search.Search
 import com.google.firebase.Timestamp
@@ -12,18 +13,17 @@ data class User(
     var birthDay: String? = null,
     var profileImageUrl: String? = null,
     var coverImageUrl: String? = null,
-    var postsIds: List<String>? = null,//list of
-    var friendsIds: List<String>? = null,//list of
-    var followersIds: List<String>? = null,//list of
-    var followingIds: List<String>? = null,//list of
-    var groupsIds: List<String>? = null,//list of
-    var favPagesIds: List<String>? = null,//list of
+    var postsIds: List<String>? = null,
+    var friends: List<Friend>? = null,
+    var followersIds: List<String>? = null,
+    var followingIds: List<String>? = null,
+    var groupsIds: List<String>? = null,
+    var favPagesIds: List<String>? = null,
     var friendRequests: List<FriendRequest>? = null,
     var biography: String? = null,
-    var blockedIds: List<String>? = null,//list of
-    var notificationsIds: List<String>? = null,//list of
-    var statusesIds: List<String>? = null,//list of
+    var blockedIds: List<String>? = null,
+    var notificationsIds: List<String>? = null,
+    var statusesIds: List<String>? = null,
     var searches: List<Search>? = null,
     val creationTime: Timestamp = Timestamp(Date())
-
 )

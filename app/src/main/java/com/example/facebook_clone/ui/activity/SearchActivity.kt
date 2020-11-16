@@ -8,6 +8,7 @@ import android.text.TextWatcher
 import android.view.View
 import androidx.lifecycle.LiveData
 import com.example.facebook_clone.R
+import com.example.facebook_clone.adapter.RecentSearchesAdapter
 import com.example.facebook_clone.adapter.SearchedUsersAdapter
 import com.example.facebook_clone.helper.listener.SearchedItemListener
 import com.example.facebook_clone.model.user.User
@@ -21,6 +22,8 @@ class SearchActivity : AppCompatActivity(), SearchedItemListener {
     private var usersSearchResultLiveData: LiveData<List<User>>? = null
     private val searchActivityViewModel by viewModel<SearchActivityViewModel>()
     private lateinit var searchedUsersAdapter: SearchedUsersAdapter
+    //private lateinit var recentSearchesAdapter: RecentSearchesAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
@@ -53,6 +56,8 @@ class SearchActivity : AppCompatActivity(), SearchedItemListener {
                     }
                 } else {
                     recentSearchRecyclerView.visibility = View.VISIBLE
+                    //recentSearchesAdapter = RecentSearchesAdapter()
+                   // recentSearchRecyclerView.adapter = recentSearchesAdapter
                     usersSearchResultRecyclerView.visibility = View.GONE
                     pagesSearchResultRecyclerView.visibility = View.GONE
                     groupsSearchResultRecyclerView.visibility = View.GONE
@@ -76,4 +81,5 @@ class SearchActivity : AppCompatActivity(), SearchedItemListener {
     override fun onBackPressed() {
         finish()
     }
+
 }

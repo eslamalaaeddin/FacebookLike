@@ -48,7 +48,8 @@ class BaseApplication : Application() {
                     postsRepositoryModule,
                     postCreatorViewModelModule,
                     searchActivityViewModelModule,
-                    othersProfileActivityViewModelModule
+                    othersProfileActivityViewModelModule,
+                    notificationsFragmentViewModelModule
                 )
             )
         }

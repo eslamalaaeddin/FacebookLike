@@ -136,7 +136,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:text="19 mutual"
+            tools:text="19 mutual"
             app:layout_constraintStart_toStartOf="@+id/textView3"
             app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
@@ -145,7 +145,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:text="friends"
+            tools:text="friends"
             app:layout_constraintBottom_toBottomOf="@+id/friendsCountTextView"
             app:layout_constraintStart_toEndOf="@+id/friendsCountTextView"
             app:layout_constraintTop_toTopOf="@+id/friendsCountTextView" />
@@ -161,11 +161,13 @@
             app:layout_constraintTop_toTopOf="@+id/textView3" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
+            android:id="@+id/friendsRecyclerView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="4dp"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="3"
             android:layout_marginEnd="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -182,7 +184,7 @@
             android:textAllCaps="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/recyclerView" />
+            app:layout_constraintTop_toBottomOf="@+id/friendsRecyclerView" />
 
         <View
             android:id="@+id/view"
@@ -259,7 +261,7 @@
             android:id="@+id/bioTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Islam"
+            android:text="Yoyo"
             app:layout_constraintEnd_toEndOf="@+id/userNameTextView"
             app:layout_constraintStart_toStartOf="@+id/userNameTextView"
             app:layout_constraintTop_toBottomOf="@+id/userNameTextView" />
