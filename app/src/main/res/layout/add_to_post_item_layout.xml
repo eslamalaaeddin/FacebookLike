@@ -7,7 +7,7 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/addToPostIcon"
+        android:id="@+id/addToPostImage"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_marginStart="8dp"
@@ -20,11 +20,11 @@
         android:id="@+id/additionDescriptionTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="36dp"
         android:text="Photo"
         android:textColor="@color/black"
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@+id/addToPostIcon"
-        app:layout_constraintStart_toEndOf="@+id/addToPostIcon"
-        app:layout_constraintTop_toTopOf="@+id/addToPostIcon" />
+        app:layout_constraintBottom_toBottomOf="@+id/addToPostImage"
+        app:layout_constraintStart_toEndOf="@+id/addToPostImage"
+        app:layout_constraintTop_toTopOf="@+id/addToPostImage" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,14 +8,13 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.Window
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.ProfilePostsAdapter
 import com.example.facebook_clone.helper.listener.PostListener
 import com.example.facebook_clone.helper.Utils
-import com.example.facebook_clone.model.User
+import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.comment.CommentDocument
 import com.example.facebook_clone.model.post.react.React

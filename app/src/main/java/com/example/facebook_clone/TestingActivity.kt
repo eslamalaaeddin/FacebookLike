@@ -1,64 +1,50 @@
 package com.example.facebook_clone
 
-import android.content.Intent
 import android.graphics.Bitmap
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.MediaStore
-import android.util.Log
-import android.widget.Toast
-import com.google.firebase.storage.FirebaseStorage
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
+import com.example.facebook_clone.helper.BaseApplication
+import com.example.facebook_clone.model.notification.Notification
+import com.example.facebook_clone.model.notification.Notifier
+import com.example.facebook_clone.ui.activity.MainActivity
 import kotlinx.android.synthetic.main.activity_testing.*
-import java.io.ByteArrayOutputStream
-import java.io.IOException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 private const val IMAGE_REQUEST_CODE = 159
 private const val TAG = "TestingActivity"
 
 class TestingActivity : AppCompatActivity() {
-    private lateinit var path: Uri
     private lateinit var bitmap: Bitmap
-
+    private lateinit var notification: Notification
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_testing)
+        val imageUrl = "https://firebasestorage.googleapis.com/v0/b/facebook-clone-5e8ed.appspot.com/o/xVfyUJlnN9RQpBwvN5KZuYdQKcl2%2FProfile%20images%2Fprofile%2FxVfyUJlnN9RQpBwvN5KZuYdQKcl2.jpeg?alt=media&token=2aa3c4d4-9bff-408f-b996-dd13551d6490"
 
-//        chooseButton.setOnClickListener {
-//            val imageIntent = Intent(Intent.ACTION_GET_CONTENT)
-//            imageIntent.type = "image/*"
-//            startActivityForResult(
-//                Intent.createChooser(imageIntent, "Choose an image"),
-//                IMAGE_REQUEST_CODE
-//            )
-//        }
+        Glide.with(this)
+            .asBitmap()
+            .load(imageUrl)
+            .circleCrop()
+            .into(object : SimpleTarget<Bitmap>() {
+                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    bitmap = resource
+                    val notifier = Notifier(
+                        id = "xVfyUJlnN9RQpBwvN5KZuYdQKcl2",
+                        bitmap,
+                        name = "Islam AlaaEddin"
+                    )
+                     notification = Notification("comment", notifier)
+                }
+            })
 
-//        uploadButton.setOnClickListener {
-//            val storageReference =
-//                FirebaseStorage.getInstance().reference.child("DUMMY").child("Dummy1")
-//
-//            val byteArrayOutputStream = ByteArrayOutputStream()
-//
-//            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
-//
-//            storageReference.putBytes(byteArrayOutputStream.toByteArray()).addOnSuccessListener {
-//                Toast.makeText(this, "${it.storage.downloadUrl}", Toast.LENGTH_LONG).show()
-//            }
-//
-//
-//        }
+        button.setOnClickListener {
+            BaseApplication.fireNotification(notification, MainActivity::class.java)
+        }
     }
 
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//        if (requestCode == IMAGE_REQUEST_CODE && resultCode == RESULT_OK && data != null && data.data != null) {
-//            path = data.data!!
-//            try {
-//                 bitmap = MediaStore.Images.Media.getBitmap(contentResolver, path)
-//                imageView.setImageBitmap(bitmap)
-//            } catch (ex: IOException) {
-//                Log.e(TAG, "onActivityResult: ${ex.message}", ex)
-//            }
-//        }
-//    }
 }

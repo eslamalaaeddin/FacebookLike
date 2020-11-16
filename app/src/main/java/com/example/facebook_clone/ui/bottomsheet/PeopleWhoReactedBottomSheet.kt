@@ -2,13 +2,13 @@ package com.example.facebook_clone.ui.bottomsheet
 
 import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.ReactsAdapter
+import com.example.facebook_clone.adapter.SearchedUsersAdapter
 import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.model.post.react.ReactDocument
 import com.example.facebook_clone.viewmodel.PostViewModel

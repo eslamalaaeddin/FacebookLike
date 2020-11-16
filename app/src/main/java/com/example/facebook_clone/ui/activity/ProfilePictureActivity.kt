@@ -6,20 +6,13 @@ import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
-import android.view.View
-import android.widget.ProgressBar
-import android.widget.Toast
-import com.example.facebook_clone.OthersProfileActivity
 import com.example.facebook_clone.R
 import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.viewmodel.ProfilePictureActivityViewModel
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.android.synthetic.main.activity_profile.*
 import kotlinx.android.synthetic.main.activity_profile_picture.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.io.ByteArrayOutputStream
 
 private const val REQUEST_CODE = 159
 private const val TAG = "ProfilePictureActivity"

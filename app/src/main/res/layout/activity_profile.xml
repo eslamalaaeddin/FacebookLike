@@ -256,7 +256,7 @@
         android:id="@+id/bioTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Yoyo"
+        tools:text="Null"
         app:layout_constraintEnd_toEndOf="@+id/userNameTextView"
         app:layout_constraintStart_toStartOf="@+id/userNameTextView"
         app:layout_constraintTop_toBottomOf="@+id/userNameTextView" />

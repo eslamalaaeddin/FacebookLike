@@ -25,7 +25,7 @@ class AddToPostAdapter(context: Context, resource: Int, objects: MutableList<Opt
         val additionItem = getItem(position)
 
         additionItem?.let { additionItem ->
-            view.addToPostIcon.setImageResource(additionItem.imageRes)
+            view.addToPostImage.setImageResource(additionItem.imageRes)
             view.additionDescriptionTextView.text = additionItem.imageDescription
         }
 

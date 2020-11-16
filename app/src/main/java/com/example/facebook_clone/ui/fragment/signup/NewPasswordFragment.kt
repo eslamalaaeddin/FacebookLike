@@ -10,7 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.facebook_clone.R
 import com.example.facebook_clone.helper.Utils
-import com.example.facebook_clone.model.User
+import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.ui.activity.ProfilePictureActivity
 import com.example.facebook_clone.viewmodel.PasswordFragmentViewModel
 import com.google.firebase.auth.FirebaseAuth

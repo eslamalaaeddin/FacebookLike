@@ -1,7 +1,7 @@
 package com.example.facebook_clone.livedata
 
 import androidx.lifecycle.LiveData
-import com.example.facebook_clone.model.User
+import com.example.facebook_clone.model.user.User
 import com.google.firebase.firestore.*
 
 class UserLiveData (private val documentReference: DocumentReference) : LiveData<User>(),

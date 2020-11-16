@@ -4,10 +4,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
 import android.view.Window
 import android.view.WindowManager
-import com.example.facebook_clone.OthersProfileActivity
 import com.example.facebook_clone.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -27,9 +25,9 @@ class SplashActivity : AppCompatActivity() {
             if (currentUser == null) {
                 navigateToRecentUsersActivity()
             } else {
-//                navigateToNewsFeedActivity()
-                //navigateToProfileActivity()
-                navigateToOthersProfileActivity()
+                navigateToNewsFeedActivity()
+//                navigateToProfileActivity()
+//                navigateToOthersProfileActivity()
             }
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
             //navigateToRecentUsersActivity()
