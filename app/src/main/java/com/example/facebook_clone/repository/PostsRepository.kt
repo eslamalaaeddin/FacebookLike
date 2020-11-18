@@ -134,5 +134,29 @@ class PostsRepository(
 
     }
 
+    fun uploadImageCommentToCloudStorage(bitmap: Bitmap): UploadTask {
+        val userId = auth.currentUser?.uid.toString()
+
+        val firebaseStorageRef =
+            storage.reference.child(userId).child("Post images").child("comments").child("${UUID.randomUUID()}.jpeg")
+
+        val byteArrayOutputStream = ByteArrayOutputStream()
+
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+
+        return firebaseStorageRef.putBytes(byteArrayOutputStream.toByteArray())
+
+    }
+
+    fun uploadVideoCommentToCloudStorage(videoUri: Uri): UploadTask {
+        val userId = auth.currentUser?.uid.toString()
+
+        val firebaseStorageRef =
+            storage.reference.child(userId).child("Post videos").child("comments").child("${UUID.randomUUID()}.mp4")
+
+        return firebaseStorageRef.putFile(videoUri)
+
+    }
+
 
 }

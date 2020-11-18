@@ -51,4 +51,6 @@ interface PostListener{
         interactorImageUrl: String,
         postPosition: Int
     )
+
+    fun onMediaPostClicked(mediaUrl: String)
 }

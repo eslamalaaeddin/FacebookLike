@@ -33,7 +33,7 @@ class EditCommentBottomSheet(private val comment: Comment,
 
         Picasso.get().load(comment.commenterImageUrl).into(userImageView)
 
-        editCommentEditText.setText(comment.comment.toString())
+        editCommentEditText.setText(comment.attachmentCommentUrl.toString())
 
         editCommentEditText.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -43,7 +43,7 @@ class EditCommentBottomSheet(private val comment: Comment,
             }
 
             override fun afterTextChanged(newComment: Editable?) {
-                updateCommentButton.isEnabled = newComment.toString() != comment.comment.toString()
+                updateCommentButton.isEnabled = newComment.toString() != comment.attachmentCommentUrl.toString()
             }
         })
 
@@ -51,7 +51,7 @@ class EditCommentBottomSheet(private val comment: Comment,
             //New comment
             //i can't update field in array so i deleted the old comment and added a new one
             postViewModel.deleteComment(comment, postId, postPublisherId)
-            comment.comment = editCommentEditText.text.toString()
+            comment.attachmentCommentUrl = editCommentEditText.text.toString()
             postViewModel.updateComment(comment, postId, postPublisherId)
         }
 

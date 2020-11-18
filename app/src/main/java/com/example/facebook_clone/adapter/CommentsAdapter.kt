@@ -6,21 +6,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.example.facebook_clone.R
 import com.example.facebook_clone.helper.listener.CommentClickListener
 import com.example.facebook_clone.helper.listener.ReactClickListener
 import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.react.React
-import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.comment_item_layout.view.*
 
 private const val TAG = "CommentsAdapter"
+
 class CommentsAdapter(
-                      private var comments: List<Comment>,
-                      private var reacts: List<React>?,
-                      private val commentClickListener: CommentClickListener,
-                      private val reactClickListener: ReactClickListener
+    private var comments: List<Comment>,
+    private var reacts: List<React>?,
+    private val commentClickListener: CommentClickListener,
+    private val reactClickListener: ReactClickListener
 ) :
     RecyclerView.Adapter<CommentsAdapter.CommentHolder>() {
     private val picasso = Picasso.get()
@@ -28,28 +30,92 @@ class CommentsAdapter(
     private lateinit var rClickListener: ReactClickListener
 
 
-    inner class CommentHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnLongClickListener {
+    inner class CommentHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+        View.OnLongClickListener, View.OnClickListener {
         init {
             cClickListener = commentClickListener
             rClickListener = reactClickListener
             itemView.setOnLongClickListener(this)
-            
-            itemView.replyTextView.setOnClickListener {
+            itemView.setOnClickListener(this)
+
+            itemView.replyOnCommentTextView.setOnClickListener {
                 Toast.makeText(itemView.context, "Reply", Toast.LENGTH_SHORT).show()
+            }
+
+            itemView.reactOnCommentTextView.setOnClickListener {
+                val comment = comments[adapterPosition]
+                val commentId = comment.id.toString()
+                val commentReacts = comment.reacts
+               // cClickListener.onReactOnCommentClicked(commentId, adapterPosition, commentReacts!!)
+            }
+
+            itemView.mediaCommentCardView.setOnClickListener {
+                val comment = comments[adapterPosition]
+                cClickListener.onMediaCommentClicked(comment.attachmentCommentUrl.toString())
             }
         }
 
         fun bind(comment: Comment) {
             picasso.load(comment.commenterImageUrl).into(itemView.commenterImageView)
-            itemView.commenterNameTextView.text = comment.commenterName
-            itemView.commentTextView.text = comment.comment
             itemView.commentCreationTimeTextView.text =
                 format("EEE, MMM d, h:mm a", comment.commentTime.toDate())
-    }
+            itemView.commenterNameTextView.text = comment.commenterName
+
+            val interval: Long = 1 * 1000
+            val options: RequestOptions = RequestOptions().frame(interval)
+            //Media comment
+            val commentType = comment.commentType
+            if (comment.attachmentCommentUrl != null) {
+                itemView.mediaCommentCardView.visibility = View.VISIBLE
+
+                if (commentType == "textWithImage") {
+                    itemView.commentTextView.text = comment.textComment
+                    picasso.load(comment.attachmentCommentUrl).into(itemView.mediaCommentImageView)
+                    itemView.playButtonImgView.visibility = View.GONE
+                    itemView.commentTextView.visibility = View.VISIBLE
+                }
+
+                else if (commentType == "textWithVideo") {
+                    itemView.commentTextView.text = comment.textComment
+                    itemView.playButtonImgView.visibility = View.VISIBLE
+                    itemView.commentTextView.visibility = View.VISIBLE
+
+                    Glide.with(itemView.context)
+                        .asBitmap().load(comment.attachmentCommentUrl).apply(options)
+                        .into(itemView.mediaCommentImageView)
+                }
+
+                else if (commentType == "image") {
+                    itemView.commentTextView.visibility = View.GONE
+                    picasso.load(comment.attachmentCommentUrl).into(itemView.mediaCommentImageView)
+                    itemView.playButtonImgView.visibility = View.GONE
+                }
+
+                else if (commentType == "video") {
+                    itemView.commentTextView.visibility = View.GONE
+                    itemView.playButtonImgView.visibility = View.VISIBLE
+                    Glide.with(itemView.context)
+                        .asBitmap().load(comment.attachmentCommentUrl).apply(options)
+                        .into(itemView.mediaCommentImageView)
+                }
+            }
+
+            else {
+                itemView.commentTextView.visibility = View.VISIBLE
+                itemView.commentTextView.text = comment.textComment
+                itemView.mediaCommentCardView.visibility = View.GONE
+            }
+
+
+        }
 
         override fun onLongClick(p0: View?): Boolean {
             cClickListener.onCommentLongClicked(comments[adapterPosition])
             return true
+        }
+
+        override fun onClick(p0: View?) {
+
         }
 
     }

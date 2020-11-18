@@ -5,20 +5,23 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.facebook_clone.R
+import com.example.facebook_clone.helper.listener.CommentClickListener
+import com.example.facebook_clone.helper.listener.FriendClickListener
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.model.user.friend.Friend
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.friend_item_layout.view.*
 
 
-class FriendsAdapter(private val friends: List<Friend>) :
+class FriendsAdapter(private val friends: List<Friend>, private val friendClickListener: FriendClickListener) :
     RecyclerView.Adapter<FriendsAdapter.FriendsHolder>() {
-
+    private lateinit var frClickListener: FriendClickListener
     inner class FriendsHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
         View.OnClickListener, View.OnLongClickListener {
 
 
         init {
+            frClickListener = friendClickListener
             itemView.setOnClickListener(this)
             itemView.setOnLongClickListener(this)
         }
@@ -30,7 +33,8 @@ class FriendsAdapter(private val friends: List<Friend>) :
         }
 
         override fun onClick(item: View?) {
-
+            val friendId = friends[adapterPosition].id.toString()
+            frClickListener.onFriendClicked(friendId)
         }
 
         override fun onLongClick(item: View?): Boolean {

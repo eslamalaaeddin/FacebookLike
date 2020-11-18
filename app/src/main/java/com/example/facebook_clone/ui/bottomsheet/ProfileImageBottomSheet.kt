@@ -14,9 +14,7 @@ import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.ui.dialog.ImageViewerDialog
 import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.android.synthetic.main.activity_testing.*
 import kotlinx.android.synthetic.main.profile_images_bottom_sheet_layout.*
-import okhttp3.internal.Util
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.IOException
 
@@ -50,7 +48,7 @@ class ProfileImageBottomSheet(private val profileImageUrl:String) : BottomSheetD
         viewProfilePicture.setOnClickListener {
             val imageViewerDialog = ImageViewerDialog()
             imageViewerDialog.show(activity?.supportFragmentManager!!, "signature")
-            imageViewerDialog.setImageUrl(profileImageUrl)
+            imageViewerDialog.setMediaUrl(profileImageUrl)
         }
 
     }

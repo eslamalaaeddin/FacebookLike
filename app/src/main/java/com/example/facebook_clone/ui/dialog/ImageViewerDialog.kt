@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import com.example.facebook_clone.R
-import com.example.facebook_clone.helper.provider.ImageUrlsProvider
+import com.example.facebook_clone.helper.provider.MediaUrlProvider
 import com.github.chrisbanes.photoview.PhotoView
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.image_viewer_dialog.*
@@ -14,7 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class ImageViewerDialog() : DialogFragment(), ImageUrlsProvider {
+class ImageViewerDialog() : DialogFragment(), MediaUrlProvider {
 
     private val scope = CoroutineScope(Dispatchers.IO)
     private lateinit var imageUrl: String
@@ -35,20 +35,22 @@ class ImageViewerDialog() : DialogFragment(), ImageUrlsProvider {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val photoView = view.findViewById<PhotoView>(R.id.photoView)
+        //Image
 
-        scope.launch {
-            val bitmap = Picasso.get()
-                .load(imageUrl)
-                .get()
-            photoView.setImageBitmap(bitmap)
-        }
+            scope.launch {
+                val bitmap = Picasso.get()
+                    .load(imageUrl)
+                    .get()
+                photoView.setImageBitmap(bitmap)
+            }
+
         upButton.setOnClickListener {
             dismiss()
         }
 
     }
 
-    override fun setImageUrl(url: String) {
+    override fun setMediaUrl(url: String) {
         imageUrl = url
     }
 }

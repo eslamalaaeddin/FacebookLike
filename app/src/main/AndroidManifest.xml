@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".ui.activity.PostViewerActivity"></activity>
-
+        <activity android:name=".ui.activity.VideoPlayerActivity" />
         <service
             android:name=".helper.notification.FirebaseService"
             android:permission="com.google.android.c2dm.permission.SEND">

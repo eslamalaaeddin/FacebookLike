@@ -100,6 +100,14 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
     override fun onCommentLongClicked(comment: Comment) {
     }
 
+//    override fun onReactOnCommentClicked(commentId: String, commentPosition: Int) {
+//
+//    }
+
+    override fun onMediaCommentClicked(mediaUrl: String) {
+
+    }
+
     override fun onReactButtonLongClicked() {
     }
 

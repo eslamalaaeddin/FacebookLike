@@ -99,6 +99,7 @@
     android:padding="8dp">
 
     <ImageView
+        android:id="@+id/addAttachmentToComment"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:src="@drawable/ic_attachment"
@@ -132,7 +133,7 @@
             android:layout_height="28dp"
             android:layout_margin="4dp"
             android:src="@drawable/ic_comment_send"
-            android:visibility="gone" />
+             />
 
     </LinearLayout>
 

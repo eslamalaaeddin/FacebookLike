@@ -60,7 +60,7 @@
         app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
 
     <TextView
-        android:id="@+id/reactTextView"
+        android:id="@+id/reactOnCommentTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -70,14 +70,14 @@
         app:layout_constraintTop_toTopOf="@+id/commentCreationTimeTextView" />
 
     <TextView
-        android:id="@+id/replyTextView"
+        android:id="@+id/replyOnCommentTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:text="Reply"
-        app:layout_constraintBottom_toBottomOf="@+id/reactTextView"
-        app:layout_constraintStart_toEndOf="@+id/reactTextView"
-        app:layout_constraintTop_toTopOf="@+id/reactTextView" />
+        app:layout_constraintBottom_toBottomOf="@+id/reactOnCommentTextView"
+        app:layout_constraintStart_toEndOf="@+id/reactOnCommentTextView"
+        app:layout_constraintTop_toTopOf="@+id/reactOnCommentTextView" />
 
 
     <LinearLayout

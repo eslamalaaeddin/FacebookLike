@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/postLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -52,9 +53,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
-        android:textSize="16sp"
         android:layout_marginEnd="8dp"
         android:textColor="@color/black"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/circleImageView"
@@ -73,7 +74,6 @@
         app:layout_constraintTop_toBottomOf="@+id/reactImageViewGrey" />
 
 
-
     <ImageView
         android:id="@+id/imageView8"
         android:layout_width="wrap_content"
@@ -84,8 +84,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/addCommentTextView"
         app:layout_constraintTop_toTopOf="@+id/addCommentTextView"
-        app:srcCompat="@drawable/ic_share"
-         />
+        app:srcCompat="@drawable/ic_share" />
 
     <TextView
         android:id="@+id/addShareTextView"
@@ -122,8 +121,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/view3"
-        app:srcCompat="@drawable/ic_thumb_up_grey"
-         />
+        app:srcCompat="@drawable/ic_thumb_up_grey" />
 
     <ImageView
         android:id="@+id/reactImageViewBlue"
@@ -135,8 +133,7 @@
         app:layout_constraintEnd_toStartOf="@+id/addReactTextView"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view3"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/view3" />
 
     <TextView
         android:id="@+id/addCommentTextView"
@@ -160,8 +157,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/addReactTextView"
         app:layout_constraintTop_toTopOf="@+id/addReactTextView"
-        app:srcCompat="@drawable/ic_comment"
-         />
+        app:srcCompat="@drawable/ic_comment" />
 
     <View
         android:id="@+id/view3"
@@ -203,10 +199,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:visibility="invisible"
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/attachmentImageView"
-            app:srcCompat="@drawable/ic_like_react" />
+            app:layout_constraintTop_toBottomOf="@+id/attachmentImageView" />
 
         <ImageView
             android:id="@+id/loveReactPlaceHolder"

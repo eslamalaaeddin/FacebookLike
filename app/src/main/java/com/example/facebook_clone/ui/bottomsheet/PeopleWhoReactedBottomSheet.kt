@@ -10,6 +10,7 @@ import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.ReactsAdapter
 import com.example.facebook_clone.adapter.SearchedUsersAdapter
 import com.example.facebook_clone.helper.Utils
+import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.react.ReactDocument
 import com.example.facebook_clone.viewmodel.PostViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -20,7 +21,11 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 private const val TAG = "PeopleWhoReactedBottomS"
 
-class PeopleWhoReactedBottomSheet(private val postId: String, private val postPublisherId: String) :
+class PeopleWhoReactedBottomSheet(
+    private val postId: String,
+    private val postPublisherId: String,
+    private val reactedOn: String
+) :
     BottomSheetDialogFragment() {
     private val postViewModel by viewModel<PostViewModel>()
     private var reactsAdapter = ReactsAdapter(emptyList())
@@ -51,10 +56,23 @@ class PeopleWhoReactedBottomSheet(private val postId: String, private val postPu
 
         postViewModel.getPostById(postPublisherId, postId).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                val reacts = task.result?.toObject(ReactDocument::class.java)?.reacts.orEmpty()
-                reactsAdapter = ReactsAdapter(reacts)
-                peopleWhoReactedRecyclerView.adapter = reactsAdapter
-
+                //POST REACTS
+                if (reactedOn == "post") {
+                    val reactsOnPost =
+                        task.result?.toObject(ReactDocument::class.java)?.reacts.orEmpty()
+                    reactsAdapter = ReactsAdapter(reactsOnPost)
+                    peopleWhoReactedRecyclerView.adapter = reactsAdapter
+                }
+                //COMMENT REACTS
+                else {
+                    val post = task.result?.toObject(Post::class.java)
+                    post?.comments?.forEach { comment ->
+                        if (comment.id == "commentId") {
+                            reactsAdapter = ReactsAdapter(comment.reacts.orEmpty())
+                            peopleWhoReactedRecyclerView.adapter = reactsAdapter
+                        }
+                    }
+                }
             } else {
                 Utils.toastMessage(requireContext(), task.exception?.message.toString())
             }

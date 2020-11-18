@@ -1,26 +1,30 @@
 package com.example.facebook_clone.ui.activity
 
+import android.app.Dialog
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.Window
 import android.widget.Toast
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.FriendsAdapter
 import com.example.facebook_clone.adapter.ProfilePostsAdapter
 import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.helper.listener.CommentsBottomSheetListener
+import com.example.facebook_clone.helper.listener.FriendClickListener
 import com.example.facebook_clone.helper.listener.PostListener
 import com.example.facebook_clone.helper.notification.PushNotification
 import com.example.facebook_clone.helper.notification.RetrofitInstance
 import com.example.facebook_clone.model.notification.Notification
 import com.example.facebook_clone.model.post.Post
-import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.model.post.share.Share
 import com.example.facebook_clone.model.user.friendrequest.FriendRequest
 import com.example.facebook_clone.ui.bottomsheet.CommentsBottomSheet
+import com.example.facebook_clone.ui.dialog.ImageViewerDialog
 import com.example.facebook_clone.viewmodel.NotificationsFragmentViewModel
 import com.example.facebook_clone.viewmodel.OthersProfileActivityViewModel
 import com.example.facebook_clone.viewmodel.PostViewModel
@@ -37,6 +41,7 @@ import kotlinx.android.synthetic.main.activity_profile.joinDateTextView
 import kotlinx.android.synthetic.main.activity_profile.profileImageView
 import kotlinx.android.synthetic.main.activity_profile.smallProfileImageView
 import kotlinx.android.synthetic.main.activity_profile.userNameTextView
+import kotlinx.android.synthetic.main.long_clicked_reacts_button.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,7 +49,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 private const val TAG = "OthersProfileActivity"
-class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomSheetListener {
+class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomSheetListener, FriendClickListener {
     private val profileActivityViewModel by viewModel<ProfileActivityViewModel>()
     private val othersProfileActivityViewModel by viewModel<OthersProfileActivityViewModel>()
     private val postViewModel by viewModel<PostViewModel>()
@@ -56,9 +61,11 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
     private var currentFriendRequest: FriendRequest? = null
     private lateinit var userIdIAmViewing: String
     private lateinit var picasso: Picasso
+    private var iAmFriend: Boolean = false
     private var currentEditedPostPosition: Int = -1
     private var profilePostsAdapter: ProfilePostsAdapter? = null
     private lateinit var friendsAdapter: FriendsAdapter
+    private var choice: Int? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_others_profile)
@@ -71,17 +78,17 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
                 currentUser = user
                 //Check for friend requests
                 if (!currentUser.friendRequests.isNullOrEmpty()) {
-                    Toast.makeText(this, "a", Toast.LENGTH_SHORT).show()
+                 //   Toast.makeText(this, "a", Toast.LENGTH_SHORT).show()
                     currentUser.friendRequests?.forEach { friendRequest ->
                         if (friendRequest.fromId == currentUser.id) {
-                            Toast.makeText(this, "b", Toast.LENGTH_SHORT).show()
+                          //  Toast.makeText(this, "b", Toast.LENGTH_SHORT).show()
                             addFriendButton.visibility = View.INVISIBLE
                             addFriendButton.isEnabled = false
                             cancelRequestButton.isEnabled = true
                             cancelRequestButton.visibility = View.VISIBLE
                             currentFriendRequest = friendRequest
                         } else {
-                            Toast.makeText(this, "c", Toast.LENGTH_SHORT).show()
+                           // Toast.makeText(this, "c", Toast.LENGTH_SHORT).show()
                             addFriendButton.isEnabled = true
                             cancelRequestButton.isEnabled = false
                             addFriendButton.visibility = View.VISIBLE
@@ -92,12 +99,12 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
 
                 //there might be a friendship
                 else if (currentUser.friends != null) {
-                    Toast.makeText(this, "d", Toast.LENGTH_SHORT).show()
+                   // Toast.makeText(this, "d", Toast.LENGTH_SHORT).show()
                     if (currentUser.friends!!.isNotEmpty()) {
-                        Toast.makeText(this, "e", Toast.LENGTH_SHORT).show()
+                      //  Toast.makeText(this, "e", Toast.LENGTH_SHORT).show()
                         currentUser.friends?.forEach { friend ->
                             if (friend.id == userIdIAmViewing) {
-                                Toast.makeText(this, "f", Toast.LENGTH_SHORT).show()
+                             //   Toast.makeText(this, "f", Toast.LENGTH_SHORT).show()
                                 addFriendButton.isEnabled = false
                                 cancelRequestButton.isEnabled = false
                                 addFriendButton.visibility = View.INVISIBLE
@@ -120,7 +127,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
 
                 }
                 else {
-                    Toast.makeText(this, "g", Toast.LENGTH_SHORT).show()
+                   // Toast.makeText(this, "g", Toast.LENGTH_SHORT).show()
                     addFriendButton.isEnabled = true
                     cancelRequestButton.isEnabled = false
                     addFriendButton.visibility = View.VISIBLE
@@ -136,8 +143,9 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
                 userIAmViewing = user
                 updateUserInfo(user)
                 if (!user.friends.isNullOrEmpty()) {
-                    friendsAdapter = FriendsAdapter(user.friends!!)
+                    friendsAdapter = FriendsAdapter(user.friends!!, this)
                     friendsRecyclerView.adapter = friendsAdapter
+                    iAmFriend()
                 }
                 val postsLiveData =
                     postViewModel.getPostsWithoutOptions(userIdIAmViewing)
@@ -195,8 +203,9 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             posts,
             this,
             currentUser.name.toString(),
-            currentUser.profileImageUrl.toString()
-        )
+            currentUser.profileImageUrl.toString(),
+            iAmFriend
+         )
         profilePostsRecyclerView.adapter = profilePostsAdapter
         if (currentEditedPostPosition != -1){
             profilePostsRecyclerView.scrollToPosition(currentEditedPostPosition)
@@ -336,7 +345,10 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         postReacts: List<React>?,
         postPosition: Int
     ) {
-
+        currentEditedPostPosition = postPosition
+        if (postReacts?.isEmpty()!!){
+            showReactsChooserDialog(interactorId, interactorName, interactorImageUrl, postId, postPublisherId)
+        }
     }
 
     override fun onCommentButtonClicked(
@@ -401,6 +413,21 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
 
     }
 
+    override fun onMediaPostClicked(mediaUrl: String) {
+        //Image
+        if (mediaUrl.contains("jpeg")) {
+            val imageViewerDialog = ImageViewerDialog()
+            imageViewerDialog.show(supportFragmentManager, "signature")
+            imageViewerDialog.setMediaUrl(mediaUrl)
+        }
+        //video(I chosed an activity to show media controllers)
+        else{
+            val videoIntent = Intent(this, VideoPlayerActivity::class.java)
+            videoIntent.putExtra("videoUrl", mediaUrl)
+            startActivity(videoIntent)
+        }
+    }
+
     private fun addReactToDb(react: React, postId: String, postPublisherId: String): Task<Void> {
         return postViewModel.createReact(react, postId, postPublisherId)
 
@@ -463,5 +490,162 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         othersProfileActivityViewModel.removeNotificationIdFromHisDocument(notificationId, hisId)
         notificationsFragmentViewModel.deleteNotificationById(userIdIAmViewing, notificationId)
     }
+
+    override fun onFriendClicked(friendId: String) {
+        val intent = Intent(this, OthersProfileActivity::class.java)
+        intent.putExtra("userId", friendId)
+        startActivity(intent)
+    }
+
+    private fun iAmFriend(){
+        userIAmViewing.friends?.forEach { friend ->
+            if (friend.id == currentUser.id){
+                iAmFriend = true
+            }
+        }
+    }
+
+    private fun showReactsChooserDialog(interactorId: String, interactorName: String, interactorImageUrl: String, postId: String, postPublisherId: String) {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+        dialog.setContentView(R.layout.long_clicked_reacts_button)
+
+        dialog.loveReactButton.setOnClickListener {
+            choice = 2
+            val react =  React(
+                reactorId = interactorId,
+                reactorName = interactorName,
+                reactorImageUrl = interactorImageUrl,
+                react = choice
+            )
+            addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    handleNotificationCreationAndFiringAndAdditionToDB(
+                        notificationType = "reactOnPost",
+                        postId = postId,
+                        commentPosition = null,
+                        commentId = null
+                    )
+                }else{
+                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+            dialog.dismiss()
+        }
+        dialog.careReactButton.setOnClickListener {
+            choice = 3
+            val react =  React(
+                reactorId = interactorId,
+                reactorName = interactorName,
+                reactorImageUrl = interactorImageUrl,
+                react = choice
+            )
+            addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    handleNotificationCreationAndFiringAndAdditionToDB(
+                        notificationType = "reactOnPost",
+                        postId = postId,
+                        commentPosition = null,
+                        commentId = null
+                    )
+                }else{
+                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+            dialog.dismiss()
+        }
+        dialog.hahaReactButton.setOnClickListener {
+            choice = 4
+            val react =  React(
+                reactorId = interactorId,
+                reactorName = interactorName,
+                reactorImageUrl = interactorImageUrl,
+                react = choice
+            )
+            addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    handleNotificationCreationAndFiringAndAdditionToDB(
+                        notificationType = "reactOnPost",
+                        postId = postId,
+                        commentPosition = null,
+                        commentId = null
+                    )
+                }else{
+                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+            dialog.dismiss()
+        }
+        dialog.wowReactButton.setOnClickListener {
+            choice = 5
+            val react =  React(
+                reactorId = interactorId,
+                reactorName = interactorName,
+                reactorImageUrl = interactorImageUrl,
+                react = choice
+            )
+            addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    handleNotificationCreationAndFiringAndAdditionToDB(
+                        notificationType = "reactOnPost",
+                        postId = postId,
+                        commentPosition = null,
+                        commentId = null
+                    )
+                }else{
+                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+            dialog.dismiss()
+        }
+        dialog.sadReactButton.setOnClickListener {
+            choice = 6
+            val react =  React(
+                reactorId = interactorId,
+                reactorName = interactorName,
+                reactorImageUrl = interactorImageUrl,
+                react = choice
+            )
+            addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    handleNotificationCreationAndFiringAndAdditionToDB(
+                        notificationType = "reactOnPost",
+                        postId = postId,
+                        commentPosition = null,
+                        commentId = null
+                    )
+                }else{
+                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+            dialog.dismiss()
+        }
+        dialog.angryReactButton.setOnClickListener {
+            choice = 7
+            val react =  React(
+                reactorId = interactorId,
+                reactorName = interactorName,
+                reactorImageUrl = interactorImageUrl,
+                react = choice
+            )
+            addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    handleNotificationCreationAndFiringAndAdditionToDB(
+                        notificationType = "reactOnPost",
+                        postId = postId,
+                        commentPosition = null,
+                        commentId = null
+                    )
+                }else{
+                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+            dialog.dismiss()
+        }
+        dialog.show()
+
+    }
+
 
 }

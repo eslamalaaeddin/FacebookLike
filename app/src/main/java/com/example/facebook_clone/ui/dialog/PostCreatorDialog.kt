@@ -12,16 +12,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.example.facebook_clone.R
+import com.example.facebook_clone.adapter.AddToPostAdapter
+import com.example.facebook_clone.adapter.PostVisibilityAdapter
 import com.example.facebook_clone.helper.provider.NameImageProvider
 import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.helper.listener.PostAttachmentListener
+import com.example.facebook_clone.model.Option
+import com.example.facebook_clone.model.Visibility
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.ui.bottomsheet.AddToPostBottomSheet
 import com.example.facebook_clone.viewmodel.PostViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.add_to_post_bottom_sheet.view.*
 import kotlinx.android.synthetic.main.post_creator_dialog.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -61,17 +67,14 @@ class PostCreatorDialog : DialogFragment(), AdapterView.OnItemSelectedListener, 
         Picasso.get().load(userProfileImageUrl).into(smallProfileImageView)
         userNameTextView.text = userName
 
+        val publicOption = Visibility(R.drawable.ic_public_visibility, "Public")
+        val friendsOption = Visibility(R.drawable.ic_friends_visibility, "Friends")
+        val privateOption = Visibility(R.drawable.ic_private_visibility, "Private")
 
-        ArrayAdapter.createFromResource(
-            requireContext(),
-            R.array.visibility_options,
-            android.R.layout.simple_spinner_item
-        ).also { adapter ->
-            // Specify the layout to use when the list of choices appears
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            // Apply the adapter to the spinner
-            postVisibilitySpinner.adapter = adapter
-        }
+        val visibilities = mutableListOf(publicOption, friendsOption, privateOption)
+
+        val adapter = PostVisibilityAdapter(requireContext(), visibilities)
+        postVisibilitySpinner.adapter = adapter
 
         postContentTextView.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -189,11 +192,11 @@ class PostCreatorDialog : DialogFragment(), AdapterView.OnItemSelectedListener, 
         userProfileImageUrl = url
     }
 
-    override fun onAttachmentAdded(data: Intent?, dataType: String, fromeCamera:Boolean) {
+    override fun onAttachmentAdded(data: Intent?, dataType: String, fromCamera:Boolean) {
         if (data != null){
             postData = data
             postDataType = dataType
-            bitmapFromCamera = fromeCamera
+            bitmapFromCamera = fromCamera
         }
 
     }

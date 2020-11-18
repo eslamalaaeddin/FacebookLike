@@ -64,4 +64,12 @@ class PostViewModel(private val repository: PostsRepository): ViewModel() {
         return repository.uploadPostVideoToCloudStorage(videoUri)
     }
 
+    fun uploadImageCommentToCloudStorage(bitmap: Bitmap): UploadTask{
+        return repository.uploadImageCommentToCloudStorage(bitmap)
+    }
+
+    fun uploadVideoCommentToCloudStorage(videoUri: Uri): UploadTask{
+        return repository.uploadVideoCommentToCloudStorage(videoUri)
+    }
+
 }

@@ -15,6 +15,7 @@ import com.example.facebook_clone.adapter.FriendsAdapter
 import com.example.facebook_clone.adapter.ProfilePostsAdapter
 import com.example.facebook_clone.helper.listener.PostListener
 import com.example.facebook_clone.helper.Utils
+import com.example.facebook_clone.helper.listener.FriendClickListener
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.comment.CommentDocument
@@ -25,6 +26,7 @@ import com.example.facebook_clone.model.post.share.ShareDocument
 import com.example.facebook_clone.ui.bottomsheet.CommentsBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.ProfileCoverBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.ProfileImageBottomSheet
+import com.example.facebook_clone.ui.dialog.ImageViewerDialog
 import com.example.facebook_clone.ui.dialog.PostCreatorDialog
 import com.example.facebook_clone.viewmodel.PostViewModel
 import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
@@ -49,7 +51,7 @@ private const val TAG = "ProfileActivity"
 private const val REQUEST_CODE_COVER_IMAGE = 123
 private const val REQUEST_CODE_PROFILE_IMAGE = 456
 
-class ProfileActivity() : AppCompatActivity(), PostListener {
+class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener {
     private val profileActivityViewModel by viewModel<ProfileActivityViewModel>()
     private val postViewModel by viewModel<PostViewModel>()
     private val auth: FirebaseAuth by inject()
@@ -57,6 +59,7 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
     private lateinit var currentUser: User
     private lateinit var currentPosts: List<Post>
     private lateinit var picasso: Picasso
+    private var iAmFriend: Boolean = false
     private var profilePostsAdapter: ProfilePostsAdapter? = null
     private lateinit var friendsAdapter: FriendsAdapter
     private var currentEditedPostPosition: Int = -1
@@ -73,7 +76,7 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
                 currentUser = user
                 updateUserInfo(user)
                 if (!user.friends.isNullOrEmpty()){
-                    friendsAdapter = FriendsAdapter(user.friends!!)
+                    friendsAdapter = FriendsAdapter(user.friends!!, this)
                     friendsRecyclerView.adapter = friendsAdapter
                 }
                 //nested to get current user
@@ -158,7 +161,8 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
                 posts,
                 this,
                 currentUser.name.toString(),
-                currentUser.profileImageUrl.toString()
+                currentUser.profileImageUrl.toString(),
+                true
             )
             profilePostsRecyclerView.adapter = profilePostsAdapter
             //position has to be changed post
@@ -283,20 +287,20 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
         if (postReacts?.isEmpty()!!){
            showReactsChooserDialog(interactorId, interactorName, interactorImageUrl, postId, postPublisherId)
         }
-        else {
-            postReacts.forEach lit@{ react ->
-                if (react.reactorId == interactorId) {
-                    deleteReact(react, postId, postPublisherId).addOnCompleteListener { task ->
-                        if (!task.isSuccessful) {
-                            Utils.toastMessage(this, task.exception?.message.toString())
-                        }
-                    }
-                    return@lit
-                } else {
-                    showReactsChooserDialog(interactorId, interactorName, interactorImageUrl, postId, postPublisherId)
-                }
-            }
-        }
+//        else {
+//            postReacts.forEach lit@{ react ->
+//                if (react.reactorId == interactorId) {
+//                    deleteReact(react, postId, postPublisherId).addOnCompleteListener { task ->
+//                        if (!task.isSuccessful) {
+//                            Utils.toastMessage(this, task.exception?.message.toString())
+//                        }
+//                    }
+//                    return@lit
+//                } else {
+//                    showReactsChooserDialog(interactorId, interactorName, interactorImageUrl, postId, postPublisherId)
+//                }
+//            }
+//        }
     }
 
     override fun onCommentButtonClicked(
@@ -367,6 +371,22 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
         }
     }
 
+    override fun onMediaPostClicked(mediaUrl: String) {
+        //Image
+        if (mediaUrl.contains("jpeg")) {
+            val imageViewerDialog = ImageViewerDialog()
+            imageViewerDialog.show(supportFragmentManager, "signature")
+            imageViewerDialog.setMediaUrl(mediaUrl)
+        }
+        //video
+        else{
+            val videoIntent = Intent(this, VideoPlayerActivity::class.java)
+            videoIntent.putExtra("videoUrl", mediaUrl)
+            startActivity(videoIntent)
+        }
+
+    }
+
     private fun addReactToDb(react: React, postId: String, postPublisherId: String): Task<Void> {
         return postViewModel.createReact(react, postId, postPublisherId)
 
@@ -422,7 +442,7 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
     private fun showReactsChooserDialog(interactorId: String, interactorName: String, interactorImageUrl: String, postId: String, postPublisherId: String) {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCancelable(false)
+        dialog.setCancelable(true)
         dialog.setContentView(R.layout.long_clicked_reacts_button)
 
         dialog.loveReactButton.setOnClickListener {
@@ -517,6 +537,12 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
         }
         dialog.show()
 
+    }
+
+    override fun onFriendClicked(friendId: String) {
+        val intent = Intent(this, OthersProfileActivity::class.java)
+        intent.putExtra("userId", friendId)
+        startActivity(intent)
     }
 
 

@@ -26,6 +26,7 @@
         android:backgroundTint="#F3F3F3"
         android:orientation="vertical"
         android:padding="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/commentCreationTimeTextView"
         app:layout_constraintEnd_toStartOf="@+id/linearLayout3"
         app:layout_constraintStart_toEndOf="@+id/commenterImageView"
         app:layout_constraintTop_toTopOf="@+id/commenterImageView">
@@ -34,17 +35,53 @@
             android:id="@+id/commenterNameTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:text="Islam AlaaEddin"
             android:textColor="@color/black"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp"
+            tools:text="Islam AlaaEddin" />
 
         <TextView
             android:id="@+id/commentTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:text="good"
             android:textColor="@color/black"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp"
+            tools:text="good" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="96dp"
+            android:layout_margin="4dp"
+            app:cardCornerRadius="16dp"
+            android:visibility="visible"
+            android:background="@android:color/transparent"
+            android:id="@+id/mediaCommentCardView">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="96dp">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="96dp"
+                    android:id="@+id/mediaCommentImageView"
+                    android:layout_gravity="center"
+                    android:scaleType="fitXY"/>
+
+                <ImageView
+                    android:id="@+id/playButtonImgView"
+                    android:layout_width="match_parent"
+                    android:layout_height="96dp"
+                    app:srcCompat="@drawable/ic_baseline_play_arrow_24"
+                    tools:visibility="gone"
+                    app:tint="#EAEAEA" />
+            </FrameLayout>
+
+        </androidx.cardview.widget.CardView>
+
+
 
 
     </LinearLayout>
@@ -59,7 +96,7 @@
         app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
 
     <TextView
-        android:id="@+id/reactTextView"
+        android:id="@+id/reactOnCommentTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -69,14 +106,14 @@
         app:layout_constraintTop_toTopOf="@+id/commentCreationTimeTextView" />
 
     <TextView
-        android:id="@+id/replyTextView"
+        android:id="@+id/replyOnCommentTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:text="Reply"
-        app:layout_constraintBottom_toBottomOf="@+id/reactTextView"
-        app:layout_constraintStart_toEndOf="@+id/reactTextView"
-        app:layout_constraintTop_toTopOf="@+id/reactTextView" />
+        app:layout_constraintBottom_toBottomOf="@+id/reactOnCommentTextView"
+        app:layout_constraintStart_toEndOf="@+id/reactOnCommentTextView"
+        app:layout_constraintTop_toTopOf="@+id/reactOnCommentTextView" />
 
 
     <LinearLayout
