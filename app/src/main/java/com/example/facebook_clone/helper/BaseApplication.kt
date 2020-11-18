@@ -14,12 +14,17 @@ import androidx.core.app.NotificationManagerCompat
 import com.example.facebook_clone.R
 import com.example.facebook_clone.di.*
 import com.example.facebook_clone.model.notification.Notification
+import com.example.facebook_clone.model.notification.Notifier
 import com.example.facebook_clone.ui.activity.MainActivity
+import com.example.facebook_clone.ui.activity.ProfileActivity
 import com.google.api.Billing
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
+import java.util.*
+import kotlin.random.Random
+
 private const val CHANNEL_ID = "123"
 private const val CHANNEL_NAME = "channel name"
 private const val NOTIFICATION_ID = 123
@@ -56,7 +61,7 @@ class BaseApplication : Application() {
 
     }
 
-    private fun createNotificationChannel(){
+    private fun createNotificationChannel() {
         //1 Create the channel
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -71,19 +76,76 @@ class BaseApplication : Application() {
             notificationManager?.createNotificationChannel(channel)
         }
     }
+
+
     //Notification provider
     companion object {
         var context: Context? = null
-        fun fireNotification(notification: Notification, destination: Class<*>) {
-            val sound: Uri =
-                Uri.parse("android.resource://" + context?.packageName + "/" + R.raw.facebook_notification_sound)
+        var destination: Class<*>? = null
+        fun fireNotification(notificationType: String, notifier: Notifier) {
 
             val remoteView = RemoteViews(context?.packageName, R.layout.custom_notification_layout)
 
-            remoteView.setTextViewText(R.id.notificationContentTextView,
-                "${notification.notifier?.name} sent you a friend request")
-            remoteView.setImageViewBitmap(R.id.notificationImageView, notification.notifier?.imageBitmap)
+            ////////////////////// CUSTOMIZING THE NOTIFICATION //////////////////////////////
+            when (notificationType) {
 
+                "friendRequest" -> {
+                    remoteView.setTextViewText(
+                        R.id.notificationContentTextView,
+                        "${notifier.name} sent you a friend request"
+                    )
+                    destination = MainActivity::class.java
+                }
+
+
+                "commentOnPost" -> {
+                    remoteView.setTextViewText(
+                        R.id.notificationContentTextView,
+                        "${notifier.name} commented on your post"
+                    )
+                    //temp
+                    destination = ProfileActivity::class.java
+                }
+
+
+                "reactOnPost" -> {
+                    remoteView.setTextViewText(
+                        R.id.notificationContentTextView,
+                        "${notifier.name} reacted to your post"
+                    )
+
+                    destination = ProfileActivity::class.java
+                }
+
+                "share" -> {
+                    remoteView.setTextViewText(
+                        R.id.notificationContentTextView,
+                        "${notifier.name} shared your post"
+                    )
+                    destination = ProfileActivity::class.java
+                }
+
+                "groupPost" -> {
+                    remoteView.setTextViewText(
+                        R.id.notificationContentTextView,
+                        "${notifier.name} sent you a friend request"
+                    )
+                }
+
+                "acceptedInGroup" -> {
+                    remoteView.setTextViewText(
+                        R.id.notificationContentTextView,
+                        "${notifier.name} sent you a friend request"
+                    )
+                }
+
+            }
+
+            ///////////////////////////////////////////////////////////////////////////////
+            remoteView.setImageViewBitmap(R.id.notificationImageView, notifier.imageBitmap)
+
+            val sound: Uri =
+                Uri.parse("android.resource://" + context?.packageName + "/" + R.raw.facebook_notification_sound)
             //2 Create the builder
             val builder = NotificationCompat.Builder(context!!, CHANNEL_NAME)
                 .setSmallIcon(R.drawable.facebook)
@@ -94,18 +156,23 @@ class BaseApplication : Application() {
                 .setChannelId(CHANNEL_ID)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setSound(sound)
-                .setVibrate(longArrayOf(0, 500, 800, 500))
+                .setVibrate(longArrayOf(0, 250, 100, 250))
                 .setAutoCancel(true)
             //3 Create the action
             val actionIntent = Intent(context, destination)
             val pendingIntent =
-                PendingIntent.getActivity(context, 0, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+                PendingIntent.getActivity(
+                    context,
+                    0,
+                    actionIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                )
             builder.setContentIntent(pendingIntent)
 
             //4 Issue the notification
             val notificationManager =
                 NotificationManagerCompat.from(context!!)
-            notificationManager.notify((Math.random()*100).toInt(), builder.build())
+            notificationManager.notify(Random.nextInt(), builder.build())
         }
     }
 }

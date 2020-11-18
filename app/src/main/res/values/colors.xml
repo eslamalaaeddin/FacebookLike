@@ -5,12 +5,12 @@
     <color name="colorAccent">#4267B2</color>
 
     <color name="white">#ffffff</color>
-    <color name="dark_blue">#01579B</color>
+    <color name="dark_blue">#02518F</color>
     <color name="red">#E4133D</color>
     <color name="orange">#EF670D</color>
     <color name="yellow">#FAD019</color>
-    <color name="medium_blue">#3b5998</color>
-    <color name="light_blue">#8b9dc3</color>
+    <color name="medium_blue">#124ECC</color>
+    <color name="light_blue">#336CE4</color>
     <color name="medium_gray">#777777</color>
     <color name="gray">#919191</color>
     <color name="light_gray">#f7f7f7</color>

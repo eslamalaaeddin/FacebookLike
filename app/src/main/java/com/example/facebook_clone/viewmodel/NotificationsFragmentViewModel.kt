@@ -12,7 +12,7 @@ class NotificationsFragmentViewModel(private val usersRepository: UsersRepositor
         return usersRepository.getNotificationsLiveData(userId)
     }
 
-    fun deleteNotificationById(notificationId: String): Task<Void>{
-       return usersRepository.deleteNotificationById(notificationId)
+    fun deleteNotificationById(notifiedId: String,notificationId: String): Task<Void>{
+       return usersRepository.deleteNotificationById(notifiedId, notificationId)
     }
 }

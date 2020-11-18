@@ -5,15 +5,12 @@ import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.facebook_clone.R
 import com.example.facebook_clone.helper.listener.NotificationListener
 import com.example.facebook_clone.model.notification.Notification
-import com.example.facebook_clone.model.user.friend.Friend
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.notification_recycled_item_layout.view.*
-import kotlinx.android.synthetic.main.profile_post_item.view.*
 
 
 class NotificationsAdapter(private var notifications: List<Notification>,
@@ -31,17 +28,19 @@ class NotificationsAdapter(private var notifications: List<Notification>,
 
             itemView.confirmFriendRequestButton.setOnClickListener {
                 val notificationId = notifications[adapterPosition].id.toString()
-                val notifierId =notifications[adapterPosition].notifier?.id.toString()
-                val notifierName =notifications[adapterPosition].notifier?.name.toString()
-                val notifierImageUrl =notifications[adapterPosition].notifier?.imageUrl.toString()
-                notListener.onClickConfirmFriendRequestNotification(notificationId,notifierId,notifierName, notifierImageUrl)
+                val notifierId =notifications[adapterPosition].notifierId.toString()
+                val notifiedId =notifications[adapterPosition].notifierId.toString()
+                val notifierName =notifications[adapterPosition].notifierName.toString()
+                val notifierImageUrl =notifications[adapterPosition].notifierImageUrl.toString()
+                notListener.onClickConfirmFriendRequestNotification(notifiedId, notificationId,notifierId,notifierName, notifierImageUrl)
                 itemView.cancelFriendRequestButton.visibility = View.GONE
                 itemView.confirmFriendRequestButton.visibility = View.GONE
             }
 
             itemView.cancelFriendRequestButton.setOnClickListener {
                 val notificationId = notifications[adapterPosition].id.toString()
-                notListener.onClickDeleteFriendRequestNotification(notificationId)
+                val notifiedId =notifications[adapterPosition].notifierId.toString()
+                notListener.onClickDeleteFriendRequestNotification(notifiedId, notificationId)
                 itemView.cancelFriendRequestButton.visibility = View.GONE
                 itemView.confirmFriendRequestButton.visibility = View.GONE
             }
@@ -50,24 +49,67 @@ class NotificationsAdapter(private var notifications: List<Notification>,
 
         @SuppressLint("SetTextI18n")
         fun bind(notification: Notification) {
-            Picasso.get().load(notification.notifier?.imageUrl).into(itemView.notifierImageView)
+            Picasso.get().load(notification.notifierImageUrl).into(itemView.notifierImageView)
             itemView.notificationDateTextView.text =
                 DateFormat.format("EEEE, MMM d, h:mm a", notification.notificationTime.toDate())
 
             if (notification.notificationType == "friendRequest"){
-                itemView.notificationDescription.text = "${notification.notifier?.name} sent you a friend request"
+                itemView.notifierName.text = notification.notifierName
+                itemView.notificationDescription.text = "sent you a friend request"
                 itemView.notificationVisualDescription.setImageResource(R.drawable.ic_friend_request)
                 itemView.confirmFriendRequestButton.visibility = View.VISIBLE
                 itemView.cancelFriendRequestButton.visibility = View.VISIBLE
             }else{
+                if (notification.notificationType == "reactOnPost"){
+                    itemView.notifierName.text = notification.notifierName
+                    itemView.notificationDescription.text = "reacted to your post"
+                    itemView.notificationVisualDescription.setImageResource(R.drawable.ic_love_react)
+                }
+
+                if (notification.notificationType == "commentOnPost"){
+                    itemView.notifierName.text = notification.notifierName
+                    itemView.notificationDescription.text = "commented on your post"
+                    itemView.notificationVisualDescription.setImageResource(R.drawable.ic_notification_comment)
+                }
+
+                if (notification.notificationType == "share"){
+                    itemView.notifierName.text = notification.notifierName
+                    itemView.notificationDescription.text = "shared your post"
+                    itemView.notificationVisualDescription.setImageResource(R.drawable.ic_share_noification)
+                }
                 itemView.confirmFriendRequestButton.visibility = View.GONE
                 itemView.cancelFriendRequestButton.visibility = View.GONE
             }
         }
 
         override fun onClick(item: View?) {
-            val userId = notifications[adapterPosition].notifier?.id.toString()
-            notListener.onClickFriendRequestNotification(userId)
+            val currentNotification = notifications[adapterPosition]
+            val notificationType = currentNotification.notificationType.toString()
+            val notifierId = currentNotification.notifierId.toString()
+            val notifiedId = currentNotification.notifiedId.toString()
+            val notifierName = currentNotification.notifierName.toString()
+            val notifierImageUrl = currentNotification.notifierImageUrl.toString()
+            //val whereTheActionOccurred = currentNotification.whereTheActionOccurred.toString()
+           // val placeId = currentNotification.placeId.toString()
+           // val postPosition = currentNotification.postPosition
+            val postId = currentNotification.postId.toString()
+            val commentPosition = currentNotification.commentPosition
+            val commentId = currentNotification.commentId.toString()
+            val id = currentNotification.id.toString()
+
+            when (notificationType){
+                "friendRequest" ->  notListener.onClickFriendRequestNotification(notifierId)
+                "reactOnPost" -> notListener.onClickReactOnPostNotification(
+                    postPublisherId = notifiedId,
+                    postId = postId
+                )
+                "commentOnPost" -> notListener.onClickCommentOnPostNotification(
+                    postPublisherId = notifiedId,
+                    postId = postId,
+                    commentPosition = commentPosition!!
+                )
+            }
+
         }
 
         override fun onLongClick(item: View?): Boolean {

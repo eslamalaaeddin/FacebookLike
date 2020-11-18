@@ -3,6 +3,7 @@ package com.example.facebook_clone.viewmodel
 import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.model.user.friendrequest.FriendRequest
 import com.example.facebook_clone.repository.UsersRepository
@@ -17,6 +18,10 @@ class ProfileActivityViewModel(private val usersRepository: UsersRepository) : V
     fun getAnotherUser(userId: String): LiveData<User>? {
         return usersRepository.getUser(userId)
     }
+
+//    fun getNotifications(userId: String) : LiveData<List<Post>> {
+//        return usersRepository.getNotificationsLiveData(userId)
+//    }
 
     fun uploadProfileImageToCloudStorage(bitmap: Bitmap): UploadTask {
         return usersRepository.uploadImageToCloudStorage(bitmap,"profile")

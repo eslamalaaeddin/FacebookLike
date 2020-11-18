@@ -91,7 +91,7 @@
         app:layout_constraintTop_toBottomOf="@+id/userNameTextView" />
 
     <EditText
-        android:id="@+id/postContentEditText"
+        android:id="@+id/postContentTextView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"

@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:paddingBottom="8dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/notifierImageView"
@@ -20,30 +21,35 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:background="@drawable/round_background"
+        android:backgroundTint="@android:color/transparent"
         android:scaleType="centerCrop"
         app:layout_constraintCircle="@id/notifierImageView"
         app:layout_constraintCircleAngle="140"
         app:layout_constraintCircleRadius="25dp"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="40dp"
+        tools:layout_editor_absoluteY="43dp" />
 
     <TextView
         android:id="@+id/notificationDescription"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="72dp"
+        android:layout_marginEnd="8dp"
         android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/notifierName"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/notifierImageView"
+        app:layout_constraintStart_toEndOf="@+id/notifierName"
         app:layout_constraintTop_toTopOf="@+id/notifierImageView"
-        tools:text="Islam AlaaEddin commented on Your post" />
+        tools:text="commented on Your post" />
 
     <TextView
         android:id="@+id/notificationDateTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="2dp"
         android:text="Sep 24 at 10:55 PM"
         android:textSize="12sp"
         app:layout_constraintStart_toEndOf="@+id/notifierImageView"
@@ -79,5 +85,17 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/confirmFriendRequestButton"
         app:layout_constraintTop_toTopOf="@+id/confirmFriendRequestButton" />
+
+    <TextView
+        android:id="@+id/notifierName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="TextView"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/notifierImageView"
+        app:layout_constraintTop_toTopOf="@+id/notifierImageView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

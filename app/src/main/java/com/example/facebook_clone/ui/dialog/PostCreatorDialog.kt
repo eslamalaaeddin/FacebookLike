@@ -73,7 +73,7 @@ class PostCreatorDialog : DialogFragment(), AdapterView.OnItemSelectedListener, 
             postVisibilitySpinner.adapter = adapter
         }
 
-        postContentEditText.addTextChangedListener(object : TextWatcher {
+        postContentTextView.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
             }
@@ -141,18 +141,18 @@ class PostCreatorDialog : DialogFragment(), AdapterView.OnItemSelectedListener, 
                         }
                 }
             }
-
-            //val post = createPost(postData, postDataType)
-//            progressDialog = Utils.showProgressDialog(requireContext(), "Please wait...")
-//            postViewModel.createPost(post).addOnCompleteListener { task ->
-//                progressDialog?.dismiss()
-//                if (task.isSuccessful) {
-//                    Utils.toastMessage(requireContext(), "Post is created successfully")
-//                } else {
-//                    Utils.toastMessage(requireContext(), task.exception?.message.toString())
-//                }
-//            }
-
+            //Text post
+            else{
+                val post = createPost(null, null)
+                progressDialog = Utils.showProgressDialog(requireContext(), "Please wait...")
+                postViewModel.createPost(post).addOnCompleteListener { task ->
+                    progressDialog?.dismiss()
+                    if (!task.isSuccessful) {
+                        Utils.toastMessage(requireContext(), task.exception?.message.toString())
+                    }
+                    dismiss()
+                }
+            }
         }
 
         addToPostButton.setOnClickListener {
@@ -170,8 +170,8 @@ class PostCreatorDialog : DialogFragment(), AdapterView.OnItemSelectedListener, 
 
     }
 
-    private fun createPost(postAttachmentUrl: String, postAttachmentType: String): Post {
-        val content = postContentEditText.text.toString()
+    private fun createPost(postAttachmentUrl: String?, postAttachmentType: String?): Post {
+        val content = postContentTextView.text.toString()
 
         return Post(
             publisherId = auth.currentUser?.uid.toString(),
@@ -183,10 +183,6 @@ class PostCreatorDialog : DialogFragment(), AdapterView.OnItemSelectedListener, 
             attachmentType = postAttachmentType
         )
     }
-
-
-
-
 
     override fun setUserNameAndProfileImageUrl(name: String, url: String) {
         userName = name

@@ -1,5 +1,6 @@
 package com.example.facebook_clone.ui.bottomsheet
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.os.Bundle
 import android.text.Editable
@@ -13,6 +14,7 @@ import com.example.facebook_clone.adapter.CommentsAdapter
 import com.example.facebook_clone.helper.listener.CommentClickListener
 import com.example.facebook_clone.helper.listener.ReactClickListener
 import com.example.facebook_clone.helper.Utils
+import com.example.facebook_clone.helper.listener.CommentsBottomSheetListener
 import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.comment.CommentDocument
 import com.example.facebook_clone.model.post.react.React
@@ -23,7 +25,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.comments_bottom_sheet.*
-import kotlinx.android.synthetic.main.user_who_reacted_item.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -34,12 +35,16 @@ class CommentsBottomSheet(
     private val postId: String,
     private val commenterId: String,
     private val commenterName: String,
-    private val imageUrl: String
+    private val imageUrl: String,
+    private val commentsBottomSheetListener: CommentsBottomSheetListener?
 ) : BottomSheetDialogFragment(), CommentClickListener, ReactClickListener {
     private val postViewModel by viewModel<PostViewModel>()
+    private lateinit var comBottomSheetListener: CommentsBottomSheetListener
+    private lateinit var commentsList: List<Comment>
+    private lateinit var reactsList: List<React>
     private val auth: FirebaseAuth by inject()
     private var commentsAdapter: CommentsAdapter =
-        CommentsAdapter(auth, commenterName, imageUrl, emptyList(),emptyList(), this, this)
+        CommentsAdapter(emptyList(),emptyList(), this, this)
 
     private var reactClicked = false
     //private lateinit var comments: List<Comment>
@@ -62,6 +67,9 @@ class CommentsBottomSheet(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        if (commentsBottomSheetListener != null) {
+            comBottomSheetListener = commentsBottomSheetListener
+        }
         return layoutInflater.inflate(R.layout.comments_bottom_sheet, container, false)
     }
 
@@ -106,22 +114,23 @@ class CommentsBottomSheet(
                 comment = commentContent,
                 commentType = "text"
             )
-
+            commentEditText.text.clear()
             postViewModel.createComment(postId, postPublisherId, comment)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        commentEditText.text.clear()
+//                        commentEditText.text.clear()
+                        //delegate to OTHERS ACTIVITY TO NOTIFY USER
+                        comBottomSheetListener.onAnotherUserCommented(commentsList.size - 1,comment.id!!,  postId)
                     } else {
                         Utils.toastMessage(requireContext(), task.exception?.message.toString())
                     }
                 }
 
         }
-
-
-
     }
 
+
+    @SuppressLint("SetTextI18n")
     private fun updateCommentsUI() {
         postViewModel.getPostById(postPublisherId, postId).addOnCompleteListener { task ->
             if (task.isSuccessful) {
@@ -134,11 +143,22 @@ class CommentsBottomSheet(
                     val commentsResult = snapshot?.toObject(CommentDocument::class.java)?.comments
                     val reactsResult =   snapshot?.toObject(ReactDocument::class.java)?.reacts
 
-                    val commentsList = commentsResult.orEmpty()
-                    val reactsList = reactsResult.orEmpty()
+                     commentsList = commentsResult.orEmpty()
+                     reactsList = reactsResult.orEmpty()
+
+//                    if (reactsList.isEmpty()){
+//                        reactsCountsInfoTextView.text = ""
+//                    }
 
                     reactsList.forEach { react ->
                         if (react.reactorId == commenterId){
+                            if (reactsList.size == 1){
+                                reactsCountsInfoTextView.text = commenterName
+                            }
+                            else{
+                                reactsCountsInfoTextView.text = "You and ${reactsResult?.size} others"
+                            }
+
                             when(react.react){
                                 1 -> { myReactPlaceHolder.setImageResource(R.drawable.ic_like_react)}
                                 2 -> { myReactPlaceHolder.setImageResource(R.drawable.ic_love_react)}
@@ -151,11 +171,10 @@ class CommentsBottomSheet(
                         }
                     }
 
+
+
                     commentsAdapter =
                         CommentsAdapter(
-                            auth,
-                            commenterName,
-                            imageUrl,
                             commentsList,
                             reactsList,
                             this,

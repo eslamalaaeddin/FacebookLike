@@ -13,15 +13,34 @@
             android:scaleType="centerCrop"
             android:src="@drawable/mansour" />
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/notificationContentTextView"
-        android:layout_gravity="center"
-        android:text="Mansour commented on your post"
-        style="@style/TextAppearance.Compat.Notification.Info"
-        android:textSize="12sp"
-        android:textColor="@color/black"
-        android:layout_marginStart="4dp"
-        />
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Facebook"
+            style="@style/TextAppearance.Compat.Notification.Title"
+            android:textSize="12sp"
+            android:textColor="@color/black"
+            android:layout_marginStart="4dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/notificationContentTextView"
+            android:layout_gravity="center"
+            android:text="Mansour commented on your post"
+            style="@style/TextAppearance.Compat.Notification.Info"
+            android:textSize="12sp"
+            android:layout_marginStart="4dp"
+            />
+
+    </LinearLayout>
+
+
 </LinearLayout>

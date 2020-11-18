@@ -16,11 +16,9 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.comment_item_layout.view.*
 
 private const val TAG = "CommentsAdapter"
-class CommentsAdapter(private val auth: FirebaseAuth,
-                      private val userName: String,
-                      private val userImageUrl: String,
+class CommentsAdapter(
                       private var comments: List<Comment>,
-                      private var reacts: List<React>,
+                      private var reacts: List<React>?,
                       private val commentClickListener: CommentClickListener,
                       private val reactClickListener: ReactClickListener
 ) :

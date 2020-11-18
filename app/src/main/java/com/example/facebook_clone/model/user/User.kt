@@ -8,6 +8,7 @@ import java.util.*
 
 data class User(
     var id: String? = null,
+    var token: String? = null,
     var name: String? = null,
     var gender: String? = null,
     var birthDay: String? = null,

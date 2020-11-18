@@ -145,7 +145,7 @@ class ProfilePostsAdapter(
                 itemView.postVisibilityImageView.setImageResource(R.drawable.ic_private_visibility)
             }
             //Content
-            itemView.postContentEditText.text = post.content
+            itemView.postContentTextView.text = post.content
 
             if (post.attachmentUrl != null){
                 itemView.attachmentImageView.visibility = View.VISIBLE

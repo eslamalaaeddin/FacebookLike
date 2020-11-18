@@ -31,7 +31,6 @@ import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.activity_others_profile.*
 import kotlinx.android.synthetic.main.activity_profile.*
 import kotlinx.android.synthetic.main.activity_profile.bioTextView
 import kotlinx.android.synthetic.main.activity_profile.coverImageView
@@ -257,7 +256,7 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
                         //profilePostsRecyclerView.scrollToPosition(10)
                     }
                     return@lit
-                } else {
+                } else if (postReacts.indexOf(react) == postReacts.size - 1) {
                     val myReact = createReact(interactorId, interactorName, interactorImageUrl, 1)
                     addReactToDb(myReact, postId, postPublisherId).addOnCompleteListener { task ->
                         if (!task.isSuccessful) {
@@ -315,7 +314,8 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
             postId,
             interactorId,
             interactorName,
-            interactorImageUrl
+            interactorImageUrl,
+            null
         ).apply {
             show(supportFragmentManager, tag)
         }
@@ -360,7 +360,8 @@ class ProfileActivity() : AppCompatActivity(), PostListener {
             postId,
             interactorId,
             interactorName,
-            interactorImageUrl
+            interactorImageUrl,
+            null
         ).apply {
             show(supportFragmentManager, tag)
         }

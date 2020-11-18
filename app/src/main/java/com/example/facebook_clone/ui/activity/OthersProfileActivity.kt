@@ -1,52 +1,57 @@
 package com.example.facebook_clone.ui.activity
 
-import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.SimpleTarget
-import com.bumptech.glide.request.transition.Transition
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.FriendsAdapter
 import com.example.facebook_clone.adapter.ProfilePostsAdapter
-import com.example.facebook_clone.helper.BaseApplication
+import com.example.facebook_clone.helper.Utils
+import com.example.facebook_clone.helper.listener.CommentsBottomSheetListener
 import com.example.facebook_clone.helper.listener.PostListener
+import com.example.facebook_clone.helper.notification.PushNotification
+import com.example.facebook_clone.helper.notification.RetrofitInstance
 import com.example.facebook_clone.model.notification.Notification
-import com.example.facebook_clone.model.notification.Notifier
 import com.example.facebook_clone.model.post.Post
+import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.model.post.react.React
+import com.example.facebook_clone.model.post.share.Share
 import com.example.facebook_clone.model.user.friendrequest.FriendRequest
 import com.example.facebook_clone.ui.bottomsheet.CommentsBottomSheet
+import com.example.facebook_clone.viewmodel.NotificationsFragmentViewModel
 import com.example.facebook_clone.viewmodel.OthersProfileActivityViewModel
 import com.example.facebook_clone.viewmodel.PostViewModel
 import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_others_profile.*
 import kotlinx.android.synthetic.main.activity_others_profile.friendsRecyclerView
 import kotlinx.android.synthetic.main.activity_others_profile.profilePostsRecyclerView
-import kotlinx.android.synthetic.main.activity_profile.*
 import kotlinx.android.synthetic.main.activity_profile.bioTextView
 import kotlinx.android.synthetic.main.activity_profile.coverImageView
 import kotlinx.android.synthetic.main.activity_profile.joinDateTextView
 import kotlinx.android.synthetic.main.activity_profile.profileImageView
 import kotlinx.android.synthetic.main.activity_profile.smallProfileImageView
 import kotlinx.android.synthetic.main.activity_profile.userNameTextView
-import kotlinx.android.synthetic.main.activity_testing.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 private const val TAG = "OthersProfileActivity"
-class OthersProfileActivity : AppCompatActivity(), PostListener {
+class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomSheetListener {
     private val profileActivityViewModel by viewModel<ProfileActivityViewModel>()
     private val othersProfileActivityViewModel by viewModel<OthersProfileActivityViewModel>()
     private val postViewModel by viewModel<PostViewModel>()
+    private val notificationsFragmentViewModel by viewModel<NotificationsFragmentViewModel>()
     private val auth: FirebaseAuth by inject()
     private lateinit var currentUser: User
+    private var currentNotificationId: String? = null
     private lateinit var userIAmViewing: User
     private var currentFriendRequest: FriendRequest? = null
     private lateinit var userIdIAmViewing: String
@@ -58,24 +63,25 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_others_profile)
 
-
         picasso = Picasso.get()
 
         val myLiveData = profileActivityViewModel.getMe(auth.currentUser?.uid.toString())
         myLiveData?.observe(this, { user ->
             user?.let {
                 currentUser = user
-                Log.i(TAG, "FAWZY onCreate: $currentUser")
                 //Check for friend requests
                 if (!currentUser.friendRequests.isNullOrEmpty()) {
+                    Toast.makeText(this, "a", Toast.LENGTH_SHORT).show()
                     currentUser.friendRequests?.forEach { friendRequest ->
                         if (friendRequest.fromId == currentUser.id) {
+                            Toast.makeText(this, "b", Toast.LENGTH_SHORT).show()
                             addFriendButton.visibility = View.INVISIBLE
                             addFriendButton.isEnabled = false
                             cancelRequestButton.isEnabled = true
                             cancelRequestButton.visibility = View.VISIBLE
                             currentFriendRequest = friendRequest
                         } else {
+                            Toast.makeText(this, "c", Toast.LENGTH_SHORT).show()
                             addFriendButton.isEnabled = true
                             cancelRequestButton.isEnabled = false
                             addFriendButton.visibility = View.VISIBLE
@@ -84,22 +90,42 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
                     }
                 }
 
-//                if there is a friendship
+                //there might be a friendship
                 else if (currentUser.friends != null) {
-                currentUser.friends?.forEach { friend ->
-                    if (friend.id == userIdIAmViewing) {
-                        addFriendButton.isEnabled = false
+                    Toast.makeText(this, "d", Toast.LENGTH_SHORT).show()
+                    if (currentUser.friends!!.isNotEmpty()) {
+                        Toast.makeText(this, "e", Toast.LENGTH_SHORT).show()
+                        currentUser.friends?.forEach { friend ->
+                            if (friend.id == userIdIAmViewing) {
+                                Toast.makeText(this, "f", Toast.LENGTH_SHORT).show()
+                                addFriendButton.isEnabled = false
+                                cancelRequestButton.isEnabled = false
+                                addFriendButton.visibility = View.INVISIBLE
+                                cancelRequestButton.visibility = View.INVISIBLE
+                                messageButton.isEnabled = true
+                                messageButton.visibility = View.VISIBLE
+                            }
+                            else{
+                                cancelRequestButton.isEnabled = false
+                                cancelRequestButton.visibility = View.INVISIBLE
+                            }
+                        }
+
+                    }else{
+                        addFriendButton.isEnabled = true
+                        addFriendButton.visibility = View.VISIBLE
                         cancelRequestButton.isEnabled = false
-                        addFriendButton.visibility = View.INVISIBLE
                         cancelRequestButton.visibility = View.INVISIBLE
                     }
+
                 }
-            } else {
-                addFriendButton.isEnabled = true
-                cancelRequestButton.isEnabled = false
-                addFriendButton.visibility = View.VISIBLE
-                cancelRequestButton.visibility = View.INVISIBLE
-            }
+                else {
+                    Toast.makeText(this, "g", Toast.LENGTH_SHORT).show()
+                    addFriendButton.isEnabled = true
+                    cancelRequestButton.isEnabled = false
+                    addFriendButton.visibility = View.VISIBLE
+                    cancelRequestButton.visibility = View.INVISIBLE
+                }
             }
         })
 
@@ -109,7 +135,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
             user?.let {
                 userIAmViewing = user
                 updateUserInfo(user)
-                if (!user.friends.isNullOrEmpty()){
+                if (!user.friends.isNullOrEmpty()) {
                     friendsAdapter = FriendsAdapter(user.friends!!)
                     friendsRecyclerView.adapter = friendsAdapter
                 }
@@ -118,12 +144,24 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
                 postsLiveData.observe(this, { posts ->
                     updateUserPosts(posts)
                 })
+
+                val notificationsLiveData =
+                    notificationsFragmentViewModel.getNotificationsLiveData(userIdIAmViewing)
+                notificationsLiveData.observe(this, { notifications ->
+                    if (notifications != null) {
+                        val userNotificationsIds = user.notificationsIds
+                        if (userNotificationsIds != null){
+                        notifications.forEach { notification ->
+                            if (userNotificationsIds?.contains(notification.id.toString())!!) {
+                                //CURRENT NOT ID
+                                currentNotificationId = notification.id.toString()
+                            }
+                        }
+                        }
+                    }
+                })
             }
         })
-
-
-
-
 
         addFriendButton.setOnClickListener { sendUserFriendRequest() }
 
@@ -133,7 +171,9 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
                     //Update ui
                     othersProfileActivityViewModel.removeFriendRequestFromMyDocument(currentFriendRequest!!).addOnCompleteListener{task2 ->
                         if (task2.isSuccessful){
-                            Toast.makeText(this, "Friend request is removed successfully", Toast.LENGTH_SHORT).show()
+                            if (currentNotificationId != null){
+                                handleNotificationDeleting(currentNotificationId!!, userIdIAmViewing)
+                            }
                         }else{
                             Toast.makeText(this, task2.exception?.message, Toast.LENGTH_SHORT).show()
                         }
@@ -142,6 +182,24 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
                     Toast.makeText(this, task1.exception?.message, Toast.LENGTH_SHORT).show()
                 }
             }
+        }
+        
+        messageButton.setOnClickListener {
+            Toast.makeText(this, "- -\n__", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun updateUserPosts(posts: List<Post>) {
+        profilePostsAdapter = ProfilePostsAdapter(
+            auth,
+            posts,
+            this,
+            currentUser.name.toString(),
+            currentUser.profileImageUrl.toString()
+        )
+        profilePostsRecyclerView.adapter = profilePostsAdapter
+        if (currentEditedPostPosition != -1){
+            profilePostsRecyclerView.scrollToPosition(currentEditedPostPosition)
         }
     }
 
@@ -168,29 +226,17 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
             fromId = currentUser.id,
             toId = userIdIAmViewing,
         )
-
         othersProfileActivityViewModel.addFriendRequestToHisDocument(friendRequest).addOnCompleteListener { task1 ->
             if (task1.isSuccessful){
                 //Update ui
                 othersProfileActivityViewModel.addFriendRequestToMyDocument(friendRequest).addOnCompleteListener{task2 ->
                     if (task2.isSuccessful){
-                        val notifier = Notifier(
-                            id = currentUser.id,
-                            imageUrl = currentUser.profileImageUrl,
-                            name = currentUser.name
+                        handleNotificationCreationAndFiringAndAdditionToDB(
+                            notificationType = "friendRequest",
+                            postId = null,
+                            commentPosition = null,
+                            commentId = null
                         )
-                        val notification = Notification("friendRequest", notifier)
-
-                        othersProfileActivityViewModel
-                            .addNotificationToNotificationsCollection(notification,userIdIAmViewing)
-                            .addOnCompleteListener { task3 ->
-                            if (task3.isSuccessful){
-                                Toast.makeText(this, "Friend request sent successfully", Toast.LENGTH_SHORT).show()
-                                //fireFriendRequestNotification(notification)
-                            }else{
-                                Toast.makeText(this, task3.exception?.message, Toast.LENGTH_SHORT).show()
-                            }
-                        }
                     }else{
                         Toast.makeText(this, task2.exception?.message, Toast.LENGTH_SHORT).show()
                     }
@@ -201,44 +247,29 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
         }
     }
 
-    private fun fireFriendRequestNotification(notification: Notification){
-        var bitmap : Bitmap? = null
-        Glide.with(this)
-            .asBitmap()
-            .load(currentUser.profileImageUrl)
-            .circleCrop()
-            .into(object : SimpleTarget<Bitmap>() {
-                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    bitmap = resource
-                    notification.notifier?.imageBitmap = bitmap
-                }
-            })
-
-//        button.setOnClickListener {
-//            BaseApplication.fireNotification(notification!!, MainActivity::class.java)
-//        }
+    private fun addNotificationIdToHisDocument(notificationId: String, hisId: String) {
+        othersProfileActivityViewModel.addNotificationIdToHisDocument(notificationId, hisId)
     }
 
-    private fun updateUserPosts(posts: List<Post>) {
-        //this check is to prevent recycler view from auto scrolling
-        //so, the ui have to be updated first from client side in addition to updating it from the server side
 
-//        if (profilePostsAdapter == null) {
-        profilePostsAdapter = ProfilePostsAdapter(
-            auth,
-            posts,
-            this,
-            currentUser.name.toString(),
-            currentUser.profileImageUrl.toString()
-        )
-        profilePostsRecyclerView.adapter = profilePostsAdapter
-        //position has to be changed post
-        if (currentEditedPostPosition != -1){
-            profilePostsRecyclerView.scrollToPosition(currentEditedPostPosition)
+
+    private fun fireAnyNotification(notification: Notification) = CoroutineScope(
+        Dispatchers.IO).launch {
+        try {
+            //userIAmViewing.token.toString()
+            val pushNotification = PushNotification(
+                data = notification,
+                to = userIAmViewing.token.toString()
+            )
+            val response = RetrofitInstance.api.postNotification(pushNotification)
+            if(response.isSuccessful) {
+                Log.i(TAG, "Response: Success")
+            } else {
+                Log.e(TAG, response.errorBody().toString())
+            }
+        } catch(e: Exception) {
+            Log.e(TAG, e.toString())
         }
-//        }else{
-//            profilePostsAdapter?.notifyDataSetChanged()
-//        }
     }
 
     override fun onReactButtonClicked(
@@ -250,6 +281,50 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
         postReacts: List<React>?,
         postPosition: Int
     ) {
+        currentEditedPostPosition = postPosition
+        if (postReacts?.isEmpty()!!){
+            val myReact = createReact(interactorId, interactorName, interactorImageUrl,1)
+            addReactToDb(myReact, postId, postPublisherId).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    handleNotificationCreationAndFiringAndAdditionToDB(
+                        notificationType = "reactOnPost",
+                        postId = postId,
+                        commentPosition = null,
+                        commentId = null
+                    )
+                }else{
+                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        else {
+            postReacts.forEach lit@{ react ->
+                if (react.reactorId == interactorId) {
+                    deleteReact(react, postId, postPublisherId).addOnCompleteListener { task ->
+                        if (!task.isSuccessful) {
+                            Utils.toastMessage(this, task.exception?.message.toString())
+                        }
+                    }
+                    return@lit
+                }
+                //last item
+                else if (postReacts.indexOf(react) == postReacts.size - 1) {
+                    val myReact = createReact(interactorId, interactorName, interactorImageUrl, 1)
+                    addReactToDb(myReact, postId, postPublisherId).addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            handleNotificationCreationAndFiringAndAdditionToDB(
+                                notificationType = "reactOnPost",
+                                postId = postId,
+                                commentPosition = null,
+                                commentId = null
+                            )
+                        }else{
+                            Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onReactButtonLongClicked(
@@ -278,7 +353,8 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
             postId,
             interactorId,
             interactorName,
-            interactorImageUrl
+            interactorImageUrl,
+            this
         ).apply {
             show(supportFragmentManager, tag)
         }
@@ -292,6 +368,26 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
         interactorImageUrl: String,
         postPosition: Int
     ) {
+        currentEditedPostPosition = postPosition
+        val share = Share(
+            sharerId = interactorId,
+            sharerName = interactorName,
+            sharerImageUrl = interactorImageUrl,
+        )
+
+        createShare(share, postId, postPublisherId).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Toast.makeText(this, "You shared this post", Toast.LENGTH_SHORT).show()
+                handleNotificationCreationAndFiringAndAdditionToDB(
+                    notificationType = "share",
+                    postId = postId,
+                    null,
+                    null
+                )
+            } else {
+                Utils.toastMessage(this, task.exception?.message.toString())
+            }
+        }
     }
 
     override fun onReactLayoutClicked(
@@ -303,6 +399,69 @@ class OthersProfileActivity : AppCompatActivity(), PostListener {
         postPosition: Int
     ) {
 
+    }
+
+    private fun addReactToDb(react: React, postId: String, postPublisherId: String): Task<Void> {
+        return postViewModel.createReact(react, postId, postPublisherId)
+
+    }
+
+    private fun createReact(interactorId: String, interactorName: String, interactorImageUrl: String,reactType: Int): React{
+        return React(
+            reactorId = interactorId,
+            reactorName = interactorName,
+            reactorImageUrl = interactorImageUrl,
+            react = reactType
+        )
+    }
+
+    private fun deleteReact(react: React, postId: String, postPublisherId: String): Task<Void> {
+        return postViewModel.deleteReact(react, postId, postPublisherId)
+    }
+
+    private fun createShare(share: Share, postId: String, postPublisherId: String): Task<Void> {
+        return postViewModel.createShare(share, postId, postPublisherId)
+    }
+
+    override fun onAnotherUserCommented(commentPosition: Int, commentId: String, postId: String) {
+        handleNotificationCreationAndFiringAndAdditionToDB(
+            "commentOnPost",
+            postId = postId,
+            commentPosition = commentPosition,
+            commentId = commentId
+        )
+    }
+
+    private fun handleNotificationCreationAndFiringAndAdditionToDB(
+        notificationType: String?,
+        postId: String?,
+        commentPosition: Int?,
+        commentId: String?
+    ){
+        val notification = Notification(
+                        postId = postId,
+                        commentPosition = commentPosition,
+                        commentId = commentId,
+                        notificationType = notificationType,
+                        notifierId = currentUser.id,
+                        notifiedId = userIdIAmViewing,
+                        notifierName = currentUser.name,
+                        notifierImageUrl = currentUser.profileImageUrl
+                    )
+        othersProfileActivityViewModel
+            .addNotificationToNotificationsCollection(notification,userIdIAmViewing)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful){
+                    addNotificationIdToHisDocument(notification.id!!, userIdIAmViewing)
+                    fireAnyNotification(notification)
+                }else{
+                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+    private fun handleNotificationDeleting(notificationId: String, hisId: String) {
+        othersProfileActivityViewModel.removeNotificationIdFromHisDocument(notificationId, hisId)
+        notificationsFragmentViewModel.deleteNotificationById(userIdIAmViewing, notificationId)
     }
 
 }

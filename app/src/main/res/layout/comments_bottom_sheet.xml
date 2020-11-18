@@ -36,11 +36,12 @@
             android:src="@drawable/ic_love_react" />
 
         <TextView
+            android:id="@+id/reactsCountsInfoTextView"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center|start"
-            android:text="You, and 5.7K others"
+            tools:text="You, and 5.7K others"
             android:textSize="16sp" />
 
         <ImageView
@@ -86,56 +87,56 @@
 
 
     <LinearLayout
-        android:id="@+id/commentLayout"
+    android:id="@+id/commentLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentStart="true"
+    android:layout_alignParentEnd="true"
+    android:layout_alignParentBottom="true"
+    android:layout_gravity="bottom"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <ImageView
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/ic_attachment"
+        app:tint="@color/medium_gray" />
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_gravity="bottom"
+        android:layout_height="48dp"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/round_background"
+        android:backgroundTint="#EFEFEF"
         android:gravity="center"
-        android:orientation="horizontal"
-        android:padding="8dp">
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/commentEditText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:layout_weight="1"
+            android:background="@null"
+            android:hint="Write a comment..."
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            tools:ignore="RtlSymmetry" />
 
         <ImageView
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:src="@drawable/ic_attachment"
-            app:tint="@color/medium_gray" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginStart="8dp"
-            android:background="@drawable/round_background"
-            android:backgroundTint="#EFEFEF"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/commentEditText"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp"
-                android:layout_weight="1"
-                android:background="@null"
-                android:hint="Write a comment..."
-                android:paddingStart="4dp"
-                android:paddingEnd="4dp"
-                tools:ignore="RtlSymmetry" />
-
-            <ImageView
-                android:id="@+id/sendCommentImageView"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:layout_margin="4dp"
-                android:src="@drawable/ic_comment_send"
-                android:visibility="gone" />
-
-        </LinearLayout>
+            android:id="@+id/sendCommentImageView"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_margin="4dp"
+            android:src="@drawable/ic_comment_send"
+            android:visibility="gone" />
 
     </LinearLayout>
+
+</LinearLayout>
 
 
 </RelativeLayout>

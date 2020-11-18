@@ -111,6 +111,16 @@ class UsersRepository(
             .collection(Utils.MY_NOTIFICATIONS_COLLECTION).document(notification.id.toString()).set(notification)
     }
 
+    fun addNotificationIdToHisDocument(notificationId: String, hisId: String): Task<Void>{
+        return database.collection(USERS_COLLECTION).document(hisId)
+            .update("notificationsIds", FieldValue.arrayUnion(notificationId))
+    }
+
+    fun removeNotificationIdFromHisDocument(notificationId: String, hisId: String): Task<Void>{
+        return database.collection(USERS_COLLECTION).document(hisId)
+            .update("notificationsIds", FieldValue.arrayRemove(notificationId))
+    }
+
     fun getNotificationsLiveData(userId: String): LiveData<List<Notification>>{
         var notifications: MutableList<Notification>?
         val liveData = MutableLiveData<List<Notification>>()
@@ -140,10 +150,10 @@ class UsersRepository(
         }
     }
 
-    fun deleteNotificationById(notificationId: String): Task<Void>{
+    fun deleteNotificationById(notifiedId: String,notificationId: String): Task<Void>{
         return  database
             .collection(Utils.NOTIFICATIONS_COLLECTION)
-            .document(auth.currentUser?.uid.toString())
+            .document(notifiedId)
             .collection(MY_NOTIFICATIONS_COLLECTION)
             .document(notificationId).delete()
     }

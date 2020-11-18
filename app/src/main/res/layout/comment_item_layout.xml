@@ -13,7 +13,6 @@
         android:layout_height="48dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:src="@drawable/sengab"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -35,7 +34,7 @@
             android:id="@+id/commenterNameTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Islam AlaaEddin"
+            tools:text="Islam AlaaEddin"
             android:textColor="@color/black"
             android:textSize="14sp" />
 
@@ -43,7 +42,7 @@
             android:id="@+id/commentTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="good"
+            tools:text="good"
             android:textColor="@color/black"
             android:textSize="12sp" />
 
