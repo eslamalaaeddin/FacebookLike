@@ -13,6 +13,11 @@ interface NotificationListener {
         postId: String,
     )
 
+    fun onClickShareOnPostNotification(
+        postPublisherId: String,
+        postId: String,
+    )
+
     fun onClickCommentOnPostNotification(
         postPublisherId: String,
         postId: String,

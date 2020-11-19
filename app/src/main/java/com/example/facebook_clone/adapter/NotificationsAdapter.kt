@@ -61,9 +61,19 @@ class NotificationsAdapter(private var notifications: List<Notification>,
                 itemView.cancelFriendRequestButton.visibility = View.VISIBLE
             }else{
                 if (notification.notificationType == "reactOnPost"){
+                    val reactType = notification.reactType
                     itemView.notifierName.text = notification.notifierName
                     itemView.notificationDescription.text = "reacted to your post"
-                    itemView.notificationVisualDescription.setImageResource(R.drawable.ic_love_react)
+                    when(reactType){
+                        1 -> itemView.notificationVisualDescription.setImageResource(R.drawable.ic_like_react)
+                        2 -> itemView.notificationVisualDescription.setImageResource(R.drawable.ic_love_react)
+                        3 -> itemView.notificationVisualDescription.setImageResource(R.drawable.ic_care_react)
+                        4 -> itemView.notificationVisualDescription.setImageResource(R.drawable.ic_haha_react)
+                        5 -> itemView.notificationVisualDescription.setImageResource(R.drawable.ic_wow_react)
+                        6 -> itemView.notificationVisualDescription.setImageResource(R.drawable.ic_sad_react)
+                        7 -> itemView.notificationVisualDescription.setImageResource(R.drawable.ic_angry_angry)
+                    }
+
                 }
 
                 if (notification.notificationType == "commentOnPost"){
@@ -94,7 +104,7 @@ class NotificationsAdapter(private var notifications: List<Notification>,
            // val postPosition = currentNotification.postPosition
             val postId = currentNotification.postId.toString()
             val commentPosition = currentNotification.commentPosition
-            val commentId = currentNotification.commentId.toString()
+            //val commentId = currentNotification.commentId.toString()
             val id = currentNotification.id.toString()
 
             when (notificationType){
@@ -107,6 +117,10 @@ class NotificationsAdapter(private var notifications: List<Notification>,
                     postPublisherId = notifiedId,
                     postId = postId,
                     commentPosition = commentPosition!!
+                )
+                "share" -> notListener.onClickShareOnPostNotification(
+                    postPublisherId = notifiedId,
+                    postId = postId,
                 )
             }
 

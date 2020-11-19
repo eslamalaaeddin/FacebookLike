@@ -14,6 +14,7 @@ import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.facebook_clone.helper.listener.PostListener
+import com.example.facebook_clone.model.post.react.React
 import com.google.firebase.auth.FirebaseAuth
 
 private const val TAG = "ProfilePostsAdapter"
@@ -43,7 +44,8 @@ class ProfilePostsAdapter(
         holder.bind(post)
     }
 
-    inner class ProfilePostsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    inner class ProfilePostsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+        View.OnClickListener {
 
         init {
             itemView.setOnClickListener(this)
@@ -71,13 +73,27 @@ class ProfilePostsAdapter(
                 val postId = post.id.toString()
                 val postPublisherId = post.publisherId.toString()
                 val currentPostReacts = post.reacts.orEmpty()
+                var currentReact: React? = null
+                var reacted: Boolean = false
+
+                post.reacts?.let { reacts ->
+                    for (react in reacts) {
+                        if (react.reactorId == interactorId) {
+                            currentReact = react
+                            reacted = true
+                            break
+                        }
+                    }
+                }
+
                 listener.onReactButtonClicked(
                     postPublisherId,
                     postId,
                     interactorId,
                     interactorName,
                     interactorImageUrl,
-                    currentPostReacts,
+                    reacted,
+                    currentReact,//null
                     adapterPosition
                 )
 
@@ -89,13 +105,27 @@ class ProfilePostsAdapter(
                 val postId = post.id.toString()
                 val postPublisherId = post.publisherId.toString()
                 val currentPostReacts = post.reacts.orEmpty()
+                var currentReact: React? = null
+                var reacted: Boolean = false
+
+                post.reacts?.let { reacts ->
+                    for (react in reacts) {
+                        if (react.reactorId == interactorId) {
+                            currentReact = react
+                            reacted = true
+                            break
+                        }
+                    }
+                }
+
                 listener.onReactButtonLongClicked(
                     postPublisherId,
                     postId,
                     interactorId,
                     interactorName,
                     interactorImageUrl,
-                    currentPostReacts,
+                    reacted,
+                    currentReact,//null
                     adapterPosition
                 )
                 true
@@ -151,20 +181,20 @@ class ProfilePostsAdapter(
             //Content
             itemView.postContentTextView.text = post.content
 
-            if (post.attachmentUrl != null){
+            if (post.attachmentUrl != null) {
                 itemView.attachmentImageView.visibility = View.VISIBLE
-                if (post.attachmentType == "image"){
+                if (post.attachmentType == "image") {
                     picasso.load(post.attachmentUrl).into(itemView.attachmentImageView)
                     itemView.playButtonImageView.visibility = View.GONE
-                }
-                else if(post.attachmentType == "video"){
+                } else if (post.attachmentType == "video") {
                     itemView.playButtonImageView.visibility = View.VISIBLE
-                    val interval: Long = 1* 1000
+                    val interval: Long = 1 * 1000
                     val options: RequestOptions = RequestOptions().frame(interval)
                     Glide.with(itemView.context)
-                        .asBitmap().load(post.attachmentUrl).apply(options).into(itemView.attachmentImageView)
+                        .asBitmap().load(post.attachmentUrl).apply(options)
+                        .into(itemView.attachmentImageView)
                 }
-            }else{
+            } else {
                 itemView.attachmentImageView.visibility = View.GONE
                 itemView.playButtonImageView.visibility = View.GONE
             }
@@ -206,82 +236,113 @@ class ProfilePostsAdapter(
                 itemView.reactsCountTextView.text = post.reacts?.size.toString()
             }
 
-            post.reacts?.forEach { react ->
-                if (react.reactorId == auth.currentUser?.uid.toString() || post.reacts?.isEmpty()!!) {
-                    itemView.reactImageViewGrey.visibility = View.INVISIBLE
-                    itemView.reactImageViewBlue.visibility = View.VISIBLE
-                   // itemView.addReactTextView.text = "Like"
-                   // itemView.likeReactPlaceHolder.visibility = View.VISIBLE
-                    //itemView.addReactTextView.setTextColor(itemView.context.resources.getColor(R.color.dark_blue))
-                 //   itemView.reactImageViewBlue.setImageResource(R.drawable.ic_thumb_up)
-                    when(react.react){
-                        1 -> {
-                            itemView.addReactTextView.text = "Like"
-                            itemView.addReactTextView.setTextColor(itemView.context.resources.getColor(R.color.dark_blue))
-                            itemView.reactImageViewBlue.setImageResource(R.drawable.ic_thumb_up)
+            post.reacts?.let { reacts ->
+                for (react in reacts) {
+                    // || post.reacts?.isEmpty()!!
+                    if (react.reactorId == auth.currentUser?.uid.toString()) {
+                        itemView.reactImageViewGrey.visibility = View.INVISIBLE
+                        itemView.reactImageViewBlue.visibility = View.VISIBLE
+                        when (react.react) {
+                            1 -> {
+                                itemView.addReactTextView.text = "Like"
+                                itemView.addReactTextView.setTextColor(
+                                    itemView.context.resources.getColor(
+                                        R.color.dark_blue
+                                    )
+                                )
+                                itemView.reactImageViewBlue.setImageResource(R.drawable.ic_thumb_up)
+                            }
+                            2 -> {
+                                itemView.addReactTextView.text = "Love"
+                                itemView.addReactTextView.setTextColor(
+                                    itemView.context.resources.getColor(
+                                        R.color.red
+                                    )
+                                )
+                                itemView.reactImageViewBlue.setImageResource(R.drawable.ic_love_react)
+                            }
+                            3 -> {
+                                itemView.addReactTextView.text = "Care"
+                                itemView.addReactTextView.setTextColor(
+                                    itemView.context.resources.getColor(
+                                        R.color.orange
+                                    )
+                                )
+                                itemView.reactImageViewBlue.setImageResource(R.drawable.ic_care_react)
+                            }
+                            4 -> {
+                                itemView.addReactTextView.text = "Haha"
+                                itemView.addReactTextView.setTextColor(
+                                    itemView.context.resources.getColor(
+                                        R.color.orange
+                                    )
+                                )
+                                itemView.reactImageViewBlue.setImageResource(R.drawable.ic_haha_react)
+                            }
+                            5 -> {
+                                itemView.addReactTextView.text = "Wow"
+                                itemView.addReactTextView.setTextColor(
+                                    itemView.context.resources.getColor(
+                                        R.color.orange
+                                    )
+                                )
+                                itemView.reactImageViewBlue.setImageResource(R.drawable.ic_wow_react)
+                            }
+                            6 -> {
+                                itemView.addReactTextView.text = "Sad"
+                                itemView.addReactTextView.setTextColor(
+                                    itemView.context.resources.getColor(
+                                        R.color.yellow
+                                    )
+                                )
+                                itemView.reactImageViewBlue.setImageResource(R.drawable.ic_sad_react)
+                            }
+                            7 -> {
+                                itemView.addReactTextView.text = "Angry"
+                                itemView.addReactTextView.setTextColor(
+                                    itemView.context.resources.getColor(
+                                        R.color.orange
+                                    )
+                                )
+                                itemView.reactImageViewBlue.setImageResource(R.drawable.ic_angry_angry)
+                            }
                         }
-                        2 -> {
-                            itemView.addReactTextView.text = "Love"
-                            itemView.addReactTextView.setTextColor(itemView.context.resources.getColor(R.color.red))
-                            itemView.reactImageViewBlue.setImageResource(R.drawable.ic_love_react)
-                        }
-                        3 -> {
-                            itemView.addReactTextView.text = "Care"
-                            itemView.addReactTextView.setTextColor(itemView.context.resources.getColor(R.color.orange))
-                            itemView.reactImageViewBlue.setImageResource(R.drawable.ic_care_react)
-                        }
-                        4 -> {
-                            itemView.addReactTextView.text = "Haha"
-                            itemView.addReactTextView.setTextColor(itemView.context.resources.getColor(R.color.orange))
-                            itemView.reactImageViewBlue.setImageResource(R.drawable.ic_haha_react)
-                        }
-                        5 -> {
-                            itemView.addReactTextView.text = "Wow"
-                            itemView.addReactTextView.setTextColor(itemView.context.resources.getColor(R.color.orange))
-                            itemView.reactImageViewBlue.setImageResource(R.drawable.ic_wow_react)
-                        }
-                        6 -> {
-                            itemView.addReactTextView.text = "Sad"
-                            itemView.addReactTextView.setTextColor(itemView.context.resources.getColor(R.color.yellow))
-                            itemView.reactImageViewBlue.setImageResource(R.drawable.ic_sad_react)
-                        }
-                        7 -> {
-                            itemView.addReactTextView.text = "Angry"
-                            itemView.addReactTextView.setTextColor(itemView.context.resources.getColor(R.color.orange))
-                            itemView.reactImageViewBlue.setImageResource(R.drawable.ic_angry_angry)
-                        }
-
+                        break
                     }
-
-
-                }
-                //no react
-                else {
-                    itemView.reactImageViewGrey.visibility = View.VISIBLE
-                    itemView.reactImageViewBlue.visibility = View.INVISIBLE
-                    //itemView.likeReactPlaceHolder.visibility = View.INVISIBLE
+                    //no react from me
+                    else {
+                        itemView.reactImageViewGrey.visibility = View.VISIBLE
+                        itemView.reactImageViewBlue.visibility = View.INVISIBLE
+                        itemView.addReactTextView.text = "Like"
+                        //itemView.likeReactPlaceHolder.visibility = View.INVISIBLE
+                    }
                 }
             }
 
+
             val currentUserId = auth.currentUser?.uid.toString()
             val postVisibility = post.visibility
-            if (currentUserId != post.publisherId){
-                if (postVisibility == 0){
+            if (currentUserId != post.publisherId) {
+                if (postVisibility == 0) {
                     itemView.visibility = View.VISIBLE
                     itemView.layoutParams =
-                        RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-                }
-                else if (postVisibility == 1){
-                    if (iAmFriend){
+                        RecyclerView.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                        )
+                } else if (postVisibility == 1) {
+                    if (iAmFriend) {
                         itemView.visibility = View.VISIBLE
                         itemView.layoutParams =
-                            RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-                    }else{
+                            RecyclerView.LayoutParams(
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT
+                            )
+                    } else {
                         itemView.visibility = View.GONE
                         itemView.layoutParams = RecyclerView.LayoutParams(0, 0)
                     }
-                }
-                else{
+                } else {
                     itemView.visibility = View.GONE
                     itemView.layoutParams = RecyclerView.LayoutParams(0, 0)
                 }
@@ -290,10 +351,10 @@ class ProfilePostsAdapter(
 
         override fun onClick(p0: View?) {
             val post = postsList[adapterPosition]
-            if (post.attachmentType != null){
-                if (post.attachmentType == "video"){
+            if (post.attachmentType != null) {
+                if (post.attachmentType == "video") {
                     listener.onMediaPostClicked(post.attachmentUrl.toString())
-                }else{
+                } else {
                     listener.onMediaPostClicked(post.attachmentUrl.toString())
                 }
             }
@@ -303,7 +364,6 @@ class ProfilePostsAdapter(
     override fun getItemCount(): Int {
         return postsList.size
     }
-
 
 
 }

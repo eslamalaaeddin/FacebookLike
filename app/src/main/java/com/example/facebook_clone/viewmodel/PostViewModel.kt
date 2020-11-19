@@ -72,4 +72,8 @@ class PostViewModel(private val repository: PostsRepository): ViewModel() {
         return repository.uploadVideoCommentToCloudStorage(videoUri)
     }
 
+    fun updateReactedValue(postPublisherId: String, postId: String, reacted: Int?): Task<Void>{
+        return repository.updateReactedValue(postPublisherId, postId, reacted)
+    }
+
 }

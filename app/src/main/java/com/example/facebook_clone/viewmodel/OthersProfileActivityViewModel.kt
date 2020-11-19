@@ -25,16 +25,16 @@ class OthersProfileActivityViewModel(private val usersRepository: UsersRepositor
         return usersRepository.removeFriendRequestFromHisDocument(friendRequest)
     }
 
-    fun addNotificationToNotificationsCollection(notification: Notification, userToBeNotifiedId: String): Task<Void>{
-        return usersRepository.addNotificationToNotificationsCollection(notification, userToBeNotifiedId)
+    fun addNotificationToNotificationsCollection(notification: Notification, notifiedId: String): Task<Void>{
+        return usersRepository.addNotificationToNotificationsCollection(notification, notifiedId)
     }
 
-    fun addNotificationIdToHisDocument(notificationId: String, hisId: String): Task<Void>{
-         return usersRepository.addNotificationIdToHisDocument(notificationId, hisId)
+    fun addNotificationIdToNotifiedDocument(notificationId: String, notifiedId: String): Task<Void>{
+         return usersRepository.addNotificationIdToHisDocument(notificationId, notifiedId)
     }
 
-    fun removeNotificationIdFromHisDocument(notificationId: String, hisId: String): Task<Void>{
-        return usersRepository.removeNotificationIdFromHisDocument(notificationId, hisId)
+    fun deleteNotificationIdFromNotifiedDocument(notificationId: String, notifiedId: String): Task<Void>{
+        return usersRepository.deleteNotificationIdFromNotifiedDocument(notificationId, notifiedId)
     }
 
     fun createFriendshipBetweenMeAndHim(meAsFriend: Friend, himAsFriend: Friend): Task<Void>{

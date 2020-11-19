@@ -27,8 +27,9 @@
         <de.hdodenhof.circleimageview.CircleImageView
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:id="@+id/userImageView"
             android:layout_margin="8dp"
-            android:src="@drawable/mansour"/>
+            />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -39,7 +40,7 @@
                 android:id="@+id/userNameTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Islam AlaaEddin"
+                tools:text="Islam AlaaEddin"
                 android:textSize="18sp"
                 android:textColor="@color/black"/>
 

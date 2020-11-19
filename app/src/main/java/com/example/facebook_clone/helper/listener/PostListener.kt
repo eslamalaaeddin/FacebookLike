@@ -11,7 +11,8 @@ interface PostListener{
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
-        postReacts: List<React>?,
+        reacted: Boolean,
+        currentReact: React?,
         postPosition: Int
     )
 
@@ -21,7 +22,8 @@ interface PostListener{
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
-        postReacts: List<React>?,
+        reacted: Boolean,
+        currentReact: React?,
         postPosition: Int
     )
 

@@ -12,14 +12,9 @@ data class Notification(
     @get:Exclude var imageBitmap: Bitmap? = null,
     var notifierName: String? = null,
     var notifierImageUrl: String? = null,
-
-   // var whereTheActionOccurred: String? = null, //page, group, profile
-   // var placeId: String? = null, //page id, group id, profile id
-   // var postPosition: Int? = null,
     var postId: String? = null,
+    var reactType: Int? = 1,
     var commentPosition: Int? = null,
-    var commentId: String? = null,
-
     val id: String? = UUID.randomUUID().toString(),
     val notificationTime: Timestamp = Timestamp(Date())
 )

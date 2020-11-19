@@ -15,6 +15,7 @@ import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.helper.listener.CommentsBottomSheetListener
 import com.example.facebook_clone.helper.listener.FriendClickListener
 import com.example.facebook_clone.helper.listener.PostListener
+import com.example.facebook_clone.helper.notification.NotificationsHandler
 import com.example.facebook_clone.helper.notification.PushNotification
 import com.example.facebook_clone.helper.notification.RetrofitInstance
 import com.example.facebook_clone.model.notification.Notification
@@ -65,17 +66,27 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
     private var currentEditedPostPosition: Int = -1
     private var profilePostsAdapter: ProfilePostsAdapter? = null
     private lateinit var friendsAdapter: FriendsAdapter
+    private lateinit var notificationsHandler: NotificationsHandler
     private var choice: Int? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_others_profile)
 
         picasso = Picasso.get()
+        notificationsHandler = NotificationsHandler(
+            othersProfileActivityViewModel = othersProfileActivityViewModel,
+            notificationsFragmentViewModel = notificationsFragmentViewModel
+        )
 
         val myLiveData = profileActivityViewModel.getMe(auth.currentUser?.uid.toString())
         myLiveData?.observe(this, { user ->
             user?.let {
                 currentUser = user
+
+                notificationsHandler.notifierId = currentUser.id
+                notificationsHandler.notifierName = currentUser.name
+                notificationsHandler.notifierImageUrl = currentUser.profileImageUrl
+
                 //Check for friend requests
                 if (!currentUser.friendRequests.isNullOrEmpty()) {
                  //   Toast.makeText(this, "a", Toast.LENGTH_SHORT).show()
@@ -136,11 +147,14 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             }
         })
 
+
         userIdIAmViewing = intent.getStringExtra("userId").toString()
+        notificationsHandler.notifiedId = userIdIAmViewing
         val userLiveDate = profileActivityViewModel.getAnotherUser(userIdIAmViewing)
         userLiveDate?.observe(this, { user ->
             user?.let {
                 userIAmViewing = user
+                notificationsHandler.notifiedToken = userIAmViewing.token
                 updateUserInfo(user)
                 if (!user.friends.isNullOrEmpty()) {
                     friendsAdapter = FriendsAdapter(user.friends!!, this)
@@ -170,32 +184,34 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
                 })
             }
         })
-
-        addFriendButton.setOnClickListener { sendUserFriendRequest() }
-
-        cancelRequestButton.setOnClickListener {
-            othersProfileActivityViewModel.removeFriendRequestFromHisDocument(currentFriendRequest!!).addOnCompleteListener { task1 ->
-                if (task1.isSuccessful){
-                    //Update ui
-                    othersProfileActivityViewModel.removeFriendRequestFromMyDocument(currentFriendRequest!!).addOnCompleteListener{task2 ->
-                        if (task2.isSuccessful){
-                            if (currentNotificationId != null){
-                                handleNotificationDeleting(currentNotificationId!!, userIdIAmViewing)
-                            }
-                        }else{
-                            Toast.makeText(this, task2.exception?.message, Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }else{
-                    Toast.makeText(this, task1.exception?.message, Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
+//
+//        addFriendButton.setOnClickListener { sendUserFriendRequest() }
+//
+//        cancelRequestButton.setOnClickListener {
+//            othersProfileActivityViewModel.removeFriendRequestFromHisDocument(currentFriendRequest!!).addOnCompleteListener { task1 ->
+//                if (task1.isSuccessful){
+//                    //Update ui
+//                    othersProfileActivityViewModel.removeFriendRequestFromMyDocument(currentFriendRequest!!).addOnCompleteListener{task2 ->
+//                        if (task2.isSuccessful){
+//                            if (currentNotificationId != null){
+//                                handleNotificationDeleting(currentNotificationId!!, userIdIAmViewing)
+//                            }
+//                        }else{
+//                            Toast.makeText(this, task2.exception?.message, Toast.LENGTH_SHORT).show()
+//                        }
+//                    }
+//                }else{
+//                    Toast.makeText(this, task1.exception?.message, Toast.LENGTH_SHORT).show()
+//                }
+//            }
+//        }
         
         messageButton.setOnClickListener {
             Toast.makeText(this, "- -\n__", Toast.LENGTH_SHORT).show()
         }
     }
+
+
 
     private fun updateUserPosts(posts: List<Post>) {
         profilePostsAdapter = ProfilePostsAdapter(
@@ -229,57 +245,36 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         joinDateTextView.text = "Joined $date"
 
     }
+//
+//    private fun sendUserFriendRequest(){
+//        val friendRequest = FriendRequest(
+//            fromId = currentUser.id,
+//            toId = userIdIAmViewing,
+//        )
+//        othersProfileActivityViewModel.addFriendRequestToHisDocument(friendRequest).addOnCompleteListener { task1 ->
+//            if (task1.isSuccessful){
+//                //Update ui
+//                othersProfileActivityViewModel.addFriendRequestToMyDocument(friendRequest).addOnCompleteListener{task2 ->
+//                    if (task2.isSuccessful){
+//                        handleNotificationCreationAndFiringAndAdditionToDB(
+//                            notificationType = "friendRequest",
+//                            postId = null,
+//                            commentPosition = null,
+//                            commentId = null
+//                        )
+//                    }else{
+//                        Toast.makeText(this, task2.exception?.message, Toast.LENGTH_SHORT).show()
+//                    }
+//                }
+//            }else{
+//                Toast.makeText(this, task1.exception?.message, Toast.LENGTH_SHORT).show()
+//            }
+//        }
+//    }
 
-    private fun sendUserFriendRequest(){
-        val friendRequest = FriendRequest(
-            fromId = currentUser.id,
-            toId = userIdIAmViewing,
-        )
-        othersProfileActivityViewModel.addFriendRequestToHisDocument(friendRequest).addOnCompleteListener { task1 ->
-            if (task1.isSuccessful){
-                //Update ui
-                othersProfileActivityViewModel.addFriendRequestToMyDocument(friendRequest).addOnCompleteListener{task2 ->
-                    if (task2.isSuccessful){
-                        handleNotificationCreationAndFiringAndAdditionToDB(
-                            notificationType = "friendRequest",
-                            postId = null,
-                            commentPosition = null,
-                            commentId = null
-                        )
-                    }else{
-                        Toast.makeText(this, task2.exception?.message, Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }else{
-                Toast.makeText(this, task1.exception?.message, Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun addNotificationIdToHisDocument(notificationId: String, hisId: String) {
-        othersProfileActivityViewModel.addNotificationIdToHisDocument(notificationId, hisId)
-    }
-
-
-
-    private fun fireAnyNotification(notification: Notification) = CoroutineScope(
-        Dispatchers.IO).launch {
-        try {
-            //userIAmViewing.token.toString()
-            val pushNotification = PushNotification(
-                data = notification,
-                to = userIAmViewing.token.toString()
-            )
-            val response = RetrofitInstance.api.postNotification(pushNotification)
-            if(response.isSuccessful) {
-                Log.i(TAG, "Response: Success")
-            } else {
-                Log.e(TAG, response.errorBody().toString())
-            }
-        } catch(e: Exception) {
-            Log.e(TAG, e.toString())
-        }
-    }
+//    private fun addNotificationIdToHisDocument(notificationId: String, hisId: String) {
+//        othersProfileActivityViewModel.addNotificationIdToNotifiedDocument(notificationId, hisId)
+//    }
 
     override fun onReactButtonClicked(
         postPublisherId: String,
@@ -287,50 +282,37 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
-        postReacts: List<React>?,
+        reacted: Boolean,
+        currentReact: React?,
         postPosition: Int
     ) {
         currentEditedPostPosition = postPosition
-        if (postReacts?.isEmpty()!!){
+        //I did not react
+        if (!reacted){
+            //UPDATE REACTED VALUE WITH 1
+            postViewModel.updateReactedValue(postPublisherId, postId, 1)
             val myReact = createReact(interactorId, interactorName, interactorImageUrl,1)
             addReactToDb(myReact, postId, postPublisherId).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    handleNotificationCreationAndFiringAndAdditionToDB(
-                        notificationType = "reactOnPost",
-                        postId = postId,
-                        commentPosition = null,
-                        commentId = null
-                    )
-                }else{
+                    notificationsHandler.also {
+                        it.notificationType = "reactOnPost"
+                        it.reactType = 1
+                        it.postId = postId
+                        it.handleNotificationCreationAndFiring()
+                    }
+                }
+                else{
                     Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
                 }
             }
         }
+        //If you have reacted --> delete react
         else {
-            postReacts.forEach lit@{ react ->
-                if (react.reactorId == interactorId) {
-                    deleteReact(react, postId, postPublisherId).addOnCompleteListener { task ->
-                        if (!task.isSuccessful) {
-                            Utils.toastMessage(this, task.exception?.message.toString())
-                        }
-                    }
-                    return@lit
-                }
-                //last item
-                else if (postReacts.indexOf(react) == postReacts.size - 1) {
-                    val myReact = createReact(interactorId, interactorName, interactorImageUrl, 1)
-                    addReactToDb(myReact, postId, postPublisherId).addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            handleNotificationCreationAndFiringAndAdditionToDB(
-                                notificationType = "reactOnPost",
-                                postId = postId,
-                                commentPosition = null,
-                                commentId = null
-                            )
-                        }else{
-                            Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
-                        }
-                    }
+            //UPDATE REACTED VALUE WITH NULL
+            //postViewModel.updateReactedValue(postPublisherId, postId, currentReact!!)
+            deleteReact(currentReact!!, postId, postPublisherId).addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Utils.toastMessage(this, task.exception?.message.toString())
                 }
             }
         }
@@ -342,13 +324,12 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
-        postReacts: List<React>?,
+        reacted: Boolean,
+        currentReact: React?,
         postPosition: Int
     ) {
         currentEditedPostPosition = postPosition
-        if (postReacts?.isEmpty()!!){
-            showReactsChooserDialog(interactorId, interactorName, interactorImageUrl, postId, postPublisherId)
-        }
+            showReactsChooserDialog(interactorId, interactorName, interactorImageUrl, postId, postPublisherId, currentReact)
     }
 
     override fun onCommentButtonClicked(
@@ -389,13 +370,11 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
 
         createShare(share, postId, postPublisherId).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                Toast.makeText(this, "You shared this post", Toast.LENGTH_SHORT).show()
-                handleNotificationCreationAndFiringAndAdditionToDB(
-                    notificationType = "share",
-                    postId = postId,
-                    null,
-                    null
-                )
+                notificationsHandler.also {
+                    it.notificationType = "share"
+                    it.postId = postId
+                    it.handleNotificationCreationAndFiring()
+                }
             } else {
                 Utils.toastMessage(this, task.exception?.message.toString())
             }
@@ -433,7 +412,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
 
     }
 
-    private fun createReact(interactorId: String, interactorName: String, interactorImageUrl: String,reactType: Int): React{
+    private fun createReact(interactorId: String, interactorName: String, interactorImageUrl: String,reactType: Int?): React{
         return React(
             reactorId = interactorId,
             reactorName = interactorName,
@@ -451,50 +430,23 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
     }
 
     override fun onAnotherUserCommented(commentPosition: Int, commentId: String, postId: String) {
-        handleNotificationCreationAndFiringAndAdditionToDB(
-            "commentOnPost",
-            postId = postId,
-            commentPosition = commentPosition,
-            commentId = commentId
-        )
-    }
-
-    private fun handleNotificationCreationAndFiringAndAdditionToDB(
-        notificationType: String?,
-        postId: String?,
-        commentPosition: Int?,
-        commentId: String?
-    ){
-        val notification = Notification(
-                        postId = postId,
-                        commentPosition = commentPosition,
-                        commentId = commentId,
-                        notificationType = notificationType,
-                        notifierId = currentUser.id,
-                        notifiedId = userIdIAmViewing,
-                        notifierName = currentUser.name,
-                        notifierImageUrl = currentUser.profileImageUrl
-                    )
-        othersProfileActivityViewModel
-            .addNotificationToNotificationsCollection(notification,userIdIAmViewing)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful){
-                    addNotificationIdToHisDocument(notification.id!!, userIdIAmViewing)
-                    fireAnyNotification(notification)
-                }else{
-                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
-                }
-            }
-    }
-    private fun handleNotificationDeleting(notificationId: String, hisId: String) {
-        othersProfileActivityViewModel.removeNotificationIdFromHisDocument(notificationId, hisId)
-        notificationsFragmentViewModel.deleteNotificationById(userIdIAmViewing, notificationId)
+        notificationsHandler.also {
+            it.notificationType = "commentOnPost"
+            it.postId = postId
+            it.commentPosition = commentPosition
+            it.handleNotificationCreationAndFiring()
+        }
     }
 
     override fun onFriendClicked(friendId: String) {
-        val intent = Intent(this, OthersProfileActivity::class.java)
-        intent.putExtra("userId", friendId)
-        startActivity(intent)
+        if (friendId == currentUser.id){
+            startActivity(Intent(this, ProfileActivity::class.java))
+        }else{
+            val intent = Intent(this, OthersProfileActivity::class.java)
+            intent.putExtra("userId", friendId)
+            startActivity(intent)
+        }
+
     }
 
     private fun iAmFriend(){
@@ -504,29 +456,36 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             }
         }
     }
-
-    private fun showReactsChooserDialog(interactorId: String, interactorName: String, interactorImageUrl: String, postId: String, postPublisherId: String) {
+//
+    private fun showReactsChooserDialog(interactorId: String,
+                                        interactorName: String,
+                                        interactorImageUrl: String,
+                                        postId: String,
+                                        postPublisherId: String,
+                                        currentReact: React?) {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(true)
         dialog.setContentView(R.layout.long_clicked_reacts_button)
-
+        val react =  React(
+            reactorId = interactorId,
+            reactorName = interactorName,
+            reactorImageUrl = interactorImageUrl
+        )
         dialog.loveReactButton.setOnClickListener {
-            choice = 2
-            val react =  React(
-                reactorId = interactorId,
-                reactorName = interactorName,
-                reactorImageUrl = interactorImageUrl,
-                react = choice
-            )
+            react.react = 2
+            if (currentReact != null){
+                deleteReact(currentReact, postId, postPublisherId)
+            }
+            //postViewModel.updateReactedValue(postPublisherId, postId,2)
             addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    handleNotificationCreationAndFiringAndAdditionToDB(
-                        notificationType = "reactOnPost",
-                        postId = postId,
-                        commentPosition = null,
-                        commentId = null
-                    )
+                    notificationsHandler.also {
+                        it.notificationType = "reactOnPost"
+                        it.postId = postId
+                        it.reactType = 2
+                        it.handleNotificationCreationAndFiring()
+                    }
                 }else{
                     Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
                 }
@@ -534,21 +493,19 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             dialog.dismiss()
         }
         dialog.careReactButton.setOnClickListener {
-            choice = 3
-            val react =  React(
-                reactorId = interactorId,
-                reactorName = interactorName,
-                reactorImageUrl = interactorImageUrl,
-                react = choice
-            )
+            react.react = 3
+            if (currentReact != null){
+                deleteReact(currentReact, postId, postPublisherId)
+            }
+            //postViewModel.updateReactedValue(postPublisherId, postId,3)
             addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    handleNotificationCreationAndFiringAndAdditionToDB(
-                        notificationType = "reactOnPost",
-                        postId = postId,
-                        commentPosition = null,
-                        commentId = null
-                    )
+                    notificationsHandler.also {
+                        it.notificationType = "reactOnPost"
+                        it.postId = postId
+                        it.reactType = 3
+                        it.handleNotificationCreationAndFiring()
+                    }
                 }else{
                     Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
                 }
@@ -556,21 +513,19 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             dialog.dismiss()
         }
         dialog.hahaReactButton.setOnClickListener {
-            choice = 4
-            val react =  React(
-                reactorId = interactorId,
-                reactorName = interactorName,
-                reactorImageUrl = interactorImageUrl,
-                react = choice
-            )
+            react.react = 4
+            if (currentReact != null){
+                deleteReact(currentReact, postId, postPublisherId)
+            }
+            //postViewModel.updateReactedValue(postPublisherId, postId,4)
             addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    handleNotificationCreationAndFiringAndAdditionToDB(
-                        notificationType = "reactOnPost",
-                        postId = postId,
-                        commentPosition = null,
-                        commentId = null
-                    )
+                    notificationsHandler.also {
+                        it.notificationType = "reactOnPost"
+                        it.postId = postId
+                        it.reactType = 4
+                        it.handleNotificationCreationAndFiring()
+                    }
                 }else{
                     Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
                 }
@@ -578,21 +533,19 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             dialog.dismiss()
         }
         dialog.wowReactButton.setOnClickListener {
-            choice = 5
-            val react =  React(
-                reactorId = interactorId,
-                reactorName = interactorName,
-                reactorImageUrl = interactorImageUrl,
-                react = choice
-            )
+            react.react = 5
+            if (currentReact != null){
+                deleteReact(currentReact, postId, postPublisherId)
+            }
+            //postViewModel.updateReactedValue(postPublisherId, postId,5)
             addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    handleNotificationCreationAndFiringAndAdditionToDB(
-                        notificationType = "reactOnPost",
-                        postId = postId,
-                        commentPosition = null,
-                        commentId = null
-                    )
+                    notificationsHandler.also {
+                        it.notificationType = "reactOnPost"
+                        it.postId = postId
+                        it.reactType = 5
+                        it.handleNotificationCreationAndFiring()
+                    }
                 }else{
                     Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
                 }
@@ -600,21 +553,19 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             dialog.dismiss()
         }
         dialog.sadReactButton.setOnClickListener {
-            choice = 6
-            val react =  React(
-                reactorId = interactorId,
-                reactorName = interactorName,
-                reactorImageUrl = interactorImageUrl,
-                react = choice
-            )
+            react.react = 6
+            if (currentReact != null){
+                deleteReact(currentReact, postId, postPublisherId)
+            }
+            //postViewModel.updateReactedValue(postPublisherId, postId,6)
             addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    handleNotificationCreationAndFiringAndAdditionToDB(
-                        notificationType = "reactOnPost",
-                        postId = postId,
-                        commentPosition = null,
-                        commentId = null
-                    )
+                    notificationsHandler.also {
+                        it.notificationType = "reactOnPost"
+                        it.postId = postId
+                        it.reactType = 6
+                        it.handleNotificationCreationAndFiring()
+                    }
                 }else{
                     Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
                 }
@@ -622,21 +573,19 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             dialog.dismiss()
         }
         dialog.angryReactButton.setOnClickListener {
-            choice = 7
-            val react =  React(
-                reactorId = interactorId,
-                reactorName = interactorName,
-                reactorImageUrl = interactorImageUrl,
-                react = choice
-            )
+            react.react = 7
+            if (currentReact != null){
+                deleteReact(currentReact, postId, postPublisherId)
+            }
+            //postViewModel.updateReactedValue(postPublisherId, postId,7)
             addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    handleNotificationCreationAndFiringAndAdditionToDB(
-                        notificationType = "reactOnPost",
-                        postId = postId,
-                        commentPosition = null,
-                        commentId = null
-                    )
+                    notificationsHandler.also {
+                        it.notificationType = "reactOnPost"
+                        it.postId = postId
+                        it.reactType = 7
+                        it.handleNotificationCreationAndFiring()
+                    }
                 }else{
                     Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
                 }

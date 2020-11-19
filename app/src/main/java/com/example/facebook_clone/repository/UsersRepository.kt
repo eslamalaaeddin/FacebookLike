@@ -116,7 +116,7 @@ class UsersRepository(
             .update("notificationsIds", FieldValue.arrayUnion(notificationId))
     }
 
-    fun removeNotificationIdFromHisDocument(notificationId: String, hisId: String): Task<Void>{
+    fun deleteNotificationIdFromNotifiedDocument(notificationId: String, hisId: String): Task<Void>{
         return database.collection(USERS_COLLECTION).document(hisId)
             .update("notificationsIds", FieldValue.arrayRemove(notificationId))
     }

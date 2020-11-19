@@ -21,7 +21,6 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_notifications.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.concurrent.Flow
 
 
 private const val TAG = "NotificationsFragment"
@@ -86,7 +85,7 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), Notific
         val meAsFriend = Friend(userId, userName, userImageUrl)
         val himAsFriend = Friend(currentUser.id, currentUser.name, currentUser.profileImageUrl)
         createFriendshipBetweenMeAndHim(notificationId, meAsFriend, himAsFriend)
-        othersProfileActivityViewModel.removeNotificationIdFromHisDocument(
+        othersProfileActivityViewModel.deleteNotificationIdFromNotifiedDocument(
             notificationId,
             auth.currentUser?.uid.toString()
         )
@@ -96,12 +95,11 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), Notific
         postPublisherId: String,
         postId: String
     ) {
-        val intent = Intent(requireContext(), PostViewerActivity::class.java)
-        intent.putExtra("postPublisherId", postPublisherId)
-        intent.putExtra("postId", postId)
-        intent.putExtra("publisherName", currentUser.name)
-        intent.putExtra("publisherImageUrl", currentUser.profileImageUrl)
-        startActivity(intent)
+        navigateToPost(postPublisherId, postId)
+    }
+
+    override fun onClickShareOnPostNotification(postPublisherId: String, postId: String) {
+        navigateToPost(postPublisherId, postId)
     }
 
     override fun onClickCommentOnPostNotification(
@@ -109,13 +107,7 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), Notific
         postId: String,
         commentPosition: Int
     ) {
-        val intent = Intent(requireContext(), PostViewerActivity::class.java)
-        intent.putExtra("postPublisherId", postPublisherId)
-        intent.putExtra("postId", postId)
-        intent.putExtra("publisherName", currentUser.name)
-        intent.putExtra("publisherImageUrl", currentUser.profileImageUrl)
-        intent.putExtra("commentPosition", commentPosition)
-        startActivity(intent)
+        navigateToComment(postPublisherId, postId, commentPosition)
     }
 
     private fun deleteFriendRequestFromMeAndHim(notificationId: String) {
@@ -166,6 +158,21 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), Notific
 
     private fun deleteNotification(notifiedId: String, notificationId: String) {
         notificationsFragmentViewModel.deleteNotificationById(notifiedId, notificationId)
+    }
+
+    private fun navigateToPost(postPublisherId: String, postId: String){
+        val intent = Intent(requireContext(), PostViewerActivity::class.java)
+        intent.putExtra("postPublisherId", postPublisherId)
+        intent.putExtra("postId", postId)
+        startActivity(intent)
+    }
+
+    private fun navigateToComment(postPublisherId: String, postId: String, commentPosition: Int) {
+        val intent = Intent(requireContext(), PostViewerActivity::class.java)
+        intent.putExtra("postPublisherId", postPublisherId)
+        intent.putExtra("postId", postId)
+        intent.putExtra("commentPosition", commentPosition)
+        startActivity(intent)
     }
 
 

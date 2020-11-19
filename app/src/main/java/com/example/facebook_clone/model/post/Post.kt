@@ -5,6 +5,7 @@ import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.model.post.share.Share
 import com.google.firebase.Timestamp
 import java.util.*
+import kotlin.collections.HashMap
 
 data class Post(
     val id: String? = UUID.randomUUID().toString(),

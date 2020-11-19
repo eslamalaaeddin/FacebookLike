@@ -158,5 +158,11 @@ class PostsRepository(
 
     }
 
+    fun updateReactedValue(postPublisherId: String, postId: String, reacted: Int?): Task<Void>{
+        return database.collection(POSTS_COLLECTION).document(postPublisherId).collection(
+            PROFILE_POSTS_COLLECTION
+        ).document(postId).update("reacted", reacted)
+    }
+
 
 }

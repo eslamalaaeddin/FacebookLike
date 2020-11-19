@@ -29,21 +29,34 @@ class FirebaseService : FirebaseMessagingService() {
         val notificationType = message.data["notificationType"]
         val notifierName = message.data["notifierName"]
         val notifierId = message.data["notifierId"]
+        val notifiedId = message.data["notifiedId"]
         val notifierImageUrl = message.data["notifierImageUrl"]
+        val postId = message.data["postId"]
+        val commentPosition = message.data["commentPosition"]?.toInt()
 
         Log.i(TAG, "FAWZY onMessageReceived: $notificationType")
         Log.i(TAG, "FAWZY onMessageReceived: $notifierName")
         Log.i(TAG, "FAWZY onMessageReceived: $notifierId")
         Log.i(TAG, "FAWZY onMessageReceived: $notifierImageUrl")
 
-        createNotification(notificationType, notifierName, notifierId, notifierImageUrl)
+        createNotification(notificationType,
+            notifierName,
+            notifierId,
+            notifierImageUrl,
+            postId = postId,
+            commentPosition = commentPosition,
+            notifiedId = notifiedId
+        )
     }
 
     private fun createNotification(
         notificationType: String?,
         notifierName: String?,
         notifierId: String?,
-        notifierImageUrl: String?
+        notifierImageUrl: String?,
+        notifiedId: String?,
+        postId: String?,
+        commentPosition: Int?
     ){
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -64,7 +77,7 @@ class FirebaseService : FirebaseMessagingService() {
                             imageUrl = notifierImageUrl,
                             imageBitmap = bitmap
                         )
-                        BaseApplication.fireNotification(notificationType!!, notifier)
+                        BaseApplication.fireNotification(notificationType!!, notifier, postId, commentPosition, notifiedId)
                     }
                 })
         }

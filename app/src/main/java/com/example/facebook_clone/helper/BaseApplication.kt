@@ -16,6 +16,7 @@ import com.example.facebook_clone.di.*
 import com.example.facebook_clone.model.notification.Notification
 import com.example.facebook_clone.model.notification.Notifier
 import com.example.facebook_clone.ui.activity.MainActivity
+import com.example.facebook_clone.ui.activity.PostViewerActivity
 import com.example.facebook_clone.ui.activity.ProfileActivity
 import com.google.api.Billing
 import org.koin.android.ext.koin.androidContext
@@ -82,7 +83,7 @@ class BaseApplication : Application() {
     companion object {
         var context: Context? = null
         var destination: Class<*>? = null
-        fun fireNotification(notificationType: String, notifier: Notifier) {
+        fun fireNotification(notificationType: String, notifier: Notifier, postId: String?, commentPosition: Int?, notifiedId: String?) {
 
             val remoteView = RemoteViews(context?.packageName, R.layout.custom_notification_layout)
 
@@ -104,7 +105,7 @@ class BaseApplication : Application() {
                         "${notifier.name} commented on your post"
                     )
                     //temp
-                    destination = ProfileActivity::class.java
+                    destination = PostViewerActivity::class.java
                 }
 
 
@@ -114,7 +115,7 @@ class BaseApplication : Application() {
                         "${notifier.name} reacted to your post"
                     )
 
-                    destination = ProfileActivity::class.java
+                    destination = PostViewerActivity::class.java
                 }
 
                 "share" -> {
@@ -122,7 +123,7 @@ class BaseApplication : Application() {
                         R.id.notificationContentTextView,
                         "${notifier.name} shared your post"
                     )
-                    destination = ProfileActivity::class.java
+                    destination = PostViewerActivity::class.java
                 }
 
                 "groupPost" -> {
@@ -160,6 +161,11 @@ class BaseApplication : Application() {
                 .setAutoCancel(true)
             //3 Create the action
             val actionIntent = Intent(context, destination)
+
+            actionIntent.putExtra("postPublisherId", notifiedId)
+            actionIntent.putExtra("postId", postId)
+            actionIntent.putExtra("commentPosition", commentPosition)
+
             val pendingIntent =
                 PendingIntent.getActivity(
                     context,

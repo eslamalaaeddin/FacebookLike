@@ -22,6 +22,7 @@ import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.helper.listener.CommentsBottomSheetListener
 import com.example.facebook_clone.helper.listener.PostAttachmentListener
 import com.example.facebook_clone.model.notification.Notification
+import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.comment.CommentDocument
 import com.example.facebook_clone.model.post.react.React
@@ -54,11 +55,11 @@ class CommentsBottomSheet(
     private lateinit var reactsList: List<React>
     private val auth: FirebaseAuth by inject()
     private var commentsAdapter: CommentsAdapter =
-        CommentsAdapter(emptyList(),emptyList(), this, this)
+        CommentsAdapter(emptyList(), emptyList(), this, this)
     private var commentData: Intent? = null
     private var commentDataType: String? = null
     private var bitmapFromCamera: Boolean = false
-    private var commentAttachmentUrl:String? = null
+    private var commentAttachmentUrl: String? = null
     private var progressDialog: ProgressDialog? = null
     private var reactClicked = false
     //private lateinit var comments: List<Comment>
@@ -92,8 +93,12 @@ class CommentsBottomSheet(
 
         reactorsLayout.setOnClickListener {
             //Open people who reacted dialog
-            val peopleWhoReactedDialog = PeopleWhoReactedBottomSheet(postId, postPublisherId, "post")
-            peopleWhoReactedDialog.show(activity?.supportFragmentManager!!, peopleWhoReactedDialog.tag)
+            val peopleWhoReactedDialog =
+                PeopleWhoReactedBottomSheet(postId, postPublisherId, "post")
+            peopleWhoReactedDialog.show(
+                activity?.supportFragmentManager!!,
+                peopleWhoReactedDialog.tag
+            )
         }
 
         updateCommentsUI()
@@ -101,10 +106,9 @@ class CommentsBottomSheet(
 
         sendCommentImageView.setOnClickListener {
             val commentContent = commentEditText.text.toString()
-            if (commentContent.isEmpty() && commentData == null){
+            if (commentContent.isEmpty() && commentData == null) {
                 Toast.makeText(requireContext(), "Add comment first", Toast.LENGTH_SHORT).show()
-            }
-            else {
+            } else {
                 if (commentData != null) {
 
                     if (commentDataType == "image") {
@@ -128,9 +132,13 @@ class CommentsBottomSheet(
 
                                         val textComment = commentEditText.text.toString()
                                         val comment = if (textComment.isEmpty()) {
-                                            createComment(commentAttachmentUrl!!, null,"image")
+                                            createComment(commentAttachmentUrl!!, null, "image")
                                         } else {
-                                            createComment(commentAttachmentUrl!!, commentContent,"textWithImage")
+                                            createComment(
+                                                commentAttachmentUrl!!,
+                                                commentContent,
+                                                "textWithImage"
+                                            )
                                         }
                                         postViewModel.createComment(
                                             postId,
@@ -163,7 +171,11 @@ class CommentsBottomSheet(
                                         val comment = if (textComment.isEmpty()) {
                                             createComment(commentAttachmentUrl!!, null, "video")
                                         } else {
-                                            createComment(commentAttachmentUrl!!, commentContent,"textWithVideo")
+                                            createComment(
+                                                commentAttachmentUrl!!,
+                                                commentContent,
+                                                "textWithVideo"
+                                            )
                                         }
                                         postViewModel.createComment(
                                             postId,
@@ -188,14 +200,19 @@ class CommentsBottomSheet(
                 //Text comment
                 else {
                     val comment =
-                        createComment(commentContent = commentContent, commentType = "text", attachmentCommentUrl = null)
+                        createComment(
+                            commentContent = commentContent,
+                            commentType = "text",
+                            attachmentCommentUrl = null
+                        )
                     commentEditText.text.clear()
                     // progressDialog = Utils.showProgressDialog(requireContext(), "Please wait...")
                     postViewModel.createComment(postId, postPublisherId, comment)
                         .addOnCompleteListener { task ->
                             //   progressDialog?.dismiss()
                             if (task.isSuccessful) {
-                                if (commenterId != auth.currentUser?.uid.toString()) {
+                                //if you are not the commenter
+                                if (commenterId != postPublisherId) {
                                     comBottomSheetListener.onAnotherUserCommented(
                                         commentsList.size - 1,
                                         comment.id!!,
@@ -230,39 +247,45 @@ class CommentsBottomSheet(
                         Utils.toastMessage(requireContext(), error.message.toString())
                         return@addSnapshotListener
                     }
-
+                    val post = snapshot?.toObject(Post::class.java)
                     val commentsResult = snapshot?.toObject(CommentDocument::class.java)?.comments
-                    val reactsResult =   snapshot?.toObject(ReactDocument::class.java)?.reacts
+                    val reactsResult = snapshot?.toObject(ReactDocument::class.java)?.reacts
 
-                     commentsList = commentsResult.orEmpty().reversed()
-                     reactsList = reactsResult.orEmpty().reversed()
+                    commentsList = commentsResult.orEmpty().reversed()
+                    reactsList = reactsResult.orEmpty().reversed()
 
-//                    if (reactsList.isEmpty()){
-//                        reactsCountsInfoTextView.text = ""
-//                    }
 
-                    reactsList.forEach { react ->
-                        if (react.reactorId == commenterId){
-//                            if (reactsList.size == 1){
-//                                reactsCountsInfoTextView.text = commenterName
-//                            }
-//                            else{
-//                                reactsCountsInfoTextView.text = "You and ${reactsResult?.size} others"
-//                            }
+                    for (react in reactsList) {
+                        if (react.reactorId == commenterId) {
+                            if (myReactPlaceHolder != null) {
+                                when (react.react) {
 
-                            when(react.react){
-                                1 -> { myReactPlaceHolder.setImageResource(R.drawable.ic_like_react)}
-                                2 -> { myReactPlaceHolder.setImageResource(R.drawable.ic_love_react)}
-                                3 -> { myReactPlaceHolder.setImageResource(R.drawable.ic_care_react)}
-                                4 -> { myReactPlaceHolder.setImageResource(R.drawable.ic_haha_react)}
-                                5 -> { myReactPlaceHolder.setImageResource(R.drawable.ic_wow_react)}
-                                6 -> { myReactPlaceHolder.setImageResource(R.drawable.ic_sad_react)}
-                                7 -> { myReactPlaceHolder.setImageResource(R.drawable.ic_angry_angry)}
+                                    1 -> {
+                                        myReactPlaceHolder.setImageResource(R.drawable.ic_like_react)
+                                    }
+                                    2 -> {
+                                        myReactPlaceHolder.setImageResource(R.drawable.ic_love_react)
+                                    }
+                                    3 -> {
+                                        myReactPlaceHolder.setImageResource(R.drawable.ic_care_react)
+                                    }
+                                    4 -> {
+                                        myReactPlaceHolder.setImageResource(R.drawable.ic_haha_react)
+                                    }
+                                    5 -> {
+                                        myReactPlaceHolder.setImageResource(R.drawable.ic_wow_react)
+                                    }
+                                    6 -> {
+                                        myReactPlaceHolder.setImageResource(R.drawable.ic_sad_react)
+                                    }
+                                    7 -> {
+                                        myReactPlaceHolder.setImageResource(R.drawable.ic_angry_angry)
+                                    }
+                                }
+                                break
                             }
                         }
                     }
-
-
 
                     commentsAdapter =
                         CommentsAdapter(
@@ -301,7 +324,7 @@ class CommentsBottomSheet(
             imageViewerDialog.setMediaUrl(mediaUrl)
         }
         //video(I chosed an activity to show media controllers)
-        else{
+        else {
             val videoIntent = Intent(requireContext(), VideoPlayerActivity::class.java)
             videoIntent.putExtra("videoUrl", mediaUrl)
             startActivity(videoIntent)
@@ -314,15 +337,19 @@ class CommentsBottomSheet(
 
     //adding react
     override fun onReactButtonClicked() {
-           // createReact()
+        // createReact()
     }
 
     //removing react
     override fun onReactButtonClicked(react: React?) {
-           // deleteReact(react!!)
+        // deleteReact(react!!)
     }
 
-    private fun createComment(attachmentCommentUrl: String?, commentContent: String?, commentType: String): Comment{
+    private fun createComment(
+        attachmentCommentUrl: String?,
+        commentContent: String?,
+        commentType: String
+    ): Comment {
         return Comment(
             commenterId = commenterId,
             commenterName = commenterName,
@@ -334,14 +361,12 @@ class CommentsBottomSheet(
     }
 
     override fun onAttachmentAdded(data: Intent?, dataType: String, fromCamera: Boolean) {
-        if (data != null){
+        if (data != null) {
             commentData = data
             commentDataType = dataType
             bitmapFromCamera = fromCamera
         }
     }
-
-
 
 
 }
