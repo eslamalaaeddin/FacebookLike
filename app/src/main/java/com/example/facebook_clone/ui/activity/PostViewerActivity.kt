@@ -120,12 +120,12 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                     commentsCountsTextView.text = "${post.comments?.size.toString()} Comments"
                 }
 
-                if (post.comments != null && post.reacts != null) {
+                if (post.comments != null ) {
                     commentsAdapter =
                         CommentsAdapter(
                             auth.currentUser?.uid.toString(),
                             post.comments!!,
-                            post.reacts!!,
+                            post.reacts.orEmpty(),
                             this,
                             this,
                             postViewModel,
@@ -279,6 +279,19 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
         reacted: Boolean,
         currentReact: React?
     ) {
+
+    }
+
+    override fun onReactOnCommentLongClicked(
+        comment: Comment,
+        commentPosition: Int,
+        reacted: Boolean,
+        currentReact: React?
+    ) {
+
+    }
+
+    override fun onCommentReactionsLayoutClicked(commentId: String) {
 
     }
 

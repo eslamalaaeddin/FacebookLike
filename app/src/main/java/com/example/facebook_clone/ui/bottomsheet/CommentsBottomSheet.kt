@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.widget.FrameLayout
 import android.widget.Toast
 import com.example.facebook_clone.R
@@ -38,6 +39,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.comments_bottom_sheet.*
+import kotlinx.android.synthetic.main.long_clicked_reacts_button.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -109,14 +111,10 @@ class CommentsBottomSheet(
 
 
         reactorsLayout.setOnClickListener {
-            //Open people who reacted dialog
-            val peopleWhoReactedDialog =
-                PeopleWhoReactedBottomSheet(postId, postPublisherId, "post")
-            peopleWhoReactedDialog.show(
-                activity?.supportFragmentManager!!,
-                peopleWhoReactedDialog.tag
-            )
+            openPeopleWhoReactedLayout(null, "post")
         }
+
+
 
         updateCommentsUI()
 
@@ -359,16 +357,18 @@ class CommentsBottomSheet(
 
         //I did not react
         if (!reacted){
-            //UPDATE REACTED VALUE WITH 1
-            //postViewModel.updateReactedValue(postPublisherId, postId, 1)
             val myReact = createReact(commenterId, commenterName, commenterImageUrl,1)
             addReactOnComment(postPublisherId, comment.id.toString(), myReact).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    notificationsHandler.also {
-                        it.notificationType = "reactOnComment"
-                        it.reactType = 1
-                        it.postId = postId
-                        it.handleNotificationCreationAndFiring()
+                    updateCommentsUI()
+                    if (postPublisherId != commenterId) {
+                        notificationsHandler.also {
+                            it.notificationType = "reactOnComment"
+                            it.commentPosition = commentPosition
+                            it.reactType = 1
+                            it.postId = postId
+                            it.handleNotificationCreationAndFiring()
+                        }
                     }
                 }
                 else{
@@ -379,15 +379,37 @@ class CommentsBottomSheet(
         }
         //If you have reacted --> delete react
         else {
-            //UPDATE REACTED VALUE WITH NULL
-            //postViewModel.updateReactedValue(postPublisherId, postId, currentReact!!)
             deleteReactFromComment(postPublisherId, comment.id.toString(), currentReact).addOnCompleteListener { task ->
+                updateCommentsUI()
                 if (!task.isSuccessful) {
                     Utils.toastMessage(requireContext(), task.exception?.message.toString())
                     Toast.makeText(requireContext(), "ALAA", Toast.LENGTH_SHORT).show()
                 }
             }
         }
+    }
+
+    override fun onReactOnCommentLongClicked(
+        comment: Comment,
+        commentPosition: Int,
+        reacted: Boolean,
+        currentReact: React?
+    ) {
+        Log.i(TAG, "FAWZY onReactOnCommentLongClicked: $currentReact")
+        showReactsChooserDialog(
+            interactorId = commenterId,
+            interactorName = commenterName,
+            interactorImageUrl = commenterImageUrl,
+            postId = postId,
+            postPublisherId = postPublisherId,
+            commentId = comment.id.toString(),
+            currentReact = currentReact,
+            commentPosition =commentPosition
+        )
+    }
+
+    override fun onCommentReactionsLayoutClicked(commentId: String) {
+        openPeopleWhoReactedLayout(commentId, "comment")
     }
 
     override fun onMediaCommentClicked(mediaUrl: String) {
@@ -462,6 +484,181 @@ class CommentsBottomSheet(
 
     private fun createShare(share: Share, postId: String, postPublisherId: String): Task<Void> {
         return postViewModel.createShare(share, postId, postPublisherId)
+    }
+
+    private fun showReactsChooserDialog(interactorId: String,
+                                        interactorName: String,
+                                        interactorImageUrl: String,
+                                        postId: String,
+                                        postPublisherId: String,
+                                        commentId: String,
+                                        currentReact: React?,
+                                        commentPosition: Int
+    ) {
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+        dialog.setContentView(R.layout.long_clicked_reacts_button)
+        val react =  React(
+            reactorId = interactorId,
+            reactorName = interactorName,
+            reactorImageUrl = interactorImageUrl
+        )
+        dialog.loveReactButton.setOnClickListener {
+            react.react = 2
+            if (currentReact != null){
+                deleteReactFromComment(postPublisherId, commentId, currentReact)
+            }
+            //postViewModel.updateReactedValue(postPublisherId, postId,2)
+            addReactOnComment(postPublisherId, commentId, react).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    updateCommentsUI()
+                    if (postPublisherId != commenterId) {
+                        notificationsHandler.also {
+                            it.notificationType = "reactOnComment"
+                            it.commentPosition = commentPosition
+                            it.postId = postId
+                            it.reactType = 2
+                            it.handleNotificationCreationAndFiring()
+                        }
+                    }
+                }else{
+                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+            dialog.dismiss()
+        }
+        dialog.careReactButton.setOnClickListener {
+            react.react = 3
+            if (currentReact != null){
+                deleteReactFromComment(postPublisherId, commentId, currentReact)
+            }
+            //postViewModel.updateReactedValue(postPublisherId, postId,3)
+            addReactOnComment(postPublisherId, commentId, react).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    updateCommentsUI()
+                    if (postPublisherId != commenterId) {
+                        notificationsHandler.also {
+                            it.notificationType = "reactOnComment"
+                            it.commentPosition = commentPosition
+                            it.postId = postId
+                            it.reactType = 3
+                            it.handleNotificationCreationAndFiring()
+                        }
+                    }
+                }else{
+                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+            dialog.dismiss()
+        }
+        dialog.hahaReactButton.setOnClickListener {
+            react.react = 4
+            if (currentReact != null){
+                deleteReactFromComment(postPublisherId, commentId, currentReact)
+            }
+            //postViewModel.updateReactedValue(postPublisherId, postId,4)
+            addReactOnComment(postPublisherId, commentId, react).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    updateCommentsUI()
+                    if (postPublisherId != commenterId) {
+                        notificationsHandler.also {
+                            it.notificationType = "reactOnComment"
+                            it.commentPosition = commentPosition
+                            it.postId = postId
+                            it.reactType = 4
+                            it.handleNotificationCreationAndFiring()
+                        }
+                    }
+                }else{
+                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+            dialog.dismiss()
+        }
+        dialog.wowReactButton.setOnClickListener {
+            react.react = 5
+            if (currentReact != null){
+                deleteReactFromComment(postPublisherId, commentId, currentReact)
+            }
+            //postViewModel.updateReactedValue(postPublisherId, postId,5)
+            addReactOnComment(postPublisherId, commentId, react).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    updateCommentsUI()
+                    if (postPublisherId != commenterId) {
+                        notificationsHandler.also {
+                            it.notificationType = "reactOnComment"
+                            it.commentPosition = commentPosition
+                            it.postId = postId
+                            it.reactType = 5
+                            it.handleNotificationCreationAndFiring()
+                        }
+                    }
+                }else{
+                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+            dialog.dismiss()
+        }
+        dialog.sadReactButton.setOnClickListener {
+            react.react = 6
+            if (currentReact != null){
+                deleteReactFromComment(postPublisherId, commentId, currentReact)
+            }
+            //postViewModel.updateReactedValue(postPublisherId, postId,6)
+            addReactOnComment(postPublisherId, commentId, react).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    updateCommentsUI()
+                    if (postPublisherId != commenterId) {
+                        notificationsHandler.also {
+                            it.notificationType = "reactOnComment"
+                            it.commentPosition = commentPosition
+                            it.postId = postId
+                            it.reactType = 6
+                            it.handleNotificationCreationAndFiring()
+                        }
+                    }
+                }else{
+                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+            dialog.dismiss()
+        }
+        dialog.angryReactButton.setOnClickListener {
+            react.react = 7
+            if (currentReact != null){
+                deleteReactFromComment(postPublisherId, commentId, currentReact)
+            }
+            //postViewModel.updateReactedValue(postPublisherId, postId,7)
+            addReactOnComment(postPublisherId, commentId, react).addOnCompleteListener { task ->
+                updateCommentsUI() // to update
+                if (task.isSuccessful) {
+                    if (postPublisherId != commenterId) {
+                        notificationsHandler.also {
+                            it.notificationType = "reactOnComment"
+                            it.commentPosition = commentPosition
+                            it.postId = postId
+                            it.reactType = 7
+                            it.handleNotificationCreationAndFiring()
+                        }
+                    }
+                }else{
+                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+            dialog.dismiss()
+        }
+        dialog.show()
+
+    }
+
+    private fun openPeopleWhoReactedLayout(commentId: String?, reactedOn: String){
+        val peopleWhoReactedDialog =
+            PeopleWhoReactedBottomSheet(commentId.toString(), postId, postPublisherId, reactedOn)
+        peopleWhoReactedDialog.show(
+            activity?.supportFragmentManager!!,
+            peopleWhoReactedDialog.tag
+        )
     }
 
 

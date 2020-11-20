@@ -6,6 +6,8 @@ import com.example.facebook_clone.model.post.react.React
 interface CommentClickListener {
     fun onCommentLongClicked(comment: Comment)
     fun onReactOnCommentClicked(comment: Comment, commentPosition: Int, reacted: Boolean, currentReact: React?)
+    fun onReactOnCommentLongClicked(comment: Comment, commentPosition: Int, reacted: Boolean, currentReact: React?)
 //    fun onReplyToCommentClicked()
+    fun onCommentReactionsLayoutClicked(commentId: String)
     fun onMediaCommentClicked(mediaUrl: String)
 }

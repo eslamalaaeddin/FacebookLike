@@ -11,6 +11,7 @@ import com.example.facebook_clone.adapter.ReactsAdapter
 import com.example.facebook_clone.adapter.SearchedUsersAdapter
 import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.model.post.Post
+import com.example.facebook_clone.model.post.comment.ReactionsAndSubComments
 import com.example.facebook_clone.model.post.react.ReactDocument
 import com.example.facebook_clone.viewmodel.PostViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -22,6 +23,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 private const val TAG = "PeopleWhoReactedBottomS"
 
 class PeopleWhoReactedBottomSheet(
+    private val commentId: String?,
     private val postId: String,
     private val postPublisherId: String,
     private val reactedOn: String
@@ -54,29 +56,53 @@ class PeopleWhoReactedBottomSheet(
         super.onViewCreated(view, savedInstanceState)
         upButtonImageView.setOnClickListener { dismiss() }
 
-        postViewModel.getPostById(postPublisherId, postId).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                //POST REACTS
-                if (reactedOn == "post") {
+        if (reactedOn == "post"){
+            postViewModel.getPostById(postPublisherId, postId).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
                     val reactsOnPost =
                         task.result?.toObject(ReactDocument::class.java)?.reacts.orEmpty()
                     reactsAdapter = ReactsAdapter(reactsOnPost)
                     peopleWhoReactedRecyclerView.adapter = reactsAdapter
+                }else{
+                    Utils.toastMessage(requireContext(), task.exception?.message.toString())
                 }
-                //COMMENT REACTS
-                else {
-                    val post = task.result?.toObject(Post::class.java)
-                    post?.comments?.forEach { comment ->
-                        if (comment.id == "commentId") {
-                            reactsAdapter = ReactsAdapter(comment.reacts.orEmpty())
-                            peopleWhoReactedRecyclerView.adapter = reactsAdapter
-                        }
-                    }
-                }
-            } else {
-                Utils.toastMessage(requireContext(), task.exception?.message.toString())
             }
         }
+        else if (reactedOn == "comment"){
+            postViewModel.getCommentById(postPublisherId, commentId = commentId.toString()).addOnCompleteListener { task ->
+                if (task.isSuccessful){
+                    val comment = task.result?.toObject(ReactionsAndSubComments::class.java)
+                    reactsAdapter = ReactsAdapter(comment?.reactions.orEmpty())
+                    peopleWhoReactedRecyclerView.adapter = reactsAdapter
+                }else{
+                    Utils.toastMessage(requireContext(), task.exception?.message.toString())
+                }
+            }
+        }
+
+//        postViewModel.getPostById(postPublisherId, postId).addOnCompleteListener { task ->
+//            if (task.isSuccessful) {
+//                //POST REACTS
+//                if (reactedOn == "post") {
+//                    val reactsOnPost =
+//                        task.result?.toObject(ReactDocument::class.java)?.reacts.orEmpty()
+//                    reactsAdapter = ReactsAdapter(reactsOnPost)
+//                    peopleWhoReactedRecyclerView.adapter = reactsAdapter
+//                }
+//                //COMMENT REACTS
+//                else {
+//                    val post = task.result?.toObject(Post::class.java)
+//                    post?.comments?.forEach { comment ->
+//                        if (comment.id == "commentId") {
+//                            reactsAdapter = ReactsAdapter(comment.reacts.orEmpty())
+//                            peopleWhoReactedRecyclerView.adapter = reactsAdapter
+//                        }
+//                    }
+//                }
+//            } else {
+//                Utils.toastMessage(requireContext(), task.exception?.message.toString())
+//            }
+//        }
 
     }
 }

@@ -24,5 +24,11 @@ interface NotificationListener {
         commentPosition: Int
     )
 
+    fun onClickReactsOnCommentNotification(
+        postPublisherId: String,
+        postId: String,
+        commentPosition: Int
+    )
+
 
 }

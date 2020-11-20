@@ -110,6 +110,14 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), Notific
         navigateToComment(postPublisherId, postId, commentPosition)
     }
 
+    override fun onClickReactsOnCommentNotification(
+        postPublisherId: String,
+        postId: String,
+        commentPosition: Int
+    ) {
+        navigateToComment(postPublisherId, postId, commentPosition)
+    }
+
     private fun deleteFriendRequestFromMeAndHim(notificationId: String) {
         if (currentFriendRequest != null) {
             othersProfileActivityViewModel.removeFriendRequestFromHisDocument(currentFriendRequest!!)

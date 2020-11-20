@@ -76,6 +76,22 @@ class NotificationsAdapter(private var notifications: List<Notification>,
 
                 }
 
+                if (notification.notificationType == "reactOnComment"){
+                    val reactType = notification.reactType
+                    itemView.notifierName.text = notification.notifierName
+                    itemView.notificationDescription.text = "reacted to your comment"
+                    when(reactType){
+                        1 -> itemView.notificationVisualDescription.setImageResource(R.drawable.ic_like_react)
+                        2 -> itemView.notificationVisualDescription.setImageResource(R.drawable.ic_love_react)
+                        3 -> itemView.notificationVisualDescription.setImageResource(R.drawable.ic_care_react)
+                        4 -> itemView.notificationVisualDescription.setImageResource(R.drawable.ic_haha_react)
+                        5 -> itemView.notificationVisualDescription.setImageResource(R.drawable.ic_wow_react)
+                        6 -> itemView.notificationVisualDescription.setImageResource(R.drawable.ic_sad_react)
+                        7 -> itemView.notificationVisualDescription.setImageResource(R.drawable.ic_angry_angry)
+                    }
+
+                }
+
                 if (notification.notificationType == "commentOnPost"){
                     itemView.notifierName.text = notification.notifierName
                     itemView.notificationDescription.text = "commented on your post"
@@ -121,6 +137,11 @@ class NotificationsAdapter(private var notifications: List<Notification>,
                 "share" -> notListener.onClickShareOnPostNotification(
                     postPublisherId = notifiedId,
                     postId = postId,
+                )
+                "reactOnComment" -> notListener.onClickReactsOnCommentNotification(
+                    postPublisherId = notifiedId,
+                    postId = postId,
+                    commentPosition = commentPosition!!
                 )
             }
 

@@ -27,7 +27,7 @@
         android:orientation="vertical"
         android:padding="8dp"
         app:layout_constraintBottom_toTopOf="@+id/commentCreationTimeTextView"
-        app:layout_constraintEnd_toStartOf="@+id/linearLayout3"
+        app:layout_constraintEnd_toStartOf="@+id/whoReactedOnCommentLayout"
         app:layout_constraintStart_toEndOf="@+id/commenterImageView"
         app:layout_constraintTop_toTopOf="@+id/commenterImageView">
 
@@ -117,7 +117,7 @@
 
 
     <LinearLayout
-        android:id="@+id/linearLayout3"
+        android:id="@+id/whoReactedOnCommentLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="128dp"
@@ -132,42 +132,94 @@
 
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/firstReactPlaceHolder"
+            android:id="@+id/myReactPlaceHolder"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:visibility="visible"
+            tools:layout_editor_absoluteX="170dp"
+            tools:layout_editor_absoluteY="43dp" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/likeReactPlaceHolder"
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:src="@drawable/ic_like_react"
-            android:visibility="invisible"
+            android:visibility="gone"
             tools:layout_editor_absoluteX="170dp"
             tools:layout_editor_absoluteY="43dp" />
 
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/secondReactPlaceHolder"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:src="@drawable/ic_wow_react"
-            android:visibility="invisible"
-            tools:layout_editor_absoluteX="170dp"
-            tools:layout_editor_absoluteY="43dp" />
-
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/thirdReactPlaceHolder"
+            android:id="@+id/loveReactPlaceHolder"
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:src="@drawable/ic_love_react"
-            android:visibility="invisible"
+            android:visibility="gone"
             tools:layout_editor_absoluteX="170dp"
             tools:layout_editor_absoluteY="43dp" />
 
-        <TextView
-            android:id="@+id/reactsCountTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="13"
-            android:textSize="12sp" />
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/careReactPlaceHolder"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_care_react"
+            android:visibility="gone"
+            tools:layout_editor_absoluteX="170dp"
+            tools:layout_editor_absoluteY="43dp" />
+
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/hahaReactPlaceHolder"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_haha_react"
+            android:visibility="gone"
+            tools:layout_editor_absoluteX="170dp"
+            tools:layout_editor_absoluteY="43dp" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/wowReactPlaceHolder"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_wow_react"
+            android:visibility="gone"
+            tools:layout_editor_absoluteX="170dp"
+            tools:layout_editor_absoluteY="43dp" />
+
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/sadReactPlaceHolder"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_sad_react"
+            android:visibility="gone"
+            tools:layout_editor_absoluteX="170dp"
+            tools:layout_editor_absoluteY="43dp" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/angryReactPlaceHolder"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_angry_angry"
+            android:visibility="gone"
+            tools:layout_editor_absoluteX="170dp"
+            tools:layout_editor_absoluteY="43dp" />
+
 
     </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/reactsCountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/whoReactedOnCommentLayout"
+        app:layout_constraintStart_toEndOf="@+id/whoReactedOnCommentLayout"
+        app:layout_constraintTop_toTopOf="@+id/whoReactedOnCommentLayout"
+        tools:text="13" />
 
     <TextView
         android:id="@+id/viewPreivousComments"
