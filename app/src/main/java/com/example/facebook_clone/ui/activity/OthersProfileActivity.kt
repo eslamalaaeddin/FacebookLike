@@ -4,7 +4,6 @@ import android.app.Dialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.Window
 import android.widget.Toast
@@ -16,9 +15,6 @@ import com.example.facebook_clone.helper.listener.CommentsBottomSheetListener
 import com.example.facebook_clone.helper.listener.FriendClickListener
 import com.example.facebook_clone.helper.listener.PostListener
 import com.example.facebook_clone.helper.notification.NotificationsHandler
-import com.example.facebook_clone.helper.notification.PushNotification
-import com.example.facebook_clone.helper.notification.RetrofitInstance
-import com.example.facebook_clone.model.notification.Notification
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.model.post.react.React
@@ -43,9 +39,6 @@ import kotlinx.android.synthetic.main.activity_profile.profileImageView
 import kotlinx.android.synthetic.main.activity_profile.smallProfileImageView
 import kotlinx.android.synthetic.main.activity_profile.userNameTextView
 import kotlinx.android.synthetic.main.long_clicked_reacts_button.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -347,7 +340,8 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             interactorId,
             interactorName,
             interactorImageUrl,
-            this
+            this,
+            userIAmViewing.token.toString()
         ).apply {
             show(supportFragmentManager, tag)
         }
@@ -408,7 +402,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
     }
 
     private fun addReactToDb(react: React, postId: String, postPublisherId: String): Task<Void> {
-        return postViewModel.createReact(react, postId, postPublisherId)
+        return postViewModel.addReactToDB(react, postId, postPublisherId)
 
     }
 

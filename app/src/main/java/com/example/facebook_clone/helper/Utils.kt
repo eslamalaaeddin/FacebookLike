@@ -10,6 +10,8 @@ object Utils {
     const val GROUPS_COLLECTION = "groups"
     const val PAGES_COLLECTION = "pages"
     const val POSTS_COLLECTION = "posts"
+    const val COMMENTS_COLLECTION = "comments"
+    const val MY_COMMENTS_COLLECTION = "my_comments"
     const val NOTIFICATIONS_COLLECTION = "notifications"
     const val MY_NOTIFICATIONS_COLLECTION = "my_notifications"
     const val PROFILE_POSTS_COLLECTION = "my_posts"

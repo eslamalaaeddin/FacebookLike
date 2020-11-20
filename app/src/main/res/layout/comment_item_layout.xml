@@ -136,6 +136,7 @@
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:src="@drawable/ic_like_react"
+            android:visibility="invisible"
             tools:layout_editor_absoluteX="170dp"
             tools:layout_editor_absoluteY="43dp" />
 
@@ -145,6 +146,7 @@
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:src="@drawable/ic_wow_react"
+            android:visibility="invisible"
             tools:layout_editor_absoluteX="170dp"
             tools:layout_editor_absoluteY="43dp" />
 
@@ -154,6 +156,7 @@
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:src="@drawable/ic_love_react"
+            android:visibility="invisible"
             tools:layout_editor_absoluteX="170dp"
             tools:layout_editor_absoluteY="43dp" />
 
@@ -161,7 +164,7 @@
             android:id="@+id/reactsCountTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="13"
+            tools:text="13"
             android:textSize="12sp" />
 
     </LinearLayout>

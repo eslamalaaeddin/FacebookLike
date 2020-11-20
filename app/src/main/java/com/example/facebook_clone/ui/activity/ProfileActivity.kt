@@ -295,7 +295,8 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
             interactorId,
             interactorName,
             interactorImageUrl,
-            null
+            null,
+            currentUser.token.toString()
         ).apply {
             show(supportFragmentManager, tag)
         }
@@ -341,7 +342,8 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
             interactorId,
             interactorName,
             interactorImageUrl,
-            null
+            null,
+            currentUser.token.toString(),//My token
         ).apply {
             show(supportFragmentManager, tag)
         }
@@ -364,7 +366,7 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
     }
 
     private fun addReactToDb(react: React, postId: String, postPublisherId: String): Task<Void> {
-        return postViewModel.createReact(react, postId, postPublisherId)
+        return postViewModel.addReactToDB(react, postId, postPublisherId)
 
     }
 

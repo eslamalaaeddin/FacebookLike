@@ -4,10 +4,13 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.facebook_clone.helper.Utils.COMMENTS_COLLECTION
+import com.example.facebook_clone.helper.Utils.MY_COMMENTS_COLLECTION
 import com.example.facebook_clone.helper.Utils.POSTS_COLLECTION
 import com.example.facebook_clone.helper.Utils.PROFILE_POSTS_COLLECTION
 import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.Post
+import com.example.facebook_clone.model.post.comment.ReactionsAndSubComments
 import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.model.post.share.Share
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
@@ -66,6 +69,44 @@ class PostsRepository(
             .update("comments", FieldValue.arrayUnion(comment))
     }
 
+    fun addCommentIdToCommentsCollection( postPublisherId: String,commentId: String): Task<Void>{
+        val reactionsAndSubComments = ReactionsAndSubComments(null, null)
+        return database.collection(COMMENTS_COLLECTION).document(postPublisherId)
+            .collection(MY_COMMENTS_COLLECTION).document(commentId).set(reactionsAndSubComments)
+
+    }
+
+    fun getCommentById(postPublisherId: String, commentId: String): Task<DocumentSnapshot>{
+        return database.collection(COMMENTS_COLLECTION).document(postPublisherId)
+            .collection(MY_COMMENTS_COLLECTION)
+            .document(commentId).get()
+    }
+    
+    fun addReactToReactsListInCommentDocument(postPublisherId: String,commentId: String, react: React?): Task<Void>{
+         return database.collection(COMMENTS_COLLECTION).document(postPublisherId)
+            .collection(MY_COMMENTS_COLLECTION).document(commentId)
+            .update("reactions", FieldValue.arrayUnion(react))
+    }
+
+    fun removeReactFromReactsListInCommentDocument(postPublisherId: String,commentId: String, react: React?): Task<Void>{
+        return database.collection(COMMENTS_COLLECTION).document(postPublisherId)
+            .collection(MY_COMMENTS_COLLECTION).document(commentId)
+            .update("reactions", FieldValue.arrayRemove(react))
+    }
+
+    fun addSubCommentToReactsListInCommentDocument(postPublisherId: String,commentId: String, comment: Comment?): Task<Void>{
+        return database.collection(COMMENTS_COLLECTION).document(postPublisherId)
+            .collection(MY_COMMENTS_COLLECTION).document(commentId)
+            .update("subComments", FieldValue.arrayUnion(comment))
+    }
+
+    fun removeSubCommentFromReactsListInCommentDocument(postPublisherId: String,commentId: String, comment: Comment?): Task<Void>{
+        return database.collection(COMMENTS_COLLECTION).document(postPublisherId)
+            .collection(MY_COMMENTS_COLLECTION).document(commentId)
+            .update("subComments", FieldValue.arrayRemove(comment))
+    }
+
+
     //better to be named getPostSnapshotByItsId
     fun getPostById(publisherId: String, postId: String): Task<DocumentSnapshot> {
         return database.collection(POSTS_COLLECTION).document(publisherId)
@@ -86,13 +127,25 @@ class PostsRepository(
         ).document(postId).update("comments", FieldValue.arrayUnion(comment))
     }
 
-    fun createReact(react: React, postId: String, postPublisherId: String): Task<Void> {
+    fun addReactToDB(react: React, postId: String, postPublisherId: String): Task<Void> {
         return database.collection(POSTS_COLLECTION).document(postPublisherId).collection(
             PROFILE_POSTS_COLLECTION
         ).document(postId).update("reacts", FieldValue.arrayUnion(react))
     }
 
     fun deleteReact(react: React, postId: String, postPublisherId: String): Task<Void> {
+        return database.collection(POSTS_COLLECTION).document(postPublisherId).collection(
+            PROFILE_POSTS_COLLECTION
+        ).document(postId).update("reacts", FieldValue.arrayRemove(react))
+    }
+
+    fun addReactOnCommentToDB(react: React, postId: String, postPublisherId: String): Task<Void> {
+        return database.collection(POSTS_COLLECTION).document(postPublisherId).collection(
+            PROFILE_POSTS_COLLECTION
+        ).document(postId).update("reacts", FieldValue.arrayUnion(react))
+    }
+
+    fun deleteCommentReactFromDB(react: React, postId: String, postPublisherId: String): Task<Void> {
         return database.collection(POSTS_COLLECTION).document(postPublisherId).collection(
             PROFILE_POSTS_COLLECTION
         ).document(postId).update("reacts", FieldValue.arrayRemove(react))

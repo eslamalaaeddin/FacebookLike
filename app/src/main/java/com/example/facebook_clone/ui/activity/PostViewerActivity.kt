@@ -20,6 +20,7 @@ import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.ui.dialog.ImageViewerDialog
 import com.example.facebook_clone.viewmodel.PostViewModel
+import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_post_viewer.*
 import kotlinx.android.synthetic.main.activity_post_viewer.addReactTextView
@@ -37,14 +38,18 @@ import kotlinx.android.synthetic.main.activity_post_viewer.sharesCountTextView
 import kotlinx.android.synthetic.main.activity_post_viewer.userNameTextView
 import kotlinx.android.synthetic.main.profile_post_item.*
 import kotlinx.android.synthetic.main.profile_post_item.view.*
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 private const val TAG = "PostViewerActivity"
+
 class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClickListener {
     private val postViewModel by viewModel<PostViewModel>()
     private val picasso = Picasso.get()
-    private var commentsAdapter : CommentsAdapter? = null
+    private var commentsAdapter: CommentsAdapter? = null
     private var post: Post? = null
+    private val auth: FirebaseAuth by inject()
+
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,8 +74,8 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
         */
          */
 
-        postViewModel.getPostById(postPublisherId, postId).addOnCompleteListener {task ->
-             post = task.result?.toObject(Post::class.java)
+        postViewModel.getPostById(postPublisherId, postId).addOnCompleteListener { task ->
+            post = task.result?.toObject(Post::class.java)
             post?.let { post ->
                 picasso.load(post.publisherImageUrl).into(circleImageView)
                 userNameTextView.text = post.publisherName
@@ -88,20 +93,20 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                 }
                 reactsCountTextView.text = post.reacts?.size.toString()
 
-                if (post.attachmentUrl != null){
+                if (post.attachmentUrl != null) {
                     attachmentImageView.visibility = View.VISIBLE
-                    if (post.attachmentType == "image"){
+                    if (post.attachmentType == "image") {
                         picasso.load(post.attachmentUrl).into(attachmentImageView)
                         playButtonImageView.visibility = View.GONE
-                    }
-                    else if(post.attachmentType == "video"){
+                    } else if (post.attachmentType == "video") {
                         playButtonImageView.visibility = View.VISIBLE
-                        val interval: Long = 1* 1000
+                        val interval: Long = 1 * 1000
                         val options: RequestOptions = RequestOptions().frame(interval)
                         Glide.with(this)
-                            .asBitmap().load(post.attachmentUrl).apply(options).into(attachmentImageView)
+                            .asBitmap().load(post.attachmentUrl).apply(options)
+                            .into(attachmentImageView)
                     }
-                }else{
+                } else {
                     attachmentImageView.visibility = View.GONE
                     playButtonImageView.visibility = View.GONE
                 }
@@ -117,7 +122,15 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
 
                 if (post.comments != null && post.reacts != null) {
                     commentsAdapter =
-                        CommentsAdapter(post.comments!!, post.reacts!!, this, this)
+                        CommentsAdapter(
+                            auth.currentUser?.uid.toString(),
+                            post.comments!!,
+                            post.reacts!!,
+                            this,
+                            this,
+                            postViewModel,
+                            postPublisherId
+                        )
 
                     postViewerCommentsRecyclerView.adapter = commentsAdapter
                     postViewerCommentsRecyclerView.scrollToPosition(commentPosition)
@@ -151,7 +164,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                                 3 -> {
                                     addReactTextView.text = "Care"
                                     addReactTextView.setTextColor(
-                                       resources.getColor(
+                                        resources.getColor(
                                             R.color.orange
                                         )
                                     )
@@ -208,13 +221,26 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
             }
 
 
-
         }
-        circleImageView.setOnClickListener { startActivity(Intent(this, ProfileActivity::class.java)) }
+        circleImageView.setOnClickListener {
+            startActivity(
+                Intent(
+                    this,
+                    ProfileActivity::class.java
+                )
+            )
+        }
 
-        userNameTextView.setOnClickListener { startActivity(Intent(this, ProfileActivity::class.java)) }
+        userNameTextView.setOnClickListener {
+            startActivity(
+                Intent(
+                    this,
+                    ProfileActivity::class.java
+                )
+            )
+        }
 
-        attachmentImageView.setOnClickListener{
+        attachmentImageView.setOnClickListener {
             if (post != null) {
                 //Image
                 if (post?.attachmentUrl!!.contains("jpeg")) {
@@ -247,9 +273,14 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
     override fun onCommentLongClicked(comment: Comment) {
     }
 
-//    override fun onReactOnCommentClicked(commentId: String, commentPosition: Int) {
-//
-//    }
+    override fun onReactOnCommentClicked(
+        comment: Comment,
+        commentPosition: Int,
+        reacted: Boolean,
+        currentReact: React?
+    ) {
+
+    }
 
     override fun onMediaCommentClicked(mediaUrl: String) {
         //Image
@@ -259,7 +290,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
             imageViewerDialog.setMediaUrl(mediaUrl)
         }
         //video(I chosed an activity to show media controllers)
-        else{
+        else {
             val videoIntent = Intent(this, VideoPlayerActivity::class.java)
             videoIntent.putExtra("videoUrl", mediaUrl)
             startActivity(videoIntent)

@@ -12,22 +12,29 @@ import com.example.facebook_clone.R
 import com.example.facebook_clone.helper.listener.CommentClickListener
 import com.example.facebook_clone.helper.listener.ReactClickListener
 import com.example.facebook_clone.model.post.comment.Comment
+import com.example.facebook_clone.model.post.comment.ReactionsAndSubComments
 import com.example.facebook_clone.model.post.react.React
+import com.example.facebook_clone.viewmodel.PostViewModel
+import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.comment_item_layout.view.*
 
 private const val TAG = "CommentsAdapter"
 
 class CommentsAdapter(
+    private val commenterId: String,
     private var comments: List<Comment>,
     private var reacts: List<React>?,
     private val commentClickListener: CommentClickListener,
-    private val reactClickListener: ReactClickListener
+    private val reactClickListener: ReactClickListener,
+    private val postViewModel: PostViewModel,
+    private val postPublisherId:String
 ) :
     RecyclerView.Adapter<CommentsAdapter.CommentHolder>() {
     private val picasso = Picasso.get()
     private lateinit var cClickListener: CommentClickListener
     private lateinit var rClickListener: ReactClickListener
+    private var reactsCount = 0
 
 
     inner class CommentHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
@@ -44,10 +51,50 @@ class CommentsAdapter(
 
             itemView.reactOnCommentTextView.setOnClickListener {
                 val comment = comments[adapterPosition]
-                val commentId = comment.id.toString()
-                val commentReacts = comment.reacts
-               // cClickListener.onReactOnCommentClicked(commentId, adapterPosition, commentReacts!!)
+                var currentReact: React? = null
+                var reacted: Boolean = false
+
+                //I HAVE TO GET COMMENT DOCUMENT
+                postViewModel.getCommentById(postPublisherId, comment.id.toString())
+                    .addOnCompleteListener {
+                        val commentDoc = it.result?.toObject(ReactionsAndSubComments::class.java)
+                        commentDoc?.reactions?.let { reacts ->
+                            if (reacts.isNotEmpty()) {
+                                itemView.reactsCountTextView.text = reacts.size.toString()
+                            }
+                            for (react in reacts) {
+                                if (react.reactorId == commenterId) {
+                                    itemView.reactOnCommentTextView.text = "Liked"
+                                    currentReact = react
+                                    reacted = true
+                                    break
+                                }
+                                else{
+                                    itemView.reactOnCommentTextView.text = "Like"
+                                }
+                            }
+                        }
+                        cClickListener.onReactOnCommentClicked(
+                            comment,
+                            adapterPosition,
+                            reacted,
+                            currentReact
+                        )
+                    }
             }
+
+//
+////                comment.reacts?.let { reacts ->
+////                    for (react in reacts) {
+////                        if (react.reactorId == commenterId ) {
+////                            currentReact = react
+////                            reacted = true
+////                            break
+////                        }
+////                    }
+////                }
+//
+//            }
 
             itemView.mediaCommentCardView.setOnClickListener {
                 val comment = comments[adapterPosition]

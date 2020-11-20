@@ -13,12 +13,15 @@ import com.example.facebook_clone.adapter.SearchedUsersAdapter
 import com.example.facebook_clone.helper.listener.SearchedItemListener
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.viewmodel.SearchActivityViewModel
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_search.*
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 private const val TAG = "SearchActivity"
 
 class SearchActivity : AppCompatActivity(), SearchedItemListener {
+    private val auth: FirebaseAuth by inject()
     private var usersSearchResultLiveData: LiveData<List<User>>? = null
     private val searchActivityViewModel by viewModel<SearchActivityViewModel>()
     private lateinit var searchedUsersAdapter: SearchedUsersAdapter
@@ -67,9 +70,14 @@ class SearchActivity : AppCompatActivity(), SearchedItemListener {
     }
 
     override fun onSearchedUserClicked(userId: String) {
-        val intent = Intent(this, OthersProfileActivity::class.java)
-        intent.putExtra("userId", userId)
-        startActivity(intent)
+        if (userId == auth.currentUser?.uid.toString()){
+            startActivity(Intent(this, ProfileActivity::class.java))
+        }
+        else {
+            val intent = Intent(this, OthersProfileActivity::class.java)
+            intent.putExtra("userId", userId)
+            startActivity(intent)
+        }
     }
 
     override fun onSearchedPageClicked(pageId: String) {

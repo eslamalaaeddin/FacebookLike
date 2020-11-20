@@ -7,8 +7,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
-import android.text.Editable
-import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,14 +20,17 @@ import com.example.facebook_clone.helper.listener.ReactClickListener
 import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.helper.listener.CommentsBottomSheetListener
 import com.example.facebook_clone.helper.listener.PostAttachmentListener
-import com.example.facebook_clone.model.notification.Notification
+import com.example.facebook_clone.helper.notification.NotificationsHandler
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.comment.CommentDocument
 import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.model.post.react.ReactDocument
+import com.example.facebook_clone.model.post.share.Share
 import com.example.facebook_clone.ui.activity.VideoPlayerActivity
 import com.example.facebook_clone.ui.dialog.ImageViewerDialog
+import com.example.facebook_clone.viewmodel.NotificationsFragmentViewModel
+import com.example.facebook_clone.viewmodel.OthersProfileActivityViewModel
 import com.example.facebook_clone.viewmodel.PostViewModel
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -46,17 +48,20 @@ class CommentsBottomSheet(
     private val postId: String,
     private val commenterId: String,
     private val commenterName: String,
-    private val imageUrl: String,
-    private val commentsBottomSheetListener: CommentsBottomSheetListener?
+    private val commenterImageUrl: String,
+    private val commentsBottomSheetListener: CommentsBottomSheetListener?,
+    private val postPublisherToken: String
 ) : BottomSheetDialogFragment(), CommentClickListener, ReactClickListener, PostAttachmentListener {
     private val postViewModel by viewModel<PostViewModel>()
+    private val othersProfileActivityViewModel by viewModel<OthersProfileActivityViewModel>()
+    private val notificationsFragmentViewModel by viewModel<NotificationsFragmentViewModel>()
     private lateinit var comBottomSheetListener: CommentsBottomSheetListener
     private lateinit var commentsList: List<Comment>
     private lateinit var reactsList: List<React>
     private val auth: FirebaseAuth by inject()
-    private var commentsAdapter: CommentsAdapter =
-        CommentsAdapter(emptyList(), emptyList(), this, this)
+    private lateinit var commentsAdapter: CommentsAdapter
     private var commentData: Intent? = null
+    private lateinit var notificationsHandler: NotificationsHandler
     private var commentDataType: String? = null
     private var bitmapFromCamera: Boolean = false
     private var commentAttachmentUrl: String? = null
@@ -90,6 +95,18 @@ class CommentsBottomSheet(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        notificationsHandler = NotificationsHandler(
+            othersProfileActivityViewModel = othersProfileActivityViewModel,
+            notificationsFragmentViewModel = notificationsFragmentViewModel
+        )
+
+        notificationsHandler.notifierId = commenterId
+        notificationsHandler.notifierName = commenterName
+        notificationsHandler.notifierImageUrl = commenterImageUrl
+        notificationsHandler.notifiedId = postPublisherId
+        notificationsHandler.notifiedToken = postPublisherToken
+
 
         reactorsLayout.setOnClickListener {
             //Open people who reacted dialog
@@ -140,6 +157,8 @@ class CommentsBottomSheet(
                                                 "textWithImage"
                                             )
                                         }
+//                                        change 1
+
                                         postViewModel.createComment(
                                             postId,
                                             postPublisherId,
@@ -147,6 +166,11 @@ class CommentsBottomSheet(
                                         ).addOnCompleteListener { task ->
                                             commentEditText.text.clear()
                                             progressDialog?.dismiss()
+                                            postViewModel
+                                                .addCommentIdToCommentsCollection(
+                                                    postPublisherId,
+                                                    comment.id.toString()
+                                                )
                                             if (!task.isSuccessful) {
                                                 Utils.toastMessage(
                                                     requireContext(),
@@ -177,6 +201,7 @@ class CommentsBottomSheet(
                                                 "textWithVideo"
                                             )
                                         }
+                                        //change 2
                                         postViewModel.createComment(
                                             postId,
                                             postPublisherId,
@@ -184,6 +209,11 @@ class CommentsBottomSheet(
                                         ).addOnCompleteListener { task ->
                                             commentEditText.text.clear()
                                             progressDialog?.dismiss()
+                                            postViewModel
+                                                .addCommentIdToCommentsCollection(
+                                                    postPublisherId,
+                                                    comment.id.toString()
+                                                )
                                             if (!task.isSuccessful) {
                                                 Utils.toastMessage(
                                                     requireContext(),
@@ -205,11 +235,19 @@ class CommentsBottomSheet(
                             commentType = "text",
                             attachmentCommentUrl = null
                         )
+
+                    Log.i(TAG, "FAWZY onViewCreated: $comment")
                     commentEditText.text.clear()
                     // progressDialog = Utils.showProgressDialog(requireContext(), "Please wait...")
+                    //change 3
                     postViewModel.createComment(postId, postPublisherId, comment)
                         .addOnCompleteListener { task ->
                             //   progressDialog?.dismiss()
+                            postViewModel
+                                .addCommentIdToCommentsCollection(
+                                    postPublisherId,
+                                    comment.id.toString()
+                                )
                             if (task.isSuccessful) {
                                 //if you are not the commenter
                                 if (commenterId != postPublisherId) {
@@ -224,6 +262,8 @@ class CommentsBottomSheet(
                                     requireContext(),
                                     task.exception?.message.toString()
                                 )
+
+                                Toast.makeText(requireContext(), "FAWZY", Toast.LENGTH_SHORT).show()
                             }
                             //dismiss()
                         }
@@ -289,10 +329,13 @@ class CommentsBottomSheet(
 
                     commentsAdapter =
                         CommentsAdapter(
+                            commenterId,
                             commentsList,
                             reactsList,
                             this,
-                            this
+                            this,
+                            postViewModel,
+                            postPublisherId
                         )
                     //i don't know why it becomes null ==> almost because comments bottom sheet is not vivsible
                     if (commentsRecyclerView != null) {
@@ -312,9 +355,40 @@ class CommentsBottomSheet(
         longClickedCommentBottomSheet.show(activity?.supportFragmentManager!!, "signature")
     }
 
-//    override fun onReactOnCommentClicked(commentId: String, commentPosition: Int, commentReacts: List<React>) {
-//
-//    }
+    override fun onReactOnCommentClicked(comment: Comment, commentPosition: Int, reacted: Boolean, currentReact: React?) {
+
+        //I did not react
+        if (!reacted){
+            //UPDATE REACTED VALUE WITH 1
+            //postViewModel.updateReactedValue(postPublisherId, postId, 1)
+            val myReact = createReact(commenterId, commenterName, commenterImageUrl,1)
+            addReactOnComment(postPublisherId, comment.id.toString(), myReact).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    notificationsHandler.also {
+                        it.notificationType = "reactOnComment"
+                        it.reactType = 1
+                        it.postId = postId
+                        it.handleNotificationCreationAndFiring()
+                    }
+                }
+                else{
+                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "ESLAM", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        //If you have reacted --> delete react
+        else {
+            //UPDATE REACTED VALUE WITH NULL
+            //postViewModel.updateReactedValue(postPublisherId, postId, currentReact!!)
+            deleteReactFromComment(postPublisherId, comment.id.toString(), currentReact).addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Utils.toastMessage(requireContext(), task.exception?.message.toString())
+                    Toast.makeText(requireContext(), "ALAA", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
     override fun onMediaCommentClicked(mediaUrl: String) {
         //Image
@@ -353,7 +427,7 @@ class CommentsBottomSheet(
         return Comment(
             commenterId = commenterId,
             commenterName = commenterName,
-            commenterImageUrl = imageUrl,
+            commenterImageUrl = commenterImageUrl,
             textComment = commentContent,
             commentType = commentType,
             attachmentCommentUrl = attachmentCommentUrl
@@ -366,6 +440,28 @@ class CommentsBottomSheet(
             commentDataType = dataType
             bitmapFromCamera = fromCamera
         }
+    }
+
+    private fun createReact(interactorId: String, interactorName: String, interactorImageUrl: String,reactType: Int?): React{
+        return React(
+            reactorId = interactorId,
+            reactorName = interactorName,
+            reactorImageUrl = interactorImageUrl,
+            react = reactType
+        )
+    }
+
+    private fun addReactOnComment(postPublisherId: String, commentId: String, react: React?): Task<Void> {
+        return postViewModel.addReactToReactsListInCommentDocument(postPublisherId, commentId, react)
+
+    }
+
+    private fun deleteReactFromComment(postPublisherId: String, commentId: String, react: React?): Task<Void> {
+        return postViewModel.removeReactFromReactsListInCommentDocument(postPublisherId, commentId, react)
+    }
+
+    private fun createShare(share: Share, postId: String, postPublisherId: String): Task<Void> {
+        return postViewModel.createShare(share, postId, postPublisherId)
     }
 
 
