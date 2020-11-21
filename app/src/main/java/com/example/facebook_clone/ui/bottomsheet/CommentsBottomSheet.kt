@@ -22,6 +22,7 @@ import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.helper.listener.CommentsBottomSheetListener
 import com.example.facebook_clone.helper.listener.PostAttachmentListener
 import com.example.facebook_clone.helper.notification.NotificationsHandler
+import com.example.facebook_clone.helper.provider.ReplyOnCommentDataProvider
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.comment.CommentDocument
@@ -53,7 +54,11 @@ class CommentsBottomSheet(
     private val commenterImageUrl: String,
     private val commentsBottomSheetListener: CommentsBottomSheetListener?,
     private val postPublisherToken: String
-) : BottomSheetDialogFragment(), CommentClickListener, ReactClickListener, PostAttachmentListener {
+) : BottomSheetDialogFragment(),
+    CommentClickListener,
+    ReactClickListener,
+    PostAttachmentListener,
+    ReplyOnCommentDataProvider {
     private val postViewModel by viewModel<PostViewModel>()
     private val othersProfileActivityViewModel by viewModel<OthersProfileActivityViewModel>()
     private val notificationsFragmentViewModel by viewModel<NotificationsFragmentViewModel>()
@@ -68,6 +73,10 @@ class CommentsBottomSheet(
     private var bitmapFromCamera: Boolean = false
     private var commentAttachmentUrl: String? = null
     private var progressDialog: ProgressDialog? = null
+    private lateinit var commentFromReplyBottomSheet: Comment
+    private var commentPositionFromReplyBottomSheet = 0
+    private var reactedFromReplyBottomSheet: Boolean = false
+    private var currentReactFromReplyBottomSheet: React? = null
     private var reactClicked = false
     //private lateinit var comments: List<Comment>
 
@@ -169,11 +178,26 @@ class CommentsBottomSheet(
                                                     postPublisherId,
                                                     comment.id.toString()
                                                 )
-                                            if (!task.isSuccessful) {
+                                            if (task.isSuccessful) {
+                                                //if you are not the commenter
+                                                if (commenterId != postPublisherId) {
+                                                    comBottomSheetListener.onAnotherUserCommented(
+                                                        commentsList.size - 1,
+                                                        comment.id!!,
+                                                        postId
+                                                    )
+                                                }
+                                            } else {
                                                 Utils.toastMessage(
                                                     requireContext(),
                                                     task.exception?.message.toString()
                                                 )
+
+                                                Toast.makeText(
+                                                    requireContext(),
+                                                    "FAWZY",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
                                             }
                                         }
                                         // dismiss()
@@ -212,11 +236,26 @@ class CommentsBottomSheet(
                                                     postPublisherId,
                                                     comment.id.toString()
                                                 )
-                                            if (!task.isSuccessful) {
+                                            if (task.isSuccessful) {
+                                                //if you are not the commenter
+                                                if (commenterId != postPublisherId) {
+                                                    comBottomSheetListener.onAnotherUserCommented(
+                                                        commentsList.size - 1,
+                                                        comment.id!!,
+                                                        postId
+                                                    )
+                                                }
+                                            } else {
                                                 Utils.toastMessage(
                                                     requireContext(),
                                                     task.exception?.message.toString()
                                                 )
+
+                                                Toast.makeText(
+                                                    requireContext(),
+                                                    "FAWZY",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
                                             }
                                         }
                                         //  dismiss()
@@ -234,10 +273,8 @@ class CommentsBottomSheet(
                             attachmentCommentUrl = null
                         )
 
-                    Log.i(TAG, "FAWZY onViewCreated: $comment")
                     commentEditText.text.clear()
-                    // progressDialog = Utils.showProgressDialog(requireContext(), "Please wait...")
-                    //change 3
+
                     postViewModel.createComment(postId, postPublisherId, comment)
                         .addOnCompleteListener { task ->
                             //   progressDialog?.dismiss()
@@ -353,12 +390,69 @@ class CommentsBottomSheet(
         longClickedCommentBottomSheet.show(activity?.supportFragmentManager!!, "signature")
     }
 
-    override fun onReactOnCommentClicked(comment: Comment, commentPosition: Int, reacted: Boolean, currentReact: React?) {
+    override fun onReactOnCommentClicked(
+        comment: Comment,
+        commentPosition: Int,
+        reacted: Boolean,
+        currentReact: React?
+    ) {
 
         //I did not react
-        if (!reacted){
-            val myReact = createReact(commenterId, commenterName, commenterImageUrl,1)
-            addReactOnComment(postPublisherId, comment.id.toString(), myReact).addOnCompleteListener { task ->
+        if (!reacted) {
+            val myReact = createReact(commenterId, commenterName, commenterImageUrl, 1)
+            addReactOnComment(
+                postPublisherId,
+                comment.id.toString(),
+                myReact
+            ).addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    updateCommentsUI()
+                    if (auth.currentUser?.uid.toString() != comment.commenterId) {
+                        notificationsHandler.also {
+                            it.notificationType = "reactOnComment"
+                            it.commentPosition = commentPosition
+                            it.reactType = 1
+                            it.postId = postId
+                            it.handleNotificationCreationAndFiring()
+                        }
+                    }
+                } else {
+                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT)
+                        .show()
+                    Toast.makeText(requireContext(), "ESLAM", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        //If you have reacted --> delete react
+        else {
+            deleteReactFromComment(
+                postPublisherId,
+                comment.id.toString(),
+                currentReact
+            ).addOnCompleteListener { task ->
+                updateCommentsUI()
+                if (!task.isSuccessful) {
+                    Utils.toastMessage(requireContext(), task.exception?.message.toString())
+                    Toast.makeText(requireContext(), "ALAA", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun onReactOnCommentClickedFromReplies(
+        comment: Comment,
+        commentPosition: Int,
+        reacted: Boolean,
+        currentReact: React?
+    ) {
+        //I did not react
+        if (!reacted) {
+            val myReact = createReact(commenterId, commenterName, commenterImageUrl, 1)
+            addReactOnComment(
+                postPublisherId,
+                comment.id.toString(),
+                myReact
+            ).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     updateCommentsUI()
                     if (postPublisherId != commenterId) {
@@ -370,16 +464,20 @@ class CommentsBottomSheet(
                             it.handleNotificationCreationAndFiring()
                         }
                     }
-                }
-                else{
-                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT)
+                        .show()
                     Toast.makeText(requireContext(), "ESLAM", Toast.LENGTH_SHORT).show()
                 }
             }
         }
         //If you have reacted --> delete react
         else {
-            deleteReactFromComment(postPublisherId, comment.id.toString(), currentReact).addOnCompleteListener { task ->
+            deleteReactFromComment(
+                postPublisherId,
+                comment.id.toString(),
+                currentReact
+            ).addOnCompleteListener { task ->
                 updateCommentsUI()
                 if (!task.isSuccessful) {
                     Utils.toastMessage(requireContext(), task.exception?.message.toString())
@@ -397,16 +495,41 @@ class CommentsBottomSheet(
     ) {
         Log.i(TAG, "FAWZY onReactOnCommentLongClicked: $currentReact")
         showReactsChooserDialog(
-            interactorId = commenterId,
+            interactorId = auth.currentUser?.uid.toString(),
             interactorName = commenterName,
             interactorImageUrl = commenterImageUrl,
             postId = postId,
             postPublisherId = postPublisherId,
             commentId = comment.id.toString(),
+            commenterId = comment.commenterId.toString(),
             currentReact = currentReact,
-            commentPosition =commentPosition
+            commentPosition = commentPosition
         )
     }
+
+    override fun onReplyToCommentClicked(
+        comment: Comment,
+        commentPosition: Int,
+        reacted: Boolean,
+        currentReact: React?
+    ) {
+        val replyOnCommentBottomSheet = ReplyOnCommentBottomSheet(
+            this,
+            postPublisherId,
+            comment,
+            commentPosition,
+            commenterId,
+            commenterName,
+            commenterImageUrl,
+            reacted,
+            currentReact
+        )
+        replyOnCommentBottomSheet.show(
+            activity?.supportFragmentManager!!,
+            replyOnCommentBottomSheet.tag
+        )
+    }
+
 
     override fun onCommentReactionsLayoutClicked(commentId: String) {
         openPeopleWhoReactedLayout(commentId, "comment")
@@ -464,7 +587,12 @@ class CommentsBottomSheet(
         }
     }
 
-    private fun createReact(interactorId: String, interactorName: String, interactorImageUrl: String,reactType: Int?): React{
+    private fun createReact(
+        interactorId: String,
+        interactorName: String,
+        interactorImageUrl: String,
+        reactType: Int?
+    ): React {
         return React(
             reactorId = interactorId,
             reactorName = interactorName,
@@ -473,47 +601,67 @@ class CommentsBottomSheet(
         )
     }
 
-    private fun addReactOnComment(postPublisherId: String, commentId: String, react: React?): Task<Void> {
-        return postViewModel.addReactToReactsListInCommentDocument(postPublisherId, commentId, react)
+    private fun addReactOnComment(
+        postPublisherId: String,
+        commentId: String,
+        react: React?
+    ): Task<Void> {
+        return postViewModel.addReactToReactsListInCommentDocument(
+            postPublisherId,
+            commentId,
+            react
+        )
 
     }
 
-    private fun deleteReactFromComment(postPublisherId: String, commentId: String, react: React?): Task<Void> {
-        return postViewModel.removeReactFromReactsListInCommentDocument(postPublisherId, commentId, react)
+    private fun deleteReactFromComment(
+        postPublisherId: String,
+        commentId: String,
+        react: React?
+    ): Task<Void> {
+        return postViewModel.removeReactFromReactsListInCommentDocument(
+            postPublisherId,
+            commentId,
+            react
+        )
     }
 
     private fun createShare(share: Share, postId: String, postPublisherId: String): Task<Void> {
         return postViewModel.createShare(share, postId, postPublisherId)
     }
 
-    private fun showReactsChooserDialog(interactorId: String,
-                                        interactorName: String,
-                                        interactorImageUrl: String,
-                                        postId: String,
-                                        postPublisherId: String,
-                                        commentId: String,
-                                        currentReact: React?,
-                                        commentPosition: Int
+    private fun showReactsChooserDialog(
+        interactorId: String,
+        interactorName: String,
+        interactorImageUrl: String,
+        postId: String,
+        postPublisherId: String,
+        commentId: String,
+        commenterId: String,
+        currentReact: React?,
+        commentPosition: Int
     ) {
         val dialog = Dialog(requireContext())
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(true)
         dialog.setContentView(R.layout.long_clicked_reacts_button)
-        val react =  React(
+        val react = React(
             reactorId = interactorId,
             reactorName = interactorName,
             reactorImageUrl = interactorImageUrl
         )
         dialog.loveReactButton.setOnClickListener {
             react.react = 2
-            if (currentReact != null){
+            if (currentReact != null) {
                 deleteReactFromComment(postPublisherId, commentId, currentReact)
             }
             //postViewModel.updateReactedValue(postPublisherId, postId,2)
             addReactOnComment(postPublisherId, commentId, react).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     updateCommentsUI()
-                    if (postPublisherId != commenterId) {
+                    Log.i(TAG, "YYYY showReactsChooserDialog: $commenterId")
+                    Log.i(TAG, "YYYY showReactsChooserDialog: $interactorId")
+                    if (commenterId != interactorId) {
                         notificationsHandler.also {
                             it.notificationType = "reactOnComment"
                             it.commentPosition = commentPosition
@@ -522,22 +670,23 @@ class CommentsBottomSheet(
                             it.handleNotificationCreationAndFiring()
                         }
                     }
-                }else{
-                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
             dialog.dismiss()
         }
         dialog.careReactButton.setOnClickListener {
             react.react = 3
-            if (currentReact != null){
+            if (currentReact != null) {
                 deleteReactFromComment(postPublisherId, commentId, currentReact)
             }
             //postViewModel.updateReactedValue(postPublisherId, postId,3)
             addReactOnComment(postPublisherId, commentId, react).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     updateCommentsUI()
-                    if (postPublisherId != commenterId) {
+                    if (commenterId != interactorId) {
                         notificationsHandler.also {
                             it.notificationType = "reactOnComment"
                             it.commentPosition = commentPosition
@@ -546,22 +695,23 @@ class CommentsBottomSheet(
                             it.handleNotificationCreationAndFiring()
                         }
                     }
-                }else{
-                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
             dialog.dismiss()
         }
         dialog.hahaReactButton.setOnClickListener {
             react.react = 4
-            if (currentReact != null){
+            if (currentReact != null) {
                 deleteReactFromComment(postPublisherId, commentId, currentReact)
             }
             //postViewModel.updateReactedValue(postPublisherId, postId,4)
             addReactOnComment(postPublisherId, commentId, react).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     updateCommentsUI()
-                    if (postPublisherId != commenterId) {
+                    if (commenterId != interactorId) {
                         notificationsHandler.also {
                             it.notificationType = "reactOnComment"
                             it.commentPosition = commentPosition
@@ -570,22 +720,23 @@ class CommentsBottomSheet(
                             it.handleNotificationCreationAndFiring()
                         }
                     }
-                }else{
-                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
             dialog.dismiss()
         }
         dialog.wowReactButton.setOnClickListener {
             react.react = 5
-            if (currentReact != null){
+            if (currentReact != null) {
                 deleteReactFromComment(postPublisherId, commentId, currentReact)
             }
             //postViewModel.updateReactedValue(postPublisherId, postId,5)
             addReactOnComment(postPublisherId, commentId, react).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     updateCommentsUI()
-                    if (postPublisherId != commenterId) {
+                    if (commenterId != interactorId) {
                         notificationsHandler.also {
                             it.notificationType = "reactOnComment"
                             it.commentPosition = commentPosition
@@ -594,22 +745,23 @@ class CommentsBottomSheet(
                             it.handleNotificationCreationAndFiring()
                         }
                     }
-                }else{
-                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
             dialog.dismiss()
         }
         dialog.sadReactButton.setOnClickListener {
             react.react = 6
-            if (currentReact != null){
+            if (currentReact != null) {
                 deleteReactFromComment(postPublisherId, commentId, currentReact)
             }
             //postViewModel.updateReactedValue(postPublisherId, postId,6)
             addReactOnComment(postPublisherId, commentId, react).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     updateCommentsUI()
-                    if (postPublisherId != commenterId) {
+                    if (commenterId!= interactorId) {
                         notificationsHandler.also {
                             it.notificationType = "reactOnComment"
                             it.commentPosition = commentPosition
@@ -618,22 +770,23 @@ class CommentsBottomSheet(
                             it.handleNotificationCreationAndFiring()
                         }
                     }
-                }else{
-                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
             dialog.dismiss()
         }
         dialog.angryReactButton.setOnClickListener {
             react.react = 7
-            if (currentReact != null){
+            if (currentReact != null) {
                 deleteReactFromComment(postPublisherId, commentId, currentReact)
             }
             //postViewModel.updateReactedValue(postPublisherId, postId,7)
             addReactOnComment(postPublisherId, commentId, react).addOnCompleteListener { task ->
                 updateCommentsUI() // to update
                 if (task.isSuccessful) {
-                    if (postPublisherId != commenterId) {
+                    if (commenterId!= interactorId) {
                         notificationsHandler.also {
                             it.notificationType = "reactOnComment"
                             it.commentPosition = commentPosition
@@ -642,8 +795,9 @@ class CommentsBottomSheet(
                             it.handleNotificationCreationAndFiring()
                         }
                     }
-                }else{
-                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
             dialog.dismiss()
@@ -652,13 +806,48 @@ class CommentsBottomSheet(
 
     }
 
-    private fun openPeopleWhoReactedLayout(commentId: String?, reactedOn: String){
+    private fun openPeopleWhoReactedLayout(commentId: String?, reactedOn: String) {
         val peopleWhoReactedDialog =
             PeopleWhoReactedBottomSheet(commentId.toString(), postId, postPublisherId, reactedOn)
         peopleWhoReactedDialog.show(
             activity?.supportFragmentManager!!,
             peopleWhoReactedDialog.tag
         )
+    }
+
+    override fun reactOnCommentFromRepliesDataProvider(
+        comment: Comment,
+        commentPosition: Int,
+        reacted: Boolean,
+        currentReact: React?,
+        clickType: String
+    ) {
+        if (clickType == "click") {
+            onReactOnCommentClickedFromReplies(comment, commentPosition, reacted, currentReact)
+        }
+        else if (clickType == "longClick") {
+            showReactsChooserDialog(
+                commenterId,//Interactor
+                commenterName,
+                commenterImageUrl,
+                postId,
+                postPublisherId,
+                comment.id.toString(),
+                comment.commenterId.toString(),
+                currentReact,
+                commentPosition
+            )
+
+            Log.i(TAG, "IIIII reactOnCommentFromRepliesDataProvider: $commenterId")
+            Log.i(TAG, "IIIII reactOnCommentFromRepliesDataProvider: $commenterName")
+            Log.i(TAG, "IIIII reactOnCommentFromRepliesDataProvider: $commenterImageUrl")
+            Log.i(TAG, "IIIII reactOnCommentFromRepliesDataProvider: $postId")
+            Log.i(TAG, "IIIII reactOnCommentFromRepliesDataProvider: $postPublisherId")
+            Log.i(TAG, "IIIII reactOnCommentFromRepliesDataProvider: ${comment.id.toString()}")
+            Log.i(TAG, "IIIII reactOnCommentFromRepliesDataProvider: ${comment.commenterId.toString()}")
+            Log.i(TAG, "IIIII reactOnCommentFromRepliesDataProvider: $currentReact")
+            Log.i(TAG, "IIIII reactOnCommentFromRepliesDataProvider: $commentPosition")
+        }
     }
 
 

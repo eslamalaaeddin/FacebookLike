@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:gravity="center"
     android:layout_height="match_parent">
@@ -43,7 +44,8 @@
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:layout_marginEnd="8dp"
-            android:src="@drawable/ic_copy"/>
+            android:src="@drawable/ic_copy"
+            app:tint="@color/medium_gray" />
 
         <TextView
             android:layout_width="match_parent"
@@ -69,6 +71,7 @@
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:layout_marginEnd="8dp"
+            app:tint="@color/medium_gray"
             android:src="@drawable/ic_delete"/>
 
         <TextView
@@ -95,6 +98,7 @@
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:layout_marginEnd="8dp"
+            app:tint="@color/medium_gray"
             android:src="@drawable/ic_edit"/>
 
         <TextView

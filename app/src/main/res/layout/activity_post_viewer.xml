@@ -344,7 +344,7 @@
         app:srcCompat="@drawable/ic_baseline_play_arrow_24" />
 
     <View
-        android:id="@+id/separator"
+        android:id="@+id/lastSeparator"
         android:layout_width="match_parent"
         android:layout_height="1px"
         android:layout_alignTop="@id/commentLayout"

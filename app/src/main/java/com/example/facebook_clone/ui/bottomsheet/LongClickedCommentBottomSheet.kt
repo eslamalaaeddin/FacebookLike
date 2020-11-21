@@ -1,5 +1,6 @@
 package com.example.facebook_clone.ui.bottomsheet
 
+import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -18,7 +19,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class LongClickedCommentBottomSheet(private val comment: Comment,
                                     private val postId: String,
                                     private val postPublisherId: String): BottomSheetDialogFragment() {
-
     private val postViewModel by viewModel<PostViewModel>()
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -71,9 +71,13 @@ class LongClickedCommentBottomSheet(private val comment: Comment,
 
     private fun deleteComment(comment: Comment, postId: String, postPublisherId: String){
         postViewModel.deleteComment(comment, postId, postPublisherId).addOnCompleteListener { task ->
-            if (!task.isSuccessful){
+            if (task.isSuccessful){
+                postViewModel.deleteCommentDocumentFromCommentsCollection(postPublisherId, comment.id.toString())
+            }
+            else{
                 Utils.toastMessage(requireContext(), task.exception?.message.toString())
             }
+            dismiss()
         }
     }
 }

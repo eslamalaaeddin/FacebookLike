@@ -10,7 +10,6 @@ import com.example.facebook_clone.model.post.Post
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.profile_post_item.view.*
 import android.text.format.DateFormat.format
-import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.facebook_clone.helper.listener.PostListener
@@ -159,6 +158,11 @@ class ProfilePostsAdapter(
                     interactorImageUrl,
                     adapterPosition
                 )
+            }
+
+            itemView.moreOnPostButton.setOnClickListener {
+                val post = postsList[adapterPosition]
+                listener.onPostMoreDotsClicked(post)
             }
 
         }
@@ -346,6 +350,12 @@ class ProfilePostsAdapter(
                     itemView.visibility = View.GONE
                     itemView.layoutParams = RecyclerView.LayoutParams(0, 0)
                 }
+            }
+
+            if (auth.currentUser?.uid.toString() == post.publisherId){
+                itemView.moreOnPostButton.visibility = View.VISIBLE
+            }else{
+                itemView.moreOnPostButton.visibility = View.GONE
             }
         }
 

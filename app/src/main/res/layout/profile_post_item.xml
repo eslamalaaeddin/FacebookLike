@@ -12,7 +12,7 @@
         android:layout_height="36dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:src="@drawable/mansour"
+        android:visibility="visible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -179,7 +179,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/postContentTextView"
-        app:srcCompat="@drawable/mansour" />
+         />
 
     <LinearLayout
         android:id="@+id/reactsLayout"
@@ -316,6 +316,17 @@
         app:layout_constraintTop_toTopOf="@+id/attachmentImageView"
         app:srcCompat="@drawable/ic_baseline_play_arrow_24"
         tools:visibility="gone" />
+
+    <ImageButton
+        android:id="@+id/moreOnPostButton"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="56dp"
+        android:layout_height="36dp"
+        android:scaleType="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_more"
+        app:tint="#595959" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

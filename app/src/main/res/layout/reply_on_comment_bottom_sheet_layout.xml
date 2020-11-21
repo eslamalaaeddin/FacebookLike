@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/linearLayout3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/actionBarSize"
+            android:elevation="12dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/upButtonImageView"
+                android:layout_width="24dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_semi_up_button" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginStart="16dp"
+                android:gravity="center"
+                android:paddingEnd="32dp"
+                android:text="Replies"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/firstSeparator"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_gravity="bottom"
+            android:background="@color/medium_gray" />
+
+    </LinearLayout>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/linearLayout3"
+        >
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/commenterImageView"
+            android:layout_width="36dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/round_background"
+            android:backgroundTint="#F3F3F3"
+            android:orientation="vertical"
+            android:padding="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/commentCreationTimeTextView"
+            app:layout_constraintEnd_toStartOf="@+id/whoReactedOnCommentLayout"
+            app:layout_constraintStart_toEndOf="@+id/commenterImageView"
+            app:layout_constraintTop_toTopOf="@+id/commenterImageView">
+
+            <TextView
+                android:id="@+id/commenterNameTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                tools:text="Islam AlaaEddin" />
+
+            <TextView
+                android:id="@+id/commentTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                tools:text="good" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/mediaCommentCardView"
+                android:layout_width="match_parent"
+                android:layout_height="96dp"
+                android:layout_margin="4dp"
+                android:background="@android:color/transparent"
+                android:visibility="gone"
+                app:cardCornerRadius="16dp">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="96dp">
+
+                    <ImageView
+                        android:id="@+id/mediaCommentImageView"
+                        android:layout_width="match_parent"
+                        android:layout_height="96dp"
+                        android:layout_gravity="center"
+                        android:scaleType="fitXY"
+                         />
+
+                    <ImageView
+                        android:id="@+id/playButtonImgView"
+                        android:layout_width="match_parent"
+                        android:layout_height="96dp"
+                        app:srcCompat="@drawable/ic_baseline_play_arrow_24"
+                        app:tint="#EAEAEA"
+                        tools:visibility="gone" />
+                </FrameLayout>
+
+            </androidx.cardview.widget.CardView>
+
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/commentCreationTimeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="5m"
+            app:layout_constraintStart_toStartOf="@+id/linearLayout2"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
+
+        <TextView
+            android:id="@+id/reactOnCommentTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Like"
+            app:layout_constraintBottom_toBottomOf="@+id/commentCreationTimeTextView"
+            app:layout_constraintStart_toEndOf="@+id/commentCreationTimeTextView"
+            app:layout_constraintTop_toTopOf="@+id/commentCreationTimeTextView" />
+
+        <TextView
+            android:id="@+id/replyOnCommentTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Reply"
+            app:layout_constraintBottom_toBottomOf="@+id/reactOnCommentTextView"
+            app:layout_constraintStart_toEndOf="@+id/reactOnCommentTextView"
+            app:layout_constraintTop_toTopOf="@+id/reactOnCommentTextView" />
+
+
+        <LinearLayout
+            android:id="@+id/whoReactedOnCommentLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="128dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center|start"
+            android:orientation="horizontal"
+            android:paddingTop="2dp"
+            android:paddingEnd="2dp"
+            android:paddingBottom="2dp"
+            app:layout_constraintBottom_toBottomOf="@+id/linearLayout2"
+            app:layout_constraintEnd_toEndOf="parent">
+
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/myReactPlaceHolder"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:visibility="visible"
+                tools:layout_editor_absoluteX="170dp"
+                tools:layout_editor_absoluteY="43dp" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/likeReactPlaceHolder"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_like_react"
+                android:visibility="gone"
+                tools:layout_editor_absoluteX="170dp"
+                tools:layout_editor_absoluteY="43dp" />
+
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/loveReactPlaceHolder"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_love_react"
+                android:visibility="gone"
+                tools:layout_editor_absoluteX="170dp"
+                tools:layout_editor_absoluteY="43dp" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/careReactPlaceHolder"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_care_react"
+                android:visibility="gone"
+                tools:layout_editor_absoluteX="170dp"
+                tools:layout_editor_absoluteY="43dp" />
+
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/hahaReactPlaceHolder"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_haha_react"
+                android:visibility="gone"
+                tools:layout_editor_absoluteX="170dp"
+                tools:layout_editor_absoluteY="43dp" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/wowReactPlaceHolder"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_wow_react"
+                android:visibility="gone"
+                tools:layout_editor_absoluteX="170dp"
+                tools:layout_editor_absoluteY="43dp" />
+
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/sadReactPlaceHolder"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_sad_react"
+                android:visibility="gone"
+                tools:layout_editor_absoluteX="170dp"
+                tools:layout_editor_absoluteY="43dp" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/angryReactPlaceHolder"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_angry_angry"
+                android:visibility="gone"
+                tools:layout_editor_absoluteX="170dp"
+                tools:layout_editor_absoluteY="43dp" />
+
+
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/reactsCountTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@+id/whoReactedOnCommentLayout"
+            app:layout_constraintStart_toEndOf="@+id/whoReactedOnCommentLayout"
+            app:layout_constraintTop_toTopOf="@+id/whoReactedOnCommentLayout"
+            tools:text="13" />
+
+        <TextView
+            android:id="@+id/viewPreivousComments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="1dp"
+            android:text="View preivous replies..."
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/commentCreationTimeTextView"
+            app:layout_constraintTop_toBottomOf="@+id/commentCreationTimeTextView" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/subCommentsRecyclerView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:layout_above="@id/commentLayout"
+       android:layout_below="@id/constraintLayout" />
+
+    <View
+        android:id="@+id/lastSeparator"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_alignTop="@id/commentLayout"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="bottom"
+        android:background="@color/medium_gray"
+        app:layout_constraintBottom_toTopOf="@+id/commentLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <LinearLayout
+        android:id="@+id/commentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="8dp"
+       >
+
+        <ImageView
+            android:id="@+id/addAttachmentToComment"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_attachment"
+            app:tint="@color/medium_gray" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/round_background"
+            android:backgroundTint="#EFEFEF"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/commentEditText"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:hint="Write a comment..."
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                tools:ignore="RtlSymmetry" />
+
+            <ImageView
+                android:id="@+id/sendCommentImageView"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_margin="4dp"
+                android:src="@drawable/ic_comment_send" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

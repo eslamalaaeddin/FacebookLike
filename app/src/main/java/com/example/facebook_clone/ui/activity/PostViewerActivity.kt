@@ -291,6 +291,15 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
 
     }
 
+    override fun onReplyToCommentClicked(
+        comment: Comment,
+        commentPosition: Int,
+        reacted: Boolean,
+        currentReact: React?
+    ) {
+
+    }
+
     override fun onCommentReactionsLayoutClicked(commentId: String) {
 
     }

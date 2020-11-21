@@ -38,7 +38,7 @@
     </LinearLayout>
 
     <View
-        android:id="@+id/separator"
+        android:id="@+id/lastSeparator"
         android:layout_width="match_parent"
         android:layout_height="1px"
         android:layout_below="@id/peopleWhoReactedLayout"
@@ -50,7 +50,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/separator"
+        android:layout_below="@id/lastSeparator"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"

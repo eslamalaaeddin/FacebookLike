@@ -68,7 +68,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/reactorsLayout"
-        android:layout_alignBottom="@id/separator"
+        android:layout_alignBottom="@id/lastSeparator"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="0dp"
@@ -76,7 +76,7 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     <View
-        android:id="@+id/separator"
+        android:id="@+id/lastSeparator"
         android:layout_width="match_parent"
         android:layout_height="1px"
         android:layout_alignTop="@id/commentLayout"

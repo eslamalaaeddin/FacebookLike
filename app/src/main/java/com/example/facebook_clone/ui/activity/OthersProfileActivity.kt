@@ -401,6 +401,10 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         }
     }
 
+    override fun onPostMoreDotsClicked(post: Post) {
+
+    }
+
     private fun addReactToDb(react: React, postId: String, postPublisherId: String): Task<Void> {
         return postViewModel.addReactToDB(react, postId, postPublisherId)
 

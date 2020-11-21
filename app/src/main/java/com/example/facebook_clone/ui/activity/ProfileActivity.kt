@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.Window
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.facebook_clone.R
@@ -24,6 +25,7 @@ import com.example.facebook_clone.model.post.react.ReactDocument
 import com.example.facebook_clone.model.post.share.Share
 import com.example.facebook_clone.model.post.share.ShareDocument
 import com.example.facebook_clone.ui.bottomsheet.CommentsBottomSheet
+import com.example.facebook_clone.ui.bottomsheet.PostConfigurationsBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.ProfileCoverBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.ProfileImageBottomSheet
 import com.example.facebook_clone.ui.dialog.ImageViewerDialog
@@ -364,6 +366,14 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
         }
 
     }
+
+    override fun onPostMoreDotsClicked(post: Post) {
+        //BottomSheet
+        val postConfigurationsBottomSheet = PostConfigurationsBottomSheet(post)
+        postConfigurationsBottomSheet.show(supportFragmentManager, postConfigurationsBottomSheet.tag)
+    }
+
+
 
     private fun addReactToDb(react: React, postId: String, postPublisherId: String): Task<Void> {
         return postViewModel.addReactToDB(react, postId, postPublisherId)

@@ -28,7 +28,7 @@ class CommentsAdapter(
     private val commentClickListener: CommentClickListener,
     private val reactClickListener: ReactClickListener,
     private val postViewModel: PostViewModel,
-    private val postPublisherId:String
+    private val postPublisherId: String
 ) :
     RecyclerView.Adapter<CommentsAdapter.CommentHolder>() {
     private val picasso = Picasso.get()
@@ -46,7 +46,30 @@ class CommentsAdapter(
             itemView.setOnClickListener(this)
 
             itemView.replyOnCommentTextView.setOnClickListener {
-                Toast.makeText(itemView.context, "Reply", Toast.LENGTH_SHORT).show()
+                val comment = comments[adapterPosition]
+                var currentReact: React? = null
+                var reacted: Boolean = false
+
+                postViewModel.getCommentById(postPublisherId, comment.id.toString())
+                    .addOnCompleteListener {
+                        val commentDoc = it.result?.toObject(ReactionsAndSubComments::class.java)
+                        commentDoc?.reactions?.let { reacts ->
+                            for (react in reacts) {
+                                if (react.reactorId == commenterId) {
+                                    currentReact = react
+                                    reacted = true
+                                    break
+                                }
+                            }
+                        }
+
+                        cClickListener.onReplyToCommentClicked(
+                            comment,
+                            adapterPosition,
+                            reacted,
+                            currentReact
+                        )
+                    }
             }
 
             itemView.reactOnCommentTextView.setOnClickListener {
@@ -57,7 +80,8 @@ class CommentsAdapter(
                 //I HAVE TO GET COMMENT DOCUMENT
                 postViewModel.getCommentById(postPublisherId, comment.id.toString())
                     .addOnCompleteListener {
-                        val commentDoc = it.result?.toObject(ReactionsAndSubComments::class.java)
+                        val commentDoc =
+                            it.result?.toObject(ReactionsAndSubComments::class.java)
                         commentDoc?.reactions?.let { reacts ->
                             for (react in reacts) {
                                 if (react.reactorId == commenterId) {
@@ -84,7 +108,8 @@ class CommentsAdapter(
                 //I HAVE TO GET COMMENT DOCUMENT
                 postViewModel.getCommentById(postPublisherId, comment.id.toString())
                     .addOnCompleteListener {
-                        val commentDoc = it.result?.toObject(ReactionsAndSubComments::class.java)
+                        val commentDoc =
+                            it.result?.toObject(ReactionsAndSubComments::class.java)
                         commentDoc?.reactions?.let { reacts ->
                             for (react in reacts) {
                                 if (react.reactorId == commenterId) {
@@ -130,12 +155,11 @@ class CommentsAdapter(
 
                 if (commentType == "textWithImage") {
                     itemView.commentTextView.text = comment.textComment
-                    picasso.load(comment.attachmentCommentUrl).into(itemView.mediaCommentImageView)
+                    picasso.load(comment.attachmentCommentUrl)
+                        .into(itemView.mediaCommentImageView)
                     itemView.playButtonImgView.visibility = View.GONE
                     itemView.commentTextView.visibility = View.VISIBLE
-                }
-
-                else if (commentType == "textWithVideo") {
+                } else if (commentType == "textWithVideo") {
                     itemView.commentTextView.text = comment.textComment
                     itemView.playButtonImgView.visibility = View.VISIBLE
                     itemView.commentTextView.visibility = View.VISIBLE
@@ -143,24 +167,19 @@ class CommentsAdapter(
                     Glide.with(itemView.context)
                         .asBitmap().load(comment.attachmentCommentUrl).apply(options)
                         .into(itemView.mediaCommentImageView)
-                }
-
-                else if (commentType == "image") {
+                } else if (commentType == "image") {
                     itemView.commentTextView.visibility = View.GONE
-                    picasso.load(comment.attachmentCommentUrl).into(itemView.mediaCommentImageView)
+                    picasso.load(comment.attachmentCommentUrl)
+                        .into(itemView.mediaCommentImageView)
                     itemView.playButtonImgView.visibility = View.GONE
-                }
-
-                else if (commentType == "video") {
+                } else if (commentType == "video") {
                     itemView.commentTextView.visibility = View.GONE
                     itemView.playButtonImgView.visibility = View.VISIBLE
                     Glide.with(itemView.context)
                         .asBitmap().load(comment.attachmentCommentUrl).apply(options)
                         .into(itemView.mediaCommentImageView)
                 }
-            }
-
-            else {
+            } else {
                 itemView.commentTextView.visibility = View.VISIBLE
                 itemView.commentTextView.text = comment.textComment
                 itemView.mediaCommentCardView.visibility = View.GONE
@@ -260,8 +279,8 @@ class CommentsAdapter(
                                 //Visible to me
                                 itemView.myReactPlaceHolder.visibility = View.INVISIBLE
                                 itemView.reactOnCommentTextView.text = "Like"
-                                when(react.react){
-                                    1 ->{
+                                when (react.react) {
+                                    1 -> {
                                         itemView.likeReactPlaceHolder.visibility = View.VISIBLE
                                         itemView.loveReactPlaceHolder.visibility = View.GONE
                                         itemView.careReactPlaceHolder.visibility = View.GONE
@@ -270,7 +289,7 @@ class CommentsAdapter(
                                         itemView.sadReactPlaceHolder.visibility = View.GONE
                                         itemView.angryReactPlaceHolder.visibility = View.GONE
                                     }
-                                    2 ->{
+                                    2 -> {
                                         itemView.likeReactPlaceHolder.visibility = View.GONE
                                         itemView.loveReactPlaceHolder.visibility = View.VISIBLE
                                         itemView.careReactPlaceHolder.visibility = View.GONE
@@ -279,7 +298,7 @@ class CommentsAdapter(
                                         itemView.sadReactPlaceHolder.visibility = View.GONE
                                         itemView.angryReactPlaceHolder.visibility = View.GONE
                                     }
-                                    3 ->{
+                                    3 -> {
                                         itemView.likeReactPlaceHolder.visibility = View.GONE
                                         itemView.loveReactPlaceHolder.visibility = View.GONE
                                         itemView.careReactPlaceHolder.visibility = View.VISIBLE
@@ -288,7 +307,7 @@ class CommentsAdapter(
                                         itemView.sadReactPlaceHolder.visibility = View.GONE
                                         itemView.angryReactPlaceHolder.visibility = View.GONE
                                     }
-                                    4 ->{
+                                    4 -> {
                                         itemView.likeReactPlaceHolder.visibility = View.GONE
                                         itemView.loveReactPlaceHolder.visibility = View.GONE
                                         itemView.careReactPlaceHolder.visibility = View.GONE
@@ -297,7 +316,7 @@ class CommentsAdapter(
                                         itemView.sadReactPlaceHolder.visibility = View.GONE
                                         itemView.angryReactPlaceHolder.visibility = View.GONE
                                     }
-                                    5 ->{
+                                    5 -> {
                                         itemView.likeReactPlaceHolder.visibility = View.GONE
                                         itemView.loveReactPlaceHolder.visibility = View.GONE
                                         itemView.careReactPlaceHolder.visibility = View.GONE
@@ -306,7 +325,7 @@ class CommentsAdapter(
                                         itemView.sadReactPlaceHolder.visibility = View.GONE
                                         itemView.angryReactPlaceHolder.visibility = View.GONE
                                     }
-                                    6 ->{
+                                    6 -> {
                                         itemView.likeReactPlaceHolder.visibility = View.GONE
                                         itemView.loveReactPlaceHolder.visibility = View.GONE
                                         itemView.careReactPlaceHolder.visibility = View.GONE
@@ -315,7 +334,7 @@ class CommentsAdapter(
                                         itemView.sadReactPlaceHolder.visibility = View.VISIBLE
                                         itemView.angryReactPlaceHolder.visibility = View.GONE
                                     }
-                                    7 ->{
+                                    7 -> {
                                         itemView.likeReactPlaceHolder.visibility = View.GONE
                                         itemView.loveReactPlaceHolder.visibility = View.GONE
                                         itemView.careReactPlaceHolder.visibility = View.GONE
@@ -347,7 +366,8 @@ class CommentsAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommentHolder {
         val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.comment_item_layout, parent, false)
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.comment_item_layout, parent, false)
 
         return CommentHolder(view)
     }

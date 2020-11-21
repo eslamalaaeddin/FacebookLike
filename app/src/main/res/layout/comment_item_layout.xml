@@ -37,6 +37,7 @@
             android:layout_height="wrap_content"
             android:textColor="@color/black"
             android:textSize="14sp"
+            android:textStyle="bold"
             android:paddingStart="2dp"
             android:paddingEnd="2dp"
             tools:text="Islam AlaaEddin" />

@@ -1,5 +1,6 @@
 package com.example.facebook_clone.helper.listener
 
+import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.react.React
 
 
@@ -55,4 +56,6 @@ interface PostListener{
     )
 
     fun onMediaPostClicked(mediaUrl: String)
+
+    fun onPostMoreDotsClicked(post: Post)
 }

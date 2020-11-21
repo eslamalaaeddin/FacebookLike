@@ -7,7 +7,7 @@ interface CommentClickListener {
     fun onCommentLongClicked(comment: Comment)
     fun onReactOnCommentClicked(comment: Comment, commentPosition: Int, reacted: Boolean, currentReact: React?)
     fun onReactOnCommentLongClicked(comment: Comment, commentPosition: Int, reacted: Boolean, currentReact: React?)
-//    fun onReplyToCommentClicked()
+    fun onReplyToCommentClicked(comment: Comment, commentPosition: Int, reacted: Boolean, currentReact: React?)
     fun onCommentReactionsLayoutClicked(commentId: String)
     fun onMediaCommentClicked(mediaUrl: String)
 }
