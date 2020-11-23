@@ -53,7 +53,8 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
     private var currentNotificationId: String? = null
     private lateinit var userIAmViewing: User
     private var currentFriendRequest: FriendRequest? = null
-    private lateinit var userIdIAmViewing: String
+    private var userIdIAmViewing: String? = null
+    private lateinit var notifierId: String
     private lateinit var picasso: Picasso
     private var iAmFriend: Boolean = false
     private var currentEditedPostPosition: Int = -1
@@ -71,6 +72,8 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             notificationsFragmentViewModel = notificationsFragmentViewModel
         )
 
+
+
         val myLiveData = profileActivityViewModel.getMe(auth.currentUser?.uid.toString())
         myLiveData?.observe(this, { user ->
             user?.let {
@@ -82,17 +85,17 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
 
                 //Check for friend requests
                 if (!currentUser.friendRequests.isNullOrEmpty()) {
-                 //   Toast.makeText(this, "a", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "a", Toast.LENGTH_SHORT).show()
                     currentUser.friendRequests?.forEach { friendRequest ->
                         if (friendRequest.fromId == currentUser.id) {
-                          //  Toast.makeText(this, "b", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "b", Toast.LENGTH_SHORT).show()
                             addFriendButton.visibility = View.INVISIBLE
                             addFriendButton.isEnabled = false
                             cancelRequestButton.isEnabled = true
                             cancelRequestButton.visibility = View.VISIBLE
                             currentFriendRequest = friendRequest
                         } else {
-                           // Toast.makeText(this, "c", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "c", Toast.LENGTH_SHORT).show()
                             addFriendButton.isEnabled = true
                             cancelRequestButton.isEnabled = false
                             addFriendButton.visibility = View.VISIBLE
@@ -103,12 +106,12 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
 
                 //there might be a friendship
                 else if (currentUser.friends != null) {
-                   // Toast.makeText(this, "d", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "d", Toast.LENGTH_SHORT).show()
                     if (currentUser.friends!!.isNotEmpty()) {
-                      //  Toast.makeText(this, "e", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "e", Toast.LENGTH_SHORT).show()
                         currentUser.friends?.forEach { friend ->
                             if (friend.id == userIdIAmViewing) {
-                             //   Toast.makeText(this, "f", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, "f", Toast.LENGTH_SHORT).show()
                                 addFriendButton.isEnabled = false
                                 cancelRequestButton.isEnabled = false
                                 addFriendButton.visibility = View.INVISIBLE
@@ -119,6 +122,8 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
                             else{
                                 cancelRequestButton.isEnabled = false
                                 cancelRequestButton.visibility = View.INVISIBLE
+                                addFriendButton.isEnabled = true
+                                addFriendButton.visibility = View.VISIBLE
                             }
                         }
 
@@ -131,7 +136,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
 
                 }
                 else {
-                   // Toast.makeText(this, "g", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "g", Toast.LENGTH_SHORT).show()
                     addFriendButton.isEnabled = true
                     cancelRequestButton.isEnabled = false
                     addFriendButton.visibility = View.VISIBLE
@@ -139,11 +144,16 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
                 }
             }
         })
-
-
-        userIdIAmViewing = intent.getStringExtra("userId").toString()
+        val friendRequesterId = intent.getStringExtra("friendRequester")
+        if (userIdIAmViewing == null && friendRequesterId != null){
+            userIdIAmViewing = friendRequesterId
+            notificationsHandler.notifiedId = userIdIAmViewing
+        }
+        else{
+            userIdIAmViewing = intent.getStringExtra("userId").toString()
+        }
         notificationsHandler.notifiedId = userIdIAmViewing
-        val userLiveDate = profileActivityViewModel.getAnotherUser(userIdIAmViewing)
+        val userLiveDate = profileActivityViewModel.getAnotherUser(userIdIAmViewing!!)
         userLiveDate?.observe(this, { user ->
             user?.let {
                 userIAmViewing = user
@@ -155,13 +165,13 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
                     iAmFriend()
                 }
                 val postsLiveData =
-                    postViewModel.getPostsWithoutOptions(userIdIAmViewing)
+                    postViewModel.getPostsWithoutOptions(userIdIAmViewing!!)
                 postsLiveData.observe(this, { posts ->
                     updateUserPosts(posts)
                 })
 
                 val notificationsLiveData =
-                    notificationsFragmentViewModel.getNotificationsLiveData(userIdIAmViewing)
+                    notificationsFragmentViewModel.getNotificationsLiveData(userIdIAmViewing!!)
                 notificationsLiveData.observe(this, { notifications ->
                     if (notifications != null) {
                         val userNotificationsIds = user.notificationsIds
@@ -178,26 +188,26 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             }
         })
 //
-//        addFriendButton.setOnClickListener { sendUserFriendRequest() }
-//
-//        cancelRequestButton.setOnClickListener {
-//            othersProfileActivityViewModel.removeFriendRequestFromHisDocument(currentFriendRequest!!).addOnCompleteListener { task1 ->
-//                if (task1.isSuccessful){
-//                    //Update ui
-//                    othersProfileActivityViewModel.removeFriendRequestFromMyDocument(currentFriendRequest!!).addOnCompleteListener{task2 ->
-//                        if (task2.isSuccessful){
-//                            if (currentNotificationId != null){
-//                                handleNotificationDeleting(currentNotificationId!!, userIdIAmViewing)
-//                            }
-//                        }else{
-//                            Toast.makeText(this, task2.exception?.message, Toast.LENGTH_SHORT).show()
-//                        }
-//                    }
-//                }else{
-//                    Toast.makeText(this, task1.exception?.message, Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//        }
+        addFriendButton.setOnClickListener { sendUserFriendRequest() }
+
+        cancelRequestButton.setOnClickListener {
+            othersProfileActivityViewModel.removeFriendRequestFromHisDocument(currentFriendRequest!!).addOnCompleteListener { task1 ->
+                if (task1.isSuccessful){
+                    //Update ui
+                    othersProfileActivityViewModel.removeFriendRequestFromMyDocument(currentFriendRequest!!).addOnCompleteListener{task2 ->
+                        if (task2.isSuccessful){
+                            if (currentNotificationId != null){
+                                //handleNotificationDeleting(currentNotificationId!!, userIdIAmViewing)
+                            }
+                        }else{
+                            Toast.makeText(this, task2.exception?.message, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }else{
+                    Toast.makeText(this, task1.exception?.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
         
         messageButton.setOnClickListener {
             Toast.makeText(this, "- -\n__", Toast.LENGTH_SHORT).show()
@@ -239,35 +249,34 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
 
     }
 //
-//    private fun sendUserFriendRequest(){
-//        val friendRequest = FriendRequest(
-//            fromId = currentUser.id,
-//            toId = userIdIAmViewing,
-//        )
-//        othersProfileActivityViewModel.addFriendRequestToHisDocument(friendRequest).addOnCompleteListener { task1 ->
-//            if (task1.isSuccessful){
-//                //Update ui
-//                othersProfileActivityViewModel.addFriendRequestToMyDocument(friendRequest).addOnCompleteListener{task2 ->
-//                    if (task2.isSuccessful){
-//                        handleNotificationCreationAndFiringAndAdditionToDB(
-//                            notificationType = "friendRequest",
-//                            postId = null,
-//                            commentPosition = null,
-//                            commentId = null
-//                        )
-//                    }else{
-//                        Toast.makeText(this, task2.exception?.message, Toast.LENGTH_SHORT).show()
-//                    }
-//                }
-//            }else{
-//                Toast.makeText(this, task1.exception?.message, Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//    }
+    private fun sendUserFriendRequest(){
+        val friendRequest = FriendRequest(
+            fromId = currentUser.id,
+            toId = userIdIAmViewing,
+        )
+        othersProfileActivityViewModel.addFriendRequestToHisDocument(friendRequest).addOnCompleteListener { task1 ->
+            if (task1.isSuccessful){
+                //Update ui
+                othersProfileActivityViewModel.addFriendRequestToMyDocument(friendRequest).addOnCompleteListener{task2 ->
+                    if (task2.isSuccessful){
+                         notificationsHandler.also {
+                        it.notificationType = "friendRequest"
+                        it.handleNotificationCreationAndFiring()
+                    }
+                        Toast.makeText(this, "Notifiacation", Toast.LENGTH_SHORT).show()
+                    }else{
+                        Toast.makeText(this, task2.exception?.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }else{
+                Toast.makeText(this, task1.exception?.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
-//    private fun addNotificationIdToHisDocument(notificationId: String, hisId: String) {
-//        othersProfileActivityViewModel.addNotificationIdToNotifiedDocument(notificationId, hisId)
-//    }
+    private fun addNotificationIdToHisDocument(notificationId: String, hisId: String) {
+        othersProfileActivityViewModel.addNotificationIdToNotifiedDocument(notificationId, hisId)
+    }
 
     override fun onReactButtonClicked(
         postPublisherId: String,

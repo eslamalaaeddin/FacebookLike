@@ -21,3 +21,9 @@ data class Post(
     var visibility: Int? = 0, // 0 --> public, 1 --> private ......
     val creationTime: Timestamp = Timestamp(Date())
 )
+
+/*
+FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
+             it.token
+        }
+ */

@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.comment.ReactionsAndSubComments
@@ -14,7 +13,6 @@ import com.example.facebook_clone.repository.PostsRepository
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.storage.UploadTask
 
 class PostViewModel(private val repository: PostsRepository): ViewModel() {
@@ -35,8 +33,8 @@ class PostViewModel(private val repository: PostsRepository): ViewModel() {
         return repository.updatePostWithNewEdits(publisherId, postId, post)
     }
 
-    fun createComment(postId: String,postPublisherId: String, comment: Comment): Task<Void>{
-        return repository.createComment(postId,postPublisherId, comment)
+    fun addCommentToPostComments(postId: String, postPublisherId: String, comment: Comment): Task<Void>{
+        return repository.addCommentToPostComments(postId,postPublisherId, comment)
     }
 
     fun getCommentById(postPublisherId: String, commentId: String): Task<DocumentSnapshot>{
@@ -47,21 +45,22 @@ class PostViewModel(private val repository: PostsRepository): ViewModel() {
         return repository.getCommentLiveDataById(postPublisherId, commentId)
     }
 
-    fun addSubCommentToCommentById(postPublisherId: String, commentId: String, comment: Comment): Task<Void>{
-        return repository.addSubCommentToCommentById(postPublisherId, commentId, comment)
+    fun addSubCommentToCommentById(commenterId: String, commentId: String, comment: Comment): Task<Void>{
+        return repository.addSubCommentToCommentById(commenterId, commentId, comment)
     }
 
-    fun removeSubCommentFromCommentById(postPublisherId: String, commentId: String, comment: Comment): Task<Void>{
-        return repository.removeSubCommentFromCommentById(postPublisherId, commentId, comment)
+    fun deleteSubCommentFromCommentById(commenterId: String, superCommentId: String, comment: Comment): Task<Void>{
+        return repository.deleteSubCommentFromCommentById(commenterId, superCommentId, comment)
     }
 
     fun deleteCommentDocumentFromCommentsCollection(postPublisherId: String, commentId: String): Task<Void>{
         return repository.deleteCommentDocumentFromCommentsCollection(postPublisherId, commentId)
     }
 
-    fun addCommentIdToCommentsCollection( postPublisherId: String,commentId: String): Task<Void>{
-        return repository.addCommentIdToCommentsCollection(postPublisherId, commentId)
+    fun addCommentIdToCommentsCollection( commenterId: String,commentId: String): Task<Void>{
+        return repository.addCommentIdToCommentsCollection(commenterId, commentId)
     }
+
 
     fun addReactToReactsListInCommentDocument(postPublisherId: String,commentId: String, react: React?): Task<Void>{
         return repository.addReactToReactsListInCommentDocument(postPublisherId, commentId, react)
@@ -87,8 +86,8 @@ class PostViewModel(private val repository: PostsRepository): ViewModel() {
         return repository.deletePost(publisherId, postId)
     }
 
-    fun deleteComment(comment: Comment, postId: String, postPublisherId: String): Task<Void>{
-        return repository.deleteComment(comment, postId, postPublisherId)
+    fun deleteCommentFromPost(comment: Comment, postId: String, postPublisherId: String): Task<Void>{
+        return repository.deleteCommentFromPost(comment, postId, postPublisherId)
     }
 
     fun updateComment(comment: Comment, postId: String, postPublisherId: String): Task<Void>{

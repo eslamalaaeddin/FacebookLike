@@ -1,6 +1,7 @@
 package com.example.facebook_clone.adapter
 
 import android.text.format.DateFormat.format
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +16,7 @@ import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.comment.ReactionsAndSubComments
 import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.viewmodel.PostViewModel
+import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.comment_item_layout.view.*
 import kotlinx.android.synthetic.main.comment_item_layout.view.reactsCountTextView
@@ -31,6 +33,7 @@ class CommentsAdapter(
     private val postPublisherId: String
 ) :
     RecyclerView.Adapter<CommentsAdapter.CommentHolder>() {
+
     private val picasso = Picasso.get()
     private lateinit var cClickListener: CommentClickListener
     private lateinit var rClickListener: ReactClickListener
@@ -46,6 +49,33 @@ class CommentsAdapter(
             itemView.setOnClickListener(this)
 
             itemView.replyOnCommentTextView.setOnClickListener {
+                val comment = comments[adapterPosition]
+                var currentReact: React? = null
+                var reacted: Boolean = false
+
+                postViewModel.getCommentById(postPublisherId, comment.id.toString())
+                    .addOnCompleteListener {
+                        val commentDoc = it.result?.toObject(ReactionsAndSubComments::class.java)
+                        commentDoc?.reactions?.let { reacts ->
+                            for (react in reacts) {
+                                if (react.reactorId == commenterId) {
+                                    currentReact = react
+                                    reacted = true
+                                    break
+                                }
+                            }
+                        }
+
+                        cClickListener.onReplyToCommentClicked(
+                            comment,
+                            adapterPosition,
+                            reacted,
+                            currentReact
+                        )
+                    }
+            }
+
+            itemView.viewPreviousComments.setOnClickListener {
                 val comment = comments[adapterPosition]
                 var currentReact: React? = null
                 var reacted: Boolean = false
@@ -138,6 +168,8 @@ class CommentsAdapter(
                 val commentId = comments[adapterPosition].id.toString()
                 cClickListener.onCommentReactionsLayoutClicked(commentId)
             }
+
+
         }
 
         fun bind(comment: Comment) {
@@ -188,6 +220,15 @@ class CommentsAdapter(
             postViewModel.getCommentById(postPublisherId, comment.id.toString())
                 .addOnCompleteListener {
                     val commentDoc = it.result?.toObject(ReactionsAndSubComments::class.java)
+                    //Comments
+//                    if (commentDoc?.subComments != null){
+//                        if (commentDoc.subComments!!.isNotEmpty()){
+//                            itemView.viewPreviousComments.visibility = View.VISIBLE
+//                        }else{
+//                            itemView.viewPreviousComments.visibility = View.GONE
+//                        }
+//                    }
+                    //Reacts
                     commentDoc?.reactions?.let { reacts ->
                         if (reacts.isNotEmpty()) {
                             itemView.reactsCountTextView.text = reacts.size.toString()
@@ -354,8 +395,14 @@ class CommentsAdapter(
         }
 
         override fun onLongClick(p0: View?): Boolean {
-            cClickListener.onCommentLongClicked(comments[adapterPosition])
-            return true
+            val comment = comments[adapterPosition]
+            //commenter id == interactor id
+            Log.i(TAG, "UUUU onLongClick: $comment")
+            if (commenterId == comment.commenterId) {
+                cClickListener.onCommentLongClicked(comment)
+            }
+                return true
+
         }
 
         override fun onClick(p0: View?) {

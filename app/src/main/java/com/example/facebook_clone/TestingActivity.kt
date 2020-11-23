@@ -1,6 +1,7 @@
 package com.example.facebook_clone
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -26,10 +27,29 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+private const val TAG = "TestingActivity"
 class TestingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_testing)
+
+        profile.setOnClickListener {
+            val defaultProfileImageBitmap = BitmapFactory.decodeResource(
+                resources,
+                R.drawable.hairstyle
+            )
+            Log.i(TAG, "onCreate: $defaultProfileImageBitmap")
+            imageView.setImageBitmap(defaultProfileImageBitmap)
+        }
+
+        cover.setOnClickListener {
+            val defaultCoverImageBitmap = BitmapFactory.decodeResource(
+                resources,
+                R.drawable.niqab
+            )
+            Log.i(TAG, "onCreate: $defaultCoverImageBitmap")
+            imageView.setImageBitmap(defaultCoverImageBitmap)
+        }
     }
 
 }

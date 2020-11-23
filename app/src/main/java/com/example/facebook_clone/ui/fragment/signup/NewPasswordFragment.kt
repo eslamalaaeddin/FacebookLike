@@ -13,7 +13,10 @@ import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.ui.activity.ProfilePictureActivity
 import com.example.facebook_clone.viewmodel.PasswordFragmentViewModel
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.iid.InstanceIdResult
 import kotlinx.android.synthetic.main.fragment_password.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -25,6 +28,7 @@ class NewPasswordFragment : Fragment(R.layout.fragment_password) {
     private val passFragViewModel by viewModel<PasswordFragmentViewModel>()
     private val auth: FirebaseAuth by inject()
     private var progressDialog: ProgressDialog? = null
+    private var userToken: String? = null
 
     private lateinit var firstName: String
     private lateinit var lastName: String
@@ -92,16 +96,19 @@ class NewPasswordFragment : Fragment(R.layout.fragment_password) {
             passFragViewModel.createAccountWithMailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        val user = createUser()
-                        passFragViewModel.uploadUserDataToDB(user).addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                progressDialog?.dismiss()
-                                navigateToProfilePictureActivity()
-                            } else {
-                                Utils.toastMessage(
-                                    requireContext(),
-                                    task.exception?.message.toString()
-                                )
+                        getUserToken().addOnSuccessListener {
+                                userToken = it.token
+                            val user = createUser()
+                            passFragViewModel.uploadUserDataToDB(user).addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    progressDialog?.dismiss()
+                                    navigateToProfilePictureActivity()
+                                } else {
+                                    Utils.toastMessage(
+                                        requireContext(),
+                                        task.exception?.message.toString()
+                                    )
+                                }
                             }
                         }
 
@@ -115,6 +122,7 @@ class NewPasswordFragment : Fragment(R.layout.fragment_password) {
 
     private fun navigateToProfilePictureActivity() {
         val intent = Intent(requireContext(), ProfilePictureActivity::class.java)
+        intent.putExtra("gender", gender)
         startActivity(intent)
         activity?.finish()
     }
@@ -125,7 +133,11 @@ class NewPasswordFragment : Fragment(R.layout.fragment_password) {
             name = "$firstName $lastName",
             gender = gender,
             birthDay = "$day/$month/$year",
+            token = userToken
         )
+    }
+    private fun getUserToken(): Task<InstanceIdResult> {
+        return FirebaseInstanceId.getInstance().instanceId
     }
 
 }

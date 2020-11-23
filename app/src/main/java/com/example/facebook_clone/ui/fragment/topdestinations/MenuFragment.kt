@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import com.example.facebook_clone.R
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.ui.activity.ProfileActivity
+import com.example.facebook_clone.ui.activity.RecentUsersActivity
 import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
@@ -26,8 +27,9 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
 
         val userLiveData = profileActivityViewModel.getMe(auth.currentUser?.uid.toString())
         userLiveData?.observe(viewLifecycleOwner, {
-
-            Picasso.get().load(it.profileImageUrl).into(userImageView)
+            if (it.profileImageUrl != null) {
+                Picasso.get().load(it.profileImageUrl).into(userImageView)
+            }
             userNameTextView.text = it.name
         })
         seeYourProfileLayout.setOnClickListener {
@@ -38,6 +40,7 @@ class MenuFragment: Fragment(R.layout.fragment_menu) {
         logoutLayout.setOnClickListener{
             auth.signOut()
             activity?.finish()
+            startActivity(Intent(requireContext(), RecentUsersActivity:: class.java))
         }
 
     }

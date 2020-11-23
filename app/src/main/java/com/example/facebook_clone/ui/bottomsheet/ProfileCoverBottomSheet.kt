@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.facebook_clone.R
 import com.example.facebook_clone.helper.Utils
@@ -20,7 +21,7 @@ import java.io.IOException
 
 private const val IMAGE_REQUEST_CODE = 123
 private const val TAG = "ProfileImageBottomSheet"
-class ProfileCoverBottomSheet(private val coverImageUrl: String) : BottomSheetDialogFragment(){
+class ProfileCoverBottomSheet(private val coverImageUrl: String?) : BottomSheetDialogFragment(){
     private val profileActivityViewModel by viewModel<ProfileActivityViewModel>()
     private var progressDialog: ProgressDialog? = null
     override fun onCreateView(
@@ -34,6 +35,8 @@ class ProfileCoverBottomSheet(private val coverImageUrl: String) : BottomSheetDi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+
         selectCoverPicture.setOnClickListener {
         //1 get image from gallery
             val imageIntent = Intent(Intent.ACTION_GET_CONTENT)
@@ -45,11 +48,10 @@ class ProfileCoverBottomSheet(private val coverImageUrl: String) : BottomSheetDi
         }
 
         viewCoverPicture.setOnClickListener {
-            val imageViewerDialog = ImageViewerDialog()
-            imageViewerDialog.show(activity?.supportFragmentManager!!, "signature")
-            imageViewerDialog.setMediaUrl(coverImageUrl)
+                val imageViewerDialog = ImageViewerDialog()
+                imageViewerDialog.show(activity?.supportFragmentManager!!, "signature")
+                imageViewerDialog.setMediaUrl(coverImageUrl)
         }
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -3,6 +3,7 @@ package com.example.facebook_clone.helper
 import android.app.ProgressDialog
 import android.content.Context
 import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
 
 object Utils {
 
@@ -29,5 +30,7 @@ object Utils {
         progressDialog.show()
         return progressDialog
     }
+
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
 }

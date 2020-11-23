@@ -2,7 +2,6 @@ package com.example.facebook_clone.repository
 
 import android.graphics.Bitmap
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.facebook_clone.helper.Utils.COMMENTS_COLLECTION
@@ -64,16 +63,16 @@ class PostsRepository(
         return liveData
     }
 
-    fun createComment(postId: String, postPublisherId: String, comment: Comment): Task<Void> {
+    fun addCommentToPostComments(postId: String, postPublisherId: String, comment: Comment): Task<Void> {
         return database.collection(POSTS_COLLECTION).document(postPublisherId)
             .collection(PROFILE_POSTS_COLLECTION).document(postId)
             .update("comments", FieldValue.arrayUnion(comment))
     }
 
 
-    fun addCommentIdToCommentsCollection( postPublisherId: String,commentId: String): Task<Void>{
+    fun addCommentIdToCommentsCollection( commenterId: String,commentId: String): Task<Void>{
         val reactionsAndSubComments = ReactionsAndSubComments(null, null)
-        return database.collection(COMMENTS_COLLECTION).document(postPublisherId)
+        return database.collection(COMMENTS_COLLECTION).document(commenterId)
             .collection(MY_COMMENTS_COLLECTION).document(commentId).set(reactionsAndSubComments)
 
     }
@@ -105,9 +104,9 @@ class PostsRepository(
             MY_COMMENTS_COLLECTION).document(commentId).update("subComments", FieldValue.arrayUnion(comment))
     }
 
-    fun removeSubCommentFromCommentById(commenterId: String, commentId: String, comment: Comment): Task<Void>{
+    fun deleteSubCommentFromCommentById(commenterId: String, superCommentId: String, comment: Comment): Task<Void>{
         return database.collection(COMMENTS_COLLECTION).document(commenterId).collection(
-            MY_COMMENTS_COLLECTION).document(commentId).update("subComments", FieldValue.arrayRemove(comment))
+            MY_COMMENTS_COLLECTION).document(superCommentId).update("subComments", FieldValue.arrayRemove(comment))
     }
     
     fun addReactToReactsListInCommentDocument(postPublisherId: String,commentId: String, react: React?): Task<Void>{
@@ -154,7 +153,7 @@ class PostsRepository(
             PROFILE_POSTS_COLLECTION).document(postId).delete()
     }
 
-    fun deleteComment(comment: Comment, postId: String, postPublisherId: String): Task<Void> {
+    fun deleteCommentFromPost(comment: Comment, postId: String, postPublisherId: String): Task<Void> {
         return database.collection(POSTS_COLLECTION).document(postPublisherId).collection(
             PROFILE_POSTS_COLLECTION
         ).document(postId).update("comments", FieldValue.arrayRemove(comment))

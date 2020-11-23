@@ -51,7 +51,7 @@ class EditCommentBottomSheet(private val comment: Comment,
         updateCommentButton.setOnClickListener {
             //New comment
             //i can't update field in array so i deleted the old comment and added a new one
-            postViewModel.deleteComment(comment, postId, postPublisherId)
+            postViewModel.deleteCommentFromPost(comment, postId, postPublisherId)
             comment.textComment = editCommentEditText.text.toString()
             postViewModel.updateComment(comment, postId, postPublisherId)
         }

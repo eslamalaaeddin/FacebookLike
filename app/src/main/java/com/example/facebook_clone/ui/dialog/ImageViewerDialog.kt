@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.example.facebook_clone.R
 import com.example.facebook_clone.helper.provider.MediaUrlProvider
@@ -17,7 +18,7 @@ import kotlinx.coroutines.launch
 class ImageViewerDialog() : DialogFragment(), MediaUrlProvider {
 
     private val scope = CoroutineScope(Dispatchers.IO)
-    private lateinit var imageUrl: String
+    private var imageUrl: String? = null
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -36,13 +37,18 @@ class ImageViewerDialog() : DialogFragment(), MediaUrlProvider {
         super.onViewCreated(view, savedInstanceState)
         val photoView = view.findViewById<PhotoView>(R.id.photoView)
         //Image
-
-            scope.launch {
-                val bitmap = Picasso.get()
-                    .load(imageUrl)
-                    .get()
-                photoView.setImageBitmap(bitmap)
+        //When i check if it is null, it crashes
+        scope.launch {
+            val bitmap = Picasso.get()
+                .load(imageUrl.toString())
+                .get()
+            if (bitmap != null) {
+                //Only the original thread that created a view hierarchy can touch its views.
+                CoroutineScope(Dispatchers.Main).launch {
+                    photoView.setImageBitmap(bitmap)
+                }
             }
+        }
 
         upButton.setOnClickListener {
             dismiss()
@@ -50,7 +56,9 @@ class ImageViewerDialog() : DialogFragment(), MediaUrlProvider {
 
     }
 
-    override fun setMediaUrl(url: String) {
-        imageUrl = url
+    override fun setMediaUrl(url: String?) {
+        if (url != null) {
+            imageUrl = url
+        }
     }
 }

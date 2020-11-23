@@ -11,14 +11,23 @@ import android.os.Build
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.lifecycle.LifecycleOwner
 import com.example.facebook_clone.R
 import com.example.facebook_clone.di.*
 import com.example.facebook_clone.model.notification.Notification
 import com.example.facebook_clone.model.notification.Notifier
+import com.example.facebook_clone.model.user.User
+import com.example.facebook_clone.repository.UsersRepository
 import com.example.facebook_clone.ui.activity.MainActivity
+import com.example.facebook_clone.ui.activity.OthersProfileActivity
 import com.example.facebook_clone.ui.activity.PostViewerActivity
 import com.example.facebook_clone.ui.activity.ProfileActivity
 import com.google.api.Billing
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -33,8 +42,10 @@ private const val NOTIFICATION_TITLE = "My Notification"
 private const val NOTIFICATION_CONTENT = "My Notification Content"
 
 class BaseApplication : Application() {
+
     override fun onCreate() {
         super.onCreate()
+//        FirebaseApp.initializeApp(applicationContext)
         context = this
         createNotificationChannel()
         startKoin {
@@ -60,6 +71,10 @@ class BaseApplication : Application() {
             )
         }
 
+
+
+//        getCurrentUserOnlyOnce()
+
     }
 
     private fun createNotificationChannel() {
@@ -81,9 +96,17 @@ class BaseApplication : Application() {
 
     //Notification provider
     companion object {
+        var singletonUser: User? = null
         var context: Context? = null
         var destination: Class<*>? = null
-        fun fireNotification(notificationType: String, notifier: Notifier, postId: String?, commentPosition: Int?, notifiedId: String?) {
+        //val usersRepository = UsersRepository(FirebaseFirestore.getInstance(), FirebaseAuth.getInstance(), FirebaseStorage.getInstance())
+        fun fireNotification(
+            notificationType: String,
+            notifier: Notifier,
+            postId: String?,
+            commentPosition: Int?,
+            notifiedId: String?
+        ) {
 
             val remoteView = RemoteViews(context?.packageName, R.layout.custom_notification_layout)
 
@@ -95,7 +118,7 @@ class BaseApplication : Application() {
                         R.id.notificationContentTextView,
                         "${notifier.name} sent you a friend request"
                     )
-                    destination = MainActivity::class.java
+                    destination = OthersProfileActivity::class.java
                 }
 
 
@@ -170,7 +193,7 @@ class BaseApplication : Application() {
                 .setAutoCancel(true)
             //3 Create the action
             val actionIntent = Intent(context, destination)
-
+            actionIntent.putExtra("friendRequester", notifier.id.toString())
             actionIntent.putExtra("postPublisherId", notifiedId)
             actionIntent.putExtra("postId", postId)
             actionIntent.putExtra("commentPosition", commentPosition)
@@ -189,5 +212,16 @@ class BaseApplication : Application() {
                 NotificationManagerCompat.from(context!!)
             notificationManager.notify(Random.nextInt(), builder.build())
         }
+
+        fun getCurrentUserOnlyOnce(){
+//            FirebaseApp.initializeApp(context!!)
+//            usersRepository.getUserAsRegularObjectNotLiveData(FirebaseAuth.getInstance().currentUser?.uid.toString()).addOnCompleteListener {
+//                if (it.isSuccessful){
+//                    singletonUser = it.result?.toObject(User::class.java)
+//                }
+//            }
+        }
     }
+
+
 }

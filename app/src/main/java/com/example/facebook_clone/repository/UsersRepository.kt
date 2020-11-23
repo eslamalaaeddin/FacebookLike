@@ -15,9 +15,7 @@ import com.example.facebook_clone.model.user.friend.Friend
 import com.example.facebook_clone.model.user.friendrequest.FriendRequest
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import java.io.ByteArrayOutputStream
@@ -39,11 +37,30 @@ class UsersRepository(
         return UserLiveData(documentReference)
     }
 
+    fun getUserAsRegularObjectNotLiveData(userId: String): Task<DocumentSnapshot> {
+        return database.collection(USERS_COLLECTION).document(userId).get()
+    }
+
     fun uploadImageToCloudStorage(bitmap: Bitmap, profileOrCover: String): UploadTask {
         val userId = auth.currentUser?.uid.toString()
 
         val firebaseStorageRef =
             storage.reference.child(userId).child("Profile images").child(profileOrCover)
+                .child("${userId}.jpeg")
+
+        val byteArrayOutputStream = ByteArrayOutputStream()
+
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+
+        return firebaseStorageRef.putBytes(byteArrayOutputStream.toByteArray())
+
+    }
+
+    fun uploadCoverImageToCloudStorage(bitmap: Bitmap): UploadTask {
+        val userId = auth.currentUser?.uid.toString()
+
+        val firebaseStorageRef =
+            storage.reference.child(userId).child("Profile images").child("cover")
                 .child("${userId}.jpeg")
 
         val byteArrayOutputStream = ByteArrayOutputStream()

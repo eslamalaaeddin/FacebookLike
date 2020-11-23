@@ -14,12 +14,15 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.FriendsAdapter
 import com.example.facebook_clone.adapter.ProfilePostsAdapter
+import com.example.facebook_clone.helper.BaseApplication
 import com.example.facebook_clone.helper.listener.PostListener
 import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.helper.listener.FriendClickListener
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.model.post.Post
+import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.comment.CommentDocument
+import com.example.facebook_clone.model.post.comment.ReactionsAndSubComments
 import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.model.post.react.ReactDocument
 import com.example.facebook_clone.model.post.share.Share
@@ -70,6 +73,7 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
+        Log.i(TAG, "PPPP onCreate: ${BaseApplication.singletonUser}")
 
         picasso = Picasso.get()
         val userLiveDate = profileActivityViewModel.getMe(auth.currentUser?.uid.toString())
@@ -77,7 +81,7 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
             user?.let {
                 currentUser = user
                 updateUserInfo(user)
-                if (!user.friends.isNullOrEmpty()){
+                if (!user.friends.isNullOrEmpty()) {
                     friendsAdapter = FriendsAdapter(user.friends!!, this)
                     friendsRecyclerView.adapter = friendsAdapter
                 }
@@ -96,16 +100,15 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
 
 
         profileImageView.setOnClickListener {
-            ProfileImageBottomSheet(currentUser.profileImageUrl.toString()).apply {
-                show(supportFragmentManager, tag)
-            }
+                ProfileImageBottomSheet(currentUser.profileImageUrl.toString()).apply {
+                    show(supportFragmentManager, tag)
+                }
         }
 
         coverImageView.setOnClickListener {
-            ProfileCoverBottomSheet(currentUser.coverImageUrl.toString()).apply {
-                show(supportFragmentManager, tag)
-            }
-
+                ProfileCoverBottomSheet(currentUser.coverImageUrl.toString()).apply {
+                    show(supportFragmentManager, tag)
+                }
         }
 
         coverCameraImageView.setOnClickListener {
@@ -158,17 +161,17 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
         //so, the ui have to be updated first from client side in addition to updating it from the server side
 
 //        if (profilePostsAdapter == null) {
-            profilePostsAdapter = ProfilePostsAdapter(
-                auth,
-                posts,
-                this,
-                currentUser.name.toString(),
-                currentUser.profileImageUrl.toString(),
-                true
-            )
-            profilePostsRecyclerView.adapter = profilePostsAdapter
-            //position has to be changed post
-        if (currentEditedPostPosition != -1){
+        profilePostsAdapter = ProfilePostsAdapter(
+            auth,
+            posts,
+            this,
+            currentUser.name.toString(),
+            currentUser.profileImageUrl.toString(),
+            true
+        )
+        profilePostsRecyclerView.adapter = profilePostsAdapter
+        //position has to be changed post
+        if (currentEditedPostPosition != -1) {
             profilePostsRecyclerView.scrollToPosition(currentEditedPostPosition)
         }
 //        }else{
@@ -243,10 +246,10 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
         postPosition: Int
     ) {
         currentEditedPostPosition = postPosition
-        if (!reacted){
+        if (!reacted) {
             //UPDATE REACTED VALUE WITH 1
             //postViewModel.updateReactedValue(postPublisherId, postId, 1)
-            val myReact = createReact(interactorId, interactorName, interactorImageUrl,1)
+            val myReact = createReact(interactorId, interactorName, interactorImageUrl, 1)
             addReactToDb(myReact, postId, postPublisherId).addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
@@ -277,7 +280,14 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
         postPosition: Int
     ) {
         currentEditedPostPosition = postPosition
-           showReactsChooserDialog(interactorId, interactorName, interactorImageUrl, postId, postPublisherId, currentReact)
+        showReactsChooserDialog(
+            interactorId,
+            interactorName,
+            interactorImageUrl,
+            postId,
+            postPublisherId,
+            currentReact
+        )
 
     }
 
@@ -359,7 +369,7 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
             imageViewerDialog.setMediaUrl(mediaUrl)
         }
         //video
-        else{
+        else {
             val videoIntent = Intent(this, VideoPlayerActivity::class.java)
             videoIntent.putExtra("videoUrl", mediaUrl)
             startActivity(videoIntent)
@@ -370,9 +380,11 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
     override fun onPostMoreDotsClicked(post: Post) {
         //BottomSheet
         val postConfigurationsBottomSheet = PostConfigurationsBottomSheet(post)
-        postConfigurationsBottomSheet.show(supportFragmentManager, postConfigurationsBottomSheet.tag)
+        postConfigurationsBottomSheet.show(
+            supportFragmentManager,
+            postConfigurationsBottomSheet.tag
+        )
     }
-
 
 
     private fun addReactToDb(react: React, postId: String, postPublisherId: String): Task<Void> {
@@ -380,7 +392,12 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
 
     }
 
-    private fun createReact(interactorId: String, interactorName: String, interactorImageUrl: String,reactType: Int): React{
+    private fun createReact(
+        interactorId: String,
+        interactorName: String,
+        interactorImageUrl: String,
+        reactType: Int
+    ): React {
         return React(
             reactorId = interactorId,
             reactorName = interactorName,
@@ -427,26 +444,27 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
 
     }
 
-    private fun showReactsChooserDialog(interactorId: String,
-                                        interactorName: String,
-                                        interactorImageUrl: String,
-                                        postId: String,
-                                        postPublisherId: String,
-                                        currentReact: React?
-                                        ) {
+    private fun showReactsChooserDialog(
+        interactorId: String,
+        interactorName: String,
+        interactorImageUrl: String,
+        postId: String,
+        postPublisherId: String,
+        currentReact: React?
+    ) {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(true)
         dialog.setContentView(R.layout.long_clicked_reacts_button)
-        val react =  React(
+        val react = React(
             reactorId = interactorId,
             reactorName = interactorName,
             reactorImageUrl = interactorImageUrl
         )
         dialog.loveReactButton.setOnClickListener {
             react.react = 2
-          //  postViewModel.updateReactedValue(postPublisherId, postId,2)
-            if (currentReact != null){
+            //  postViewModel.updateReactedValue(postPublisherId, postId,2)
+            if (currentReact != null) {
                 deleteReact(currentReact, postId, postPublisherId)
             }
             addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
@@ -458,10 +476,10 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
         }
         dialog.careReactButton.setOnClickListener {
             react.react = 3
-            if (currentReact != null){
+            if (currentReact != null) {
                 deleteReact(currentReact, postId, postPublisherId)
             }
-          //  postViewModel.updateReactedValue(postPublisherId, postId,3)
+            //  postViewModel.updateReactedValue(postPublisherId, postId,3)
             addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
@@ -471,10 +489,10 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
         }
         dialog.hahaReactButton.setOnClickListener {
             react.react = 4
-            if (currentReact != null){
+            if (currentReact != null) {
                 deleteReact(currentReact, postId, postPublisherId)
             }
-          //  postViewModel.updateReactedValue(postPublisherId, postId,4)
+            //  postViewModel.updateReactedValue(postPublisherId, postId,4)
             addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
@@ -484,10 +502,10 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
         }
         dialog.wowReactButton.setOnClickListener {
             react.react = 5
-            if (currentReact != null){
+            if (currentReact != null) {
                 deleteReact(currentReact, postId, postPublisherId)
             }
-           // postViewModel.updateReactedValue(postPublisherId, postId,5)
+            // postViewModel.updateReactedValue(postPublisherId, postId,5)
             addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
@@ -497,10 +515,10 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
         }
         dialog.sadReactButton.setOnClickListener {
             react.react = 6
-            if (currentReact != null){
+            if (currentReact != null) {
                 deleteReact(currentReact, postId, postPublisherId)
             }
-           // postViewModel.updateReactedValue(postPublisherId, postId,6)
+            // postViewModel.updateReactedValue(postPublisherId, postId,6)
             addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
@@ -510,10 +528,10 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
         }
         dialog.angryReactButton.setOnClickListener {
             react.react = 7
-            if (currentReact != null){
+            if (currentReact != null) {
                 deleteReact(currentReact, postId, postPublisherId)
             }
-           // postViewModel.updateReactedValue(postPublisherId, postId,7)
+            // postViewModel.updateReactedValue(postPublisherId, postId,7)
             addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
@@ -532,3 +550,5 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
 
 
 }
+
+

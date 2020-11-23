@@ -68,10 +68,10 @@ class CommentsBottomSheet(
     private val auth: FirebaseAuth by inject()
     private lateinit var commentsAdapter: CommentsAdapter
     private var commentData: Intent? = null
-    private lateinit var notificationsHandler: NotificationsHandler
     private var commentDataType: String? = null
     private var bitmapFromCamera: Boolean = false
     private var commentAttachmentUrl: String? = null
+    private lateinit var notificationsHandler: NotificationsHandler
     private var progressDialog: ProgressDialog? = null
     private lateinit var commentFromReplyBottomSheet: Comment
     private var commentPositionFromReplyBottomSheet = 0
@@ -130,11 +130,13 @@ class CommentsBottomSheet(
 
         sendCommentImageView.setOnClickListener {
             val commentContent = commentEditText.text.toString()
+
             if (commentContent.isEmpty() && commentData == null) {
                 Toast.makeText(requireContext(), "Add comment first", Toast.LENGTH_SHORT).show()
-            } else {
-                if (commentData != null) {
+            }
 
+            else {
+                if (commentData != null) {
                     if (commentDataType == "image") {
                         var bitmap: Bitmap? = null
                         if (bitmapFromCamera) {
@@ -166,7 +168,7 @@ class CommentsBottomSheet(
                                         }
 //                                        change 1
 
-                                        postViewModel.createComment(
+                                        postViewModel.addCommentToPostComments(
                                             postId,
                                             postPublisherId,
                                             comment
@@ -175,7 +177,7 @@ class CommentsBottomSheet(
                                             progressDialog?.dismiss()
                                             postViewModel
                                                 .addCommentIdToCommentsCollection(
-                                                    postPublisherId,
+                                                    comment.commenterId.toString(),
                                                     comment.id.toString()
                                                 )
                                             if (task.isSuccessful) {
@@ -204,7 +206,8 @@ class CommentsBottomSheet(
                                     }
                                 }
                             }
-                    } else if (commentDataType == "video") {
+                    }
+                    else if (commentDataType == "video") {
                         val videoUri = commentData!!.data!!
                         progressDialog =
                             Utils.showProgressDialog(requireContext(), "Please wait...")
@@ -224,7 +227,7 @@ class CommentsBottomSheet(
                                             )
                                         }
                                         //change 2
-                                        postViewModel.createComment(
+                                        postViewModel.addCommentToPostComments(
                                             postId,
                                             postPublisherId,
                                             comment
@@ -233,7 +236,7 @@ class CommentsBottomSheet(
                                             progressDialog?.dismiss()
                                             postViewModel
                                                 .addCommentIdToCommentsCollection(
-                                                    postPublisherId,
+                                                    comment.commenterId.toString(),
                                                     comment.id.toString()
                                                 )
                                             if (task.isSuccessful) {
@@ -275,17 +278,18 @@ class CommentsBottomSheet(
 
                     commentEditText.text.clear()
 
-                    postViewModel.createComment(postId, postPublisherId, comment)
+                    postViewModel.addCommentToPostComments(postId, postPublisherId, comment)
                         .addOnCompleteListener { task ->
                             //   progressDialog?.dismiss()
                             postViewModel
                                 .addCommentIdToCommentsCollection(
-                                    postPublisherId,
+                                    comment.commenterId.toString(),
                                     comment.id.toString()
                                 )
                             if (task.isSuccessful) {
                                 //if you are not the commenter
-                                if (commenterId != postPublisherId) {
+                                //commenterId
+                                if (comment.commenterId != postPublisherId) {
                                     comBottomSheetListener.onAnotherUserCommented(
                                         commentsList.size - 1,
                                         comment.id!!,
@@ -386,7 +390,7 @@ class CommentsBottomSheet(
 
     override fun onCommentLongClicked(comment: Comment) {
         val longClickedCommentBottomSheet =
-            LongClickedCommentBottomSheet(comment, postId, postPublisherId)
+            LongClickedCommentBottomSheet(comment, postId, postPublisherId, "comment")
         longClickedCommentBottomSheet.show(activity?.supportFragmentManager!!, "signature")
     }
 
@@ -455,7 +459,7 @@ class CommentsBottomSheet(
             ).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     updateCommentsUI()
-                    if (postPublisherId != commenterId) {
+                    if (comment.commenterId != commenterId) {
                         notificationsHandler.also {
                             it.notificationType = "reactOnComment"
                             it.commentPosition = commentPosition
@@ -521,6 +525,8 @@ class CommentsBottomSheet(
             commenterId,
             commenterName,
             commenterImageUrl,
+            "ff9jw4VpQB6UGgmw8pb7yv:APA91bF9nQk-5BcheHo_kPwPkLDHw9kZ1_4TuSZ4wOV9bHKW9GJMM1ZBh5bBFZiIBUeegM9zg6mx9ngUnBXJhITv4mjAsYkQNl9gr7GyU7QoxeHGWOy1Jd8uwBWe5LD5VSzj4G-mjxNz",
+            postId,
             reacted,
             currentReact
         )
