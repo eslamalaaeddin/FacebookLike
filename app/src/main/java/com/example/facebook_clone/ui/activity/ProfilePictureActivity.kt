@@ -6,10 +6,14 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.provider.MediaStore
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.facebook_clone.R
 import com.example.facebook_clone.helper.Utils
+import com.example.facebook_clone.model.user.recentloggedinuser.RecentLoggedInUser
+import com.example.facebook_clone.viewmodel.NewsFeedActivityViewModel
 import com.example.facebook_clone.viewmodel.ProfilePictureActivityViewModel
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_profile_picture.*
 import org.koin.android.ext.android.inject
@@ -22,13 +26,24 @@ private const val TAG = "ProfilePictureActivity"
 
 class ProfilePictureActivity : AppCompatActivity() {
     private val profilePictureActivityViewModel by viewModel<ProfilePictureActivityViewModel>()
+    private val newsFeedActivityViewModel by viewModel<NewsFeedActivityViewModel>()
     private val auth: FirebaseAuth by inject()
     private var progressDialog: ProgressDialog? = null
+    private lateinit var userName: String
+    private lateinit var email: String
+    private lateinit var password: String
+    private lateinit var token: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile_picture)
 
         val gender = intent.getStringExtra("gender").toString()
+         userName = intent.getStringExtra("name").toString()
+         email = intent.getStringExtra("email").toString()
+         password = intent.getStringExtra("password").toString()
+         token = intent.getStringExtra("token").toString()
+
+
 
         if (gender == "male"){
             val defaultProfileImageBitmap = BitmapFactory.decodeResource(
@@ -100,6 +115,16 @@ class ProfilePictureActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     task.result?.storage?.downloadUrl?.addOnSuccessListener { photoUrl ->
                         uploadProfileImageToUserCollection(photoUrl.toString())
+                        val currentUser = RecentLoggedInUser(email, password, userName, photoUrl.toString())
+                        addUserToRecentUsers(currentUser, token).addOnCompleteListener {
+                            if (!it.isSuccessful) {
+                                Toast.makeText(
+                                    this,
+                                    it.exception?.message.toString(),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
                         progressDialog?.dismiss()
                     }
                 }
@@ -147,6 +172,10 @@ class ProfilePictureActivity : AppCompatActivity() {
         val intent = Intent(this, ProfileActivity::class.java)
         startActivity(intent)
         finish()
+    }
+
+    private fun addUserToRecentUsers(user: RecentLoggedInUser, token: String): Task<Void> {
+        return newsFeedActivityViewModel.addUserToRecentLoggedInUsers(user, token)
     }
 
 

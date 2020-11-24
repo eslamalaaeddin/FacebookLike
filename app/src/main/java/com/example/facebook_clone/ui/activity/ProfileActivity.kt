@@ -1,32 +1,26 @@
 package com.example.facebook_clone.ui.activity
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.Window
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.FriendsAdapter
 import com.example.facebook_clone.adapter.ProfilePostsAdapter
-import com.example.facebook_clone.helper.BaseApplication
 import com.example.facebook_clone.helper.listener.PostListener
 import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.helper.listener.FriendClickListener
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.model.post.Post
-import com.example.facebook_clone.model.post.comment.Comment
-import com.example.facebook_clone.model.post.comment.CommentDocument
-import com.example.facebook_clone.model.post.comment.ReactionsAndSubComments
 import com.example.facebook_clone.model.post.react.React
-import com.example.facebook_clone.model.post.react.ReactDocument
 import com.example.facebook_clone.model.post.share.Share
-import com.example.facebook_clone.model.post.share.ShareDocument
+import com.example.facebook_clone.model.user.friend.Friend
 import com.example.facebook_clone.ui.bottomsheet.CommentsBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.PostConfigurationsBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.ProfileCoverBottomSheet
@@ -59,56 +53,52 @@ private const val REQUEST_CODE_PROFILE_IMAGE = 456
 class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener {
     private val profileActivityViewModel by viewModel<ProfileActivityViewModel>()
     private val postViewModel by viewModel<PostViewModel>()
+
     private val auth: FirebaseAuth by inject()
     private var progressDialog: ProgressDialog? = null
     private lateinit var currentUser: User
-    private lateinit var currentPosts: List<Post>
     private lateinit var picasso: Picasso
-    private var iAmFriend: Boolean = false
     private var profilePostsAdapter: ProfilePostsAdapter? = null
     private lateinit var friendsAdapter: FriendsAdapter
     private var currentEditedPostPosition: Int = -1
-    private var choice: Int? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
-        Log.i(TAG, "PPPP onCreate: ${BaseApplication.singletonUser}")
+//        val email = intent.getStringExtra("email").toString()
+//        val password = intent.getStringExtra("password").toString()
+
+
 
         picasso = Picasso.get()
+
         val userLiveDate = profileActivityViewModel.getMe(auth.currentUser?.uid.toString())
         userLiveDate?.observe(this, { user ->
             user?.let {
                 currentUser = user
-                updateUserInfo(user)
-                if (!user.friends.isNullOrEmpty()) {
-                    friendsAdapter = FriendsAdapter(user.friends!!, this)
-                    friendsRecyclerView.adapter = friendsAdapter
-                }
-                //nested to get current user
-                val postsLiveData =
-                    postViewModel.getPostsWithoutOptions(auth.currentUser?.uid.toString())
-                postsLiveData.observe(this, { posts ->
-                    //currentPosts = posts
-                    updateUserPosts(posts)
 
+
+                updateUserIdentity(user)
+                updateUserFriends(user.friends.orEmpty())
+                //To get current user i have nested the livedata
+                val postsLiveData =
+                    postViewModel.getUserProfilePostsLiveData(auth.currentUser?.uid.toString())
+                postsLiveData.observe(this, { posts ->
+                    updateUserPosts(posts)
                 })
             }
         })
 
-
-
-
         profileImageView.setOnClickListener {
-                ProfileImageBottomSheet(currentUser.profileImageUrl.toString()).apply {
-                    show(supportFragmentManager, tag)
-                }
+            ProfileImageBottomSheet(currentUser.profileImageUrl.toString()).apply {
+                show(supportFragmentManager, tag)
+            }
         }
 
         coverImageView.setOnClickListener {
-                ProfileCoverBottomSheet(currentUser.coverImageUrl.toString()).apply {
-                    show(supportFragmentManager, tag)
-                }
+            ProfileCoverBottomSheet(currentUser.coverImageUrl.toString()).apply {
+                show(supportFragmentManager, tag)
+            }
         }
 
         coverCameraImageView.setOnClickListener {
@@ -134,11 +124,10 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
                     currentUser.profileImageUrl.toString()
                 )
         }
-
     }
 
-
-    private fun updateUserInfo(user: User) {
+    @SuppressLint("SetTextI18n")
+    private fun updateUserIdentity(user: User) {
         if (user.coverImageUrl != null) {
             picasso.load(user.coverImageUrl).into(coverImageView)
         }
@@ -157,10 +146,6 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
     }
 
     private fun updateUserPosts(posts: List<Post>) {
-        //this check is to prevent recycler view from auto scrolling
-        //so, the ui have to be updated first from client side in addition to updating it from the server side
-
-//        if (profilePostsAdapter == null) {
         profilePostsAdapter = ProfilePostsAdapter(
             auth,
             posts,
@@ -170,20 +155,79 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
             true
         )
         profilePostsRecyclerView.adapter = profilePostsAdapter
-        //position has to be changed post
         if (currentEditedPostPosition != -1) {
             profilePostsRecyclerView.scrollToPosition(currentEditedPostPosition)
         }
-//        }else{
-//            profilePostsAdapter?.notifyDataSetChanged()
-//        }
+    }
+
+    private fun updateUserFriends(friends: List<Friend>) {
+        friendsCountTextView.text = if (friends.isNotEmpty()) "${friends.size}" else ""
+        if (friends.size >= 6) {
+            friendsAdapter = FriendsAdapter(friends.subList(0, 5), this)
+            friendsRecyclerView.adapter = friendsAdapter
+        } else {
+            friendsAdapter = FriendsAdapter(friends, this)
+            friendsRecyclerView.adapter = friendsAdapter
+        }
+
+    }
+
+    private fun uploadCoverImageToUserCollection(photoUrl: String) {
+        profileActivityViewModel
+            .uploadCoverImageToUserCollection(photoUrl)
+            .addOnCompleteListener { task ->
+                Utils.doAfterFinishing(
+                    this,
+                    task,
+                    "Image uploaded successfully"
+                )
+            }
+    }
+
+    private fun uploadProfileImageToUserCollection(photoUrl: String) {
+        profileActivityViewModel.uploadProfileImageToUserCollection(photoUrl)
+            .addOnCompleteListener { task ->
+                Utils.doAfterFinishing(this, task, "Image uploaded successfully")
+
+            }
+    }
+
+    private fun addReactOnPostToDb(
+        react: React,
+        postId: String,
+        postPublisherId: String
+    ): Task<Void> {
+        return postViewModel.addReactToDB(react, postId, postPublisherId)
+    }
+
+    private fun createReact(
+        interactorId: String,
+        interactorName: String,
+        interactorImageUrl: String
+    ): React {
+        return React(
+            reactorId = interactorId,
+            reactorName = interactorName,
+            reactorImageUrl = interactorImageUrl
+        )
+    }
+
+    private fun deleteReactFromPost(
+        react: React,
+        postId: String,
+        postPublisherId: String
+    ): Task<Void> {
+        return postViewModel.deleteReactFromPost(react, postId, postPublisherId)
+    }
+
+    private fun addShareToPost(share: Share, postId: String, postPublisherId: String): Task<Void> {
+        return postViewModel.addShareToPost(share, postId, postPublisherId)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         //Cover image
         if (requestCode == REQUEST_CODE_COVER_IMAGE && resultCode == RESULT_OK) {
-
             val bitmap = data?.extras?.get("data") as Bitmap
             progressDialog = Utils.showProgressDialog(this, "Please wait...")
             profileActivityViewModel.uploadCoverImageToCloudStorage(bitmap)
@@ -198,7 +242,6 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
         }
         //Profile image
         if (requestCode == REQUEST_CODE_PROFILE_IMAGE && resultCode == RESULT_OK) {
-
             val bitmap = data?.extras?.get("data") as Bitmap
             progressDialog = Utils.showProgressDialog(this, "Please wait...")
             profileActivityViewModel.uploadProfileImageToCloudStorage(bitmap)
@@ -213,27 +256,70 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
         }
     }
 
-    private fun uploadCoverImageToUserCollection(photoUrl: String) {
-        profileActivityViewModel.uploadCoverImageToUserCollection(photoUrl)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Utils.toastMessage(this, "Image uploaded successfully")
-                } else {
-                    Utils.toastMessage(this, task.exception?.message.toString())
-                }
-            }
+    private fun showReactsChooserDialog(
+        interactorId: String,
+        interactorName: String,
+        interactorImageUrl: String,
+        postId: String,
+        postPublisherId: String,
+        currentReact: React?
+    ) {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+        dialog.setContentView(R.layout.long_clicked_reacts_button)
+
+        val react = React(
+            reactorId = interactorId,
+            reactorName = interactorName,
+            reactorImageUrl = interactorImageUrl
+        )
+
+        dialog.loveReactButton.setOnClickListener {
+            react.react = 2
+            handleLongReactCreationAndDeletion(currentReact, react, postId, postPublisherId)
+            dialog.dismiss()
+        }
+        dialog.careReactButton.setOnClickListener {
+            react.react = 3
+            handleLongReactCreationAndDeletion(currentReact, react, postId, postPublisherId)
+            dialog.dismiss()
+        }
+        dialog.hahaReactButton.setOnClickListener {
+            react.react = 4
+            handleLongReactCreationAndDeletion(currentReact, react, postId, postPublisherId)
+            dialog.dismiss()
+        }
+        dialog.wowReactButton.setOnClickListener {
+            react.react = 5
+            handleLongReactCreationAndDeletion(currentReact, react, postId, postPublisherId)
+            dialog.dismiss()
+        }
+        dialog.sadReactButton.setOnClickListener {
+            react.react = 6
+            handleLongReactCreationAndDeletion(currentReact, react, postId, postPublisherId)
+            dialog.dismiss()
+        }
+        dialog.angryReactButton.setOnClickListener {
+            react.react = 7
+            handleLongReactCreationAndDeletion(currentReact, react, postId, postPublisherId)
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 
-    private fun uploadProfileImageToUserCollection(photoUrl: String) {
-        profileActivityViewModel.uploadProfileImageToUserCollection(photoUrl)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Utils.toastMessage(this, "Image uploaded successfully")
-                } else {
-                    Utils.toastMessage(this, task.exception?.message.toString())
-                }
-            }
+    private fun handleLongReactCreationAndDeletion(
+        currentReact: React?,
+        react: React,
+        postId: String,
+        postPublisherId: String
+    ) {
+        if (currentReact != null) {
+            deleteReactFromPost(currentReact, postId, postPublisherId)
+        }
+        addReactOnPostToDb(react, postId, postPublisherId)
     }
+
 
     override fun onReactButtonClicked(
         postPublisherId: String,
@@ -247,20 +333,18 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
     ) {
         currentEditedPostPosition = postPosition
         if (!reacted) {
-            //UPDATE REACTED VALUE WITH 1
-            //postViewModel.updateReactedValue(postPublisherId, postId, 1)
-            val myReact = createReact(interactorId, interactorName, interactorImageUrl, 1)
-            addReactToDb(myReact, postId, postPublisherId).addOnCompleteListener { task ->
+            val myReact = createReact(interactorId, interactorName, interactorImageUrl)
+            addReactOnPostToDb(myReact, postId, postPublisherId).addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
                 }
             }
-        }
-        //If you have reacted --> delete react
-        else {
-            //UPDATE REACTED VALUE WITH NULL
-            //postViewModel.updateReactedValue(postPublisherId, postId, reacted)
-            deleteReact(currentReact!!, postId, postPublisherId).addOnCompleteListener { task ->
+        } else {
+            deleteReactFromPost(
+                currentReact!!,
+                postId,
+                postPublisherId
+            ).addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     Utils.toastMessage(this, task.exception?.message.toString())
                 }
@@ -288,7 +372,6 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
             postPublisherId,
             currentReact
         )
-
     }
 
     override fun onCommentButtonClicked(
@@ -300,14 +383,13 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
         postPosition: Int
     ) {
         currentEditedPostPosition = postPosition
-        //Open comment bottom sheet
         CommentsBottomSheet(
             postPublisherId,
             postId,
             interactorId,
             interactorName,
             interactorImageUrl,
-            null,
+            null,//used to handle notification so, no need for it in my profile.
             currentUser.token.toString()
         ).apply {
             show(supportFragmentManager, tag)
@@ -328,13 +410,8 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
             sharerName = interactorName,
             sharerImageUrl = interactorImageUrl,
         )
-
-        createShare(share, postId, postPublisherId).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Toast.makeText(this, "You shared this post", Toast.LENGTH_SHORT).show()
-            } else {
-                Utils.toastMessage(this, task.exception?.message.toString())
-            }
+        addShareToPost(share, postId, postPublisherId).addOnCompleteListener { task ->
+            Utils.doAfterFinishing(this, task, "You shared this post")
         }
     }
 
@@ -347,7 +424,6 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
         postPosition: Int
     ) {
         currentEditedPostPosition = postPosition
-        //Open comment bottom sheet
         CommentsBottomSheet(
             postPublisherId,
             postId,
@@ -355,7 +431,7 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
             interactorName,
             interactorImageUrl,
             null,
-            currentUser.token.toString(),//My token
+            currentUser.token.toString(),
         ).apply {
             show(supportFragmentManager, tag)
         }
@@ -378,7 +454,6 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
     }
 
     override fun onPostMoreDotsClicked(post: Post) {
-        //BottomSheet
         val postConfigurationsBottomSheet = PostConfigurationsBottomSheet(post)
         postConfigurationsBottomSheet.show(
             supportFragmentManager,
@@ -386,168 +461,11 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
         )
     }
 
-
-    private fun addReactToDb(react: React, postId: String, postPublisherId: String): Task<Void> {
-        return postViewModel.addReactToDB(react, postId, postPublisherId)
-
-    }
-
-    private fun createReact(
-        interactorId: String,
-        interactorName: String,
-        interactorImageUrl: String,
-        reactType: Int
-    ): React {
-        return React(
-            reactorId = interactorId,
-            reactorName = interactorName,
-            reactorImageUrl = interactorImageUrl,
-            react = reactType
-        )
-    }
-
-
-    private fun deleteReact(react: React, postId: String, postPublisherId: String): Task<Void> {
-        return postViewModel.deleteReact(react, postId, postPublisherId)
-    }
-
-    private fun createShare(share: Share, postId: String, postPublisherId: String): Task<Void> {
-        return postViewModel.createShare(share, postId, postPublisherId)
-    }
-
-    private fun updatePostUI(postPublisherId: String, postId: String) {
-        postViewModel.getPostById(postPublisherId, postId).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                task.result?.reference?.addSnapshotListener { snapshot, error ->
-                    if (error != null) {
-                        Utils.toastMessage(this, error.message.toString())
-                        return@addSnapshotListener
-                    }
-
-                    val commentsResult = snapshot?.toObject(CommentDocument::class.java)?.comments
-                    val reactsResult = snapshot?.toObject(ReactDocument::class.java)?.reacts
-                    val sharesResult = snapshot?.toObject(ShareDocument::class.java)?.shares
-
-                    val commentsList = commentsResult.orEmpty()
-                    val reactsList = reactsResult.orEmpty()
-                    val sharesList = sharesResult.orEmpty()
-
-                    Log.i(TAG, "HHHH updatePostUI: $commentsList")
-                    Log.i(TAG, "HHHH updatePostUI: $reactsList")
-                    Log.i(TAG, "HHHH updatePostUI: $sharesList")
-
-                }
-            } else {
-                Utils.toastMessage(this, task.exception?.message.toString())
-            }
-        }
-
-    }
-
-    private fun showReactsChooserDialog(
-        interactorId: String,
-        interactorName: String,
-        interactorImageUrl: String,
-        postId: String,
-        postPublisherId: String,
-        currentReact: React?
-    ) {
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCancelable(true)
-        dialog.setContentView(R.layout.long_clicked_reacts_button)
-        val react = React(
-            reactorId = interactorId,
-            reactorName = interactorName,
-            reactorImageUrl = interactorImageUrl
-        )
-        dialog.loveReactButton.setOnClickListener {
-            react.react = 2
-            //  postViewModel.updateReactedValue(postPublisherId, postId,2)
-            if (currentReact != null) {
-                deleteReact(currentReact, postId, postPublisherId)
-            }
-            addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
-                }
-            }
-            dialog.dismiss()
-        }
-        dialog.careReactButton.setOnClickListener {
-            react.react = 3
-            if (currentReact != null) {
-                deleteReact(currentReact, postId, postPublisherId)
-            }
-            //  postViewModel.updateReactedValue(postPublisherId, postId,3)
-            addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
-                }
-            }
-            dialog.dismiss()
-        }
-        dialog.hahaReactButton.setOnClickListener {
-            react.react = 4
-            if (currentReact != null) {
-                deleteReact(currentReact, postId, postPublisherId)
-            }
-            //  postViewModel.updateReactedValue(postPublisherId, postId,4)
-            addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
-                }
-            }
-            dialog.dismiss()
-        }
-        dialog.wowReactButton.setOnClickListener {
-            react.react = 5
-            if (currentReact != null) {
-                deleteReact(currentReact, postId, postPublisherId)
-            }
-            // postViewModel.updateReactedValue(postPublisherId, postId,5)
-            addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
-                }
-            }
-            dialog.dismiss()
-        }
-        dialog.sadReactButton.setOnClickListener {
-            react.react = 6
-            if (currentReact != null) {
-                deleteReact(currentReact, postId, postPublisherId)
-            }
-            // postViewModel.updateReactedValue(postPublisherId, postId,6)
-            addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
-                }
-            }
-            dialog.dismiss()
-        }
-        dialog.angryReactButton.setOnClickListener {
-            react.react = 7
-            if (currentReact != null) {
-                deleteReact(currentReact, postId, postPublisherId)
-            }
-            // postViewModel.updateReactedValue(postPublisherId, postId,7)
-            addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
-                }
-            }
-            dialog.dismiss()
-        }
-        dialog.show()
-    }
-
     override fun onFriendClicked(friendId: String) {
         val intent = Intent(this, OthersProfileActivity::class.java)
         intent.putExtra("userId", friendId)
         startActivity(intent)
     }
-
 
 }
 

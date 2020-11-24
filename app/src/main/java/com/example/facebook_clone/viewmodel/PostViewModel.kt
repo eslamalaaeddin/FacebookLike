@@ -10,7 +10,6 @@ import com.example.facebook_clone.model.post.comment.ReactionsAndSubComments
 import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.model.post.share.Share
 import com.example.facebook_clone.repository.PostsRepository
-import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.storage.UploadTask
@@ -21,12 +20,8 @@ class PostViewModel(private val repository: PostsRepository): ViewModel() {
         return repository.createPost(post)
     }
 
-    fun getPostsByUserId(userId: String) : FirestoreRecyclerOptions<Post> {
-        return repository.getPostsByUserId(userId)
-    }
-
-    fun getPostsWithoutOptions(userId: String) : LiveData<List<Post>> {
-        return repository.getPostsWithoutOptions(userId)
+    fun getUserProfilePostsLiveData(userId: String) : LiveData<List<Post>> {
+        return repository.getUserProfilePostsLiveData(userId)
     }
 
     fun updatePostWithNewEdits(publisherId: String, postId: String, post: Post): Task<Void>{
@@ -37,12 +32,12 @@ class PostViewModel(private val repository: PostsRepository): ViewModel() {
         return repository.addCommentToPostComments(postId,postPublisherId, comment)
     }
 
-    fun getCommentById(postPublisherId: String, commentId: String): Task<DocumentSnapshot>{
-        return repository.getCommentById(postPublisherId, commentId)
+    fun getCommentById(commenterId: String, commentId: String): Task<DocumentSnapshot>{
+        return repository.getCommentById(commenterId, commentId)
     }
 
-    fun getCommentLiveDataById(postPublisherId: String, commentId: String):LiveData<ReactionsAndSubComments>{
-        return repository.getCommentLiveDataById(postPublisherId, commentId)
+    fun getCommentLiveDataById(commenterId: String, commentId: String):LiveData<ReactionsAndSubComments>{
+        return repository.getCommentLiveDataById(commenterId, commentId)
     }
 
     fun addSubCommentToCommentById(commenterId: String, commentId: String, comment: Comment): Task<Void>{
@@ -53,8 +48,8 @@ class PostViewModel(private val repository: PostsRepository): ViewModel() {
         return repository.deleteSubCommentFromCommentById(commenterId, superCommentId, comment)
     }
 
-    fun deleteCommentDocumentFromCommentsCollection(postPublisherId: String, commentId: String): Task<Void>{
-        return repository.deleteCommentDocumentFromCommentsCollection(postPublisherId, commentId)
+    fun deleteCommentDocumentFromCommentsCollection(commenterId: String, commentId: String): Task<Void>{
+        return repository.deleteCommentDocumentFromCommentsCollection(commenterId, commentId)
     }
 
     fun addCommentIdToCommentsCollection( commenterId: String,commentId: String): Task<Void>{
@@ -62,20 +57,20 @@ class PostViewModel(private val repository: PostsRepository): ViewModel() {
     }
 
 
-    fun addReactToReactsListInCommentDocument(postPublisherId: String,commentId: String, react: React?): Task<Void>{
-        return repository.addReactToReactsListInCommentDocument(postPublisherId, commentId, react)
+    fun addReactToReactsListInCommentDocument(commenterId: String, commentId: String, react: React?): Task<Void>{
+        return repository.addReactToReactsListInCommentDocument(commenterId, commentId, react)
     }
 
-    fun removeReactFromReactsListInCommentDocument(postPublisherId: String,commentId: String, react: React?): Task<Void>{
-        return repository.removeReactFromReactsListInCommentDocument(postPublisherId, commentId, react)
+    fun removeReactFromReactsListInCommentDocument(commenterId: String, commentId: String, react: React?): Task<Void>{
+        return repository.removeReactFromReactsListInCommentDocument(commenterId, commentId, react)
     }
 
-    fun addSubCommentToReactsListInCommentDocument(postPublisherId: String,commentId: String, comment: Comment?): Task<Void>{
-        return repository.addSubCommentToReactsListInCommentDocument(postPublisherId, commentId, comment)
+    fun addSubCommentToReactsListInCommentDocument(commenterId: String,commentId: String, comment: Comment?): Task<Void>{
+        return repository.addSubCommentToReactsListInCommentDocument(commenterId, commentId, comment)
     }
 
-    fun removeSubCommentFromReactsListInCommentDocument(postPublisherId: String,commentId: String, comment: Comment?): Task<Void>{
-        return repository.removeSubCommentFromReactsListInCommentDocument(postPublisherId, commentId, comment)
+    fun removeSubCommentFromReactsListInCommentDocument(commenterId: String,commentId: String, comment: Comment?): Task<Void>{
+        return repository.removeSubCommentFromReactsListInCommentDocument(commenterId, commentId, comment)
     }
 
     fun getPostById(publisherId: String, postId: String): Task<DocumentSnapshot>{
@@ -91,19 +86,19 @@ class PostViewModel(private val repository: PostsRepository): ViewModel() {
     }
 
     fun updateComment(comment: Comment, postId: String, postPublisherId: String): Task<Void>{
-        return repository.updateComment(comment, postId, postPublisherId)
+        return repository.updatePostComment(comment, postId, postPublisherId)
     }
 
     fun addReactToDB(react: React, postId: String, postPublisherId: String): Task<Void>{
         return repository.addReactToDB(react, postId, postPublisherId)
     }
 
-    fun deleteReact(react: React, postId: String, postPublisherId: String): Task<Void>{
-        return repository.deleteReact(react, postId, postPublisherId)
+    fun deleteReactFromPost(react: React, postId: String, postPublisherId: String): Task<Void>{
+        return repository.deleteReactFromPost(react, postId, postPublisherId)
     }
 
-    fun createShare(share: Share, postId: String, postPublisherId: String): Task<Void>{
-        return repository.createShare(share, postId, postPublisherId)
+    fun addShareToPost(share: Share, postId: String, postPublisherId: String): Task<Void>{
+        return repository.addShareToPost(share, postId, postPublisherId)
     }
 
     fun uploadPostImageToCloudStorage(bitmap: Bitmap): UploadTask{

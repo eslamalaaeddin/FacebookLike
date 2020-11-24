@@ -34,10 +34,13 @@ class FirebaseService : FirebaseMessagingService() {
         val postId = message.data["postId"]
         val commentPosition = message.data["commentPosition"]?.toInt()
 
+        Log.i(TAG, "FAWZY onMessageReceived: $message")
+        Log.i(TAG, "FAWZY onMessageReceived: ${message.data}")
         Log.i(TAG, "FAWZY onMessageReceived: $notificationType")
         Log.i(TAG, "FAWZY onMessageReceived: $notifierName")
         Log.i(TAG, "FAWZY onMessageReceived: $notifierId")
         Log.i(TAG, "FAWZY onMessageReceived: $notifierImageUrl")
+
 
         createNotification(notificationType,
             notifierName,

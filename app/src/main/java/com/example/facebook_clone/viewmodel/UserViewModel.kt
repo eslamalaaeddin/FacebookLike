@@ -1,6 +1,5 @@
 package com.example.facebook_clone.viewmodel
 
-import android.app.Notification
 import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -13,27 +12,27 @@ import com.google.firebase.storage.UploadTask
 class UserViewModel(private val usersRepository: UsersRepository) : ViewModel() {
 
     fun getMe(userId: String): LiveData<User>? {
-        return usersRepository.getUser(userId)
+        return usersRepository.getUserLiveData(userId)
     }
 
     fun getAnotherUser(userId: String): LiveData<User>? {
-        return usersRepository.getUser(userId)
+        return usersRepository.getUserLiveData(userId)
     }
 
     fun uploadProfileImageToCloudStorage(bitmap: Bitmap): UploadTask {
-        return usersRepository.uploadImageToCloudStorage(bitmap,"profile")
+        return usersRepository.addImageToCloudStorage(bitmap,"profile")
     }
 
     fun uploadProfileImageToUserCollection(photoUrl: String): Task<Void> {
-        return usersRepository.uploadProfileImageToUserCollection(photoUrl)
+        return usersRepository.addProfileImageToUserCollection(photoUrl)
     }
 
     fun uploadCoverImageToCloudStorage(bitmap: Bitmap): UploadTask {
-        return usersRepository.uploadImageToCloudStorage(bitmap,"cover")
+        return usersRepository.addImageToCloudStorage(bitmap,"cover")
     }
 
     fun uploadCoverImageToUserCollection(photoUrl: String): Task<Void> {
-        return usersRepository.uploadCoverImageToUserCollection(photoUrl)
+        return usersRepository.addCoverImageToUserCollection(photoUrl)
     }
 
     fun addFriendRequestToMyDocument(friendRequest: FriendRequest): Task<Void> {
@@ -45,11 +44,11 @@ class UserViewModel(private val usersRepository: UsersRepository) : ViewModel() 
     }
 
     fun removeFriendRequestFromMyDocument(friendRequest: FriendRequest): Task<Void> {
-        return usersRepository.removeFriendRequestFromMyDocument(friendRequest)
+        return usersRepository.deleteFriendRequestFromMyDocument(friendRequest)
     }
 
     fun removeFriendRequestFromHisDocument(friendRequest: FriendRequest): Task<Void> {
-        return usersRepository.removeFriendRequestFromHisDocument(friendRequest)
+        return usersRepository.deleteFriendRequestFromHisDocument(friendRequest)
     }
 
 

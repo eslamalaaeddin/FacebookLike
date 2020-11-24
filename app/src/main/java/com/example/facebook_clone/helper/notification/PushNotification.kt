@@ -5,5 +5,5 @@ import com.example.facebook_clone.model.notification.Notification
 
 data class PushNotification(
     val data: Notification,
-    val to: String
+    var to: String? = null
 )

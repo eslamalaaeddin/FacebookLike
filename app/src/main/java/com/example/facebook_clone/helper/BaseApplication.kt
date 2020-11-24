@@ -66,7 +66,9 @@ class BaseApplication : Application() {
                     postCreatorViewModelModule,
                     searchActivityViewModelModule,
                     othersProfileActivityViewModelModule,
-                    notificationsFragmentViewModelModule
+                    notificationsFragmentViewModelModule,
+                    newsFeedActivityViewModelModule,
+                    recentUsersActivityViewModelModule
                 )
             )
         }

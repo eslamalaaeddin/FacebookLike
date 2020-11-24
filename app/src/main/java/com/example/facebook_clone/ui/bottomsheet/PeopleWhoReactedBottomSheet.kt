@@ -69,6 +69,7 @@ class PeopleWhoReactedBottomSheet(
             }
         }
         else if (reactedOn == "comment"){
+            //Have to be commenterId
             postViewModel.getCommentById(postPublisherId, commentId = commentId.toString()).addOnCompleteListener { task ->
                 if (task.isSuccessful){
                     val comment = task.result?.toObject(ReactionsAndSubComments::class.java)

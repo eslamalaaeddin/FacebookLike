@@ -16,28 +16,35 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
-                android:gravity="center"
                 android:orientation="horizontal"
-                android:padding="8dp">
+                android:padding="4dp">
 
-                <TextView
+                <FrameLayout
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:gravity="center|start"
-                    android:text="Facebook"
-                    android:padding="8dp"
-                    android:textColor="@color/medium_blue"
-                    android:textSize="32sp" />
+                    android:layout_height="match_parent">
+                    <ImageView
+                        android:layout_width="180dp"
+                        android:layout_gravity="start"
+                        android:layout_height="match_parent"
+                        android:gravity="start"
+                        android:src="@drawable/facebook_logo"
+                        android:scaleType="centerCrop"
+                        />
+
+                </FrameLayout>
+
+
 
                 <ImageView
                     android:id="@+id/searchIconImageView"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center|end"
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginTop="4dp"
-                    android:scaleType="centerCrop"
+                    android:scaleType="centerInside"
                     android:src="@drawable/ic_search" />
 
             </LinearLayout>

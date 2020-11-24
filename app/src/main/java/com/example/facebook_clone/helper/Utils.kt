@@ -3,11 +3,13 @@ package com.example.facebook_clone.helper
 import android.app.ProgressDialog
 import android.content.Context
 import android.widget.Toast
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 
 object Utils {
 
     const val USERS_COLLECTION = "users"
+    const val RECENT_USERS_COLLECTION = "recentUsers"
     const val GROUPS_COLLECTION = "groups"
     const val PAGES_COLLECTION = "pages"
     const val POSTS_COLLECTION = "posts"
@@ -31,6 +33,14 @@ object Utils {
         return progressDialog
     }
 
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    //Void Task version
+    fun doAfterFinishing(context: Context, task: Task<Void>, successMessage: String){
+        if (task.isSuccessful){
+            toastMessage(context, successMessage)
+        }
+        else{
+            toastMessage(context, task.exception?.message.toString())
+        }
+    }
 
 }

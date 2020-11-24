@@ -39,8 +39,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.comment_item_layout.view.*
-import kotlinx.android.synthetic.main.comments_bottom_sheet.*
 import kotlinx.android.synthetic.main.long_clicked_reacts_button.*
 import kotlinx.android.synthetic.main.reply_on_comment_bottom_sheet_layout.*
 import kotlinx.android.synthetic.main.reply_on_comment_bottom_sheet_layout.addAttachmentToComment
@@ -383,7 +381,7 @@ class ReplyOnCommentBottomSheet(
             var currentReact: React? = null
             var reacted: Boolean = false
 
-            postViewModel.getCommentById(postPublisherId, comment.id.toString())
+            postViewModel.getCommentById(comment.commenterId.toString(), comment.id.toString())
                 .addOnCompleteListener {
                     val commentDoc =
                         it.result?.toObject(ReactionsAndSubComments::class.java)
@@ -425,7 +423,7 @@ class ReplyOnCommentBottomSheet(
             var currentReact: React? = null
             var reacted: Boolean = false
 
-            postViewModel.getCommentById(postPublisherId, comment.id.toString())
+            postViewModel.getCommentById(comment.commenterId.toString(), comment.id.toString())
                 .addOnCompleteListener {
                     val commentDoc =
                         it.result?.toObject(ReactionsAndSubComments::class.java)
@@ -466,9 +464,10 @@ class ReplyOnCommentBottomSheet(
         replyOnCommentTextView.setOnClickListener {  commentEditText.requestFocus() }
     }
 
+
     private fun updateCommentsUI() {
-            val commentLiveData = postViewModel.getCommentLiveDataById(postPublisherId, comment.id.toString())
-            commentLiveData.observe(viewLifecycleOwner, {reactionsAndComments ->
+            val commentLiveData = postViewModel.getCommentLiveDataById(comment.commenterId.toString(), comment.id.toString())
+            commentLiveData.observe(viewLifecycleOwner, { reactionsAndComments ->
                 //REACTIONS
                 reactionsAndComments?.reactions?.let { reacts ->
                     if (reacts.isNotEmpty()) {
@@ -556,8 +555,7 @@ class ReplyOnCommentBottomSheet(
 //                                    )
 //                                )
                                 break
-                            }
-                            else {
+                            } else {
                                 //Visible to me
                                 myReactPlaceHolder.visibility = View.INVISIBLE
                                 //itemView.likeReactPlaceHolder.visibility = View.GONE
@@ -636,7 +634,7 @@ class ReplyOnCommentBottomSheet(
                             }
 
                         }
-                    }else{
+                    } else {
                         myReactPlaceHolder.visibility = View.INVISIBLE
                         reactsCountTextView.visibility = View.INVISIBLE
 
@@ -644,25 +642,29 @@ class ReplyOnCommentBottomSheet(
                         reactOnCommentTextView.setTextColor(
                             activity?.resources?.getColor(
                                 R.color.gray
-                            )!!)
+                            )!!
+                        )
                     }
 
                 }
 
                 //SUBCOMMENTS
-                if (reactionsAndComments.subComments != null){
-                    commentsAdapter =CommentsAdapter(
+                Log.i(TAG, "ISLAM updateCommentsUI: ${reactionsAndComments}")
+                reactionsAndComments?.let {
+//                    if (it.subComments != null){
+                    commentsAdapter = CommentsAdapter(
                         auth.currentUser?.uid.toString(),
-                        reactionsAndComments.subComments!!,
+                        reactionsAndComments.subComments.orEmpty(),
                         null,
                         this,
                         this,
                         postViewModel,
                         postPublisherId
                     )
-
                     subCommentsRecyclerView.adapter = commentsAdapter
+//                    }
                 }
+
             })
 
 
@@ -703,6 +705,7 @@ class ReplyOnCommentBottomSheet(
         val longClickedCommentBottomSheet =
             LongClickedCommentBottomSheet(comment, postId, postPublisherId, "subComment")
         longClickedCommentBottomSheet.show(activity?.supportFragmentManager!!, "signature")
+
     }
 
     override fun onReactOnCommentClicked(

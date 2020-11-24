@@ -18,11 +18,11 @@ class OthersProfileActivityViewModel(private val usersRepository: UsersRepositor
     }
 
     fun removeFriendRequestFromMyDocument(friendRequest: FriendRequest): Task<Void> {
-        return usersRepository.removeFriendRequestFromMyDocument(friendRequest)
+        return usersRepository.deleteFriendRequestFromMyDocument(friendRequest)
     }
 
     fun removeFriendRequestFromHisDocument(friendRequest: FriendRequest): Task<Void> {
-        return usersRepository.removeFriendRequestFromHisDocument(friendRequest)
+        return usersRepository.deleteFriendRequestFromHisDocument(friendRequest)
     }
 
     fun addNotificationToNotificationsCollection(notification: Notification, notifiedId: String): Task<Void>{
@@ -38,7 +38,7 @@ class OthersProfileActivityViewModel(private val usersRepository: UsersRepositor
     }
 
     fun createFriendshipBetweenMeAndHim(meAsFriend: Friend, himAsFriend: Friend): Task<Void>{
-        return usersRepository.createFriendshipBetweenMeAndHim(meAsFriend, himAsFriend)
+        return usersRepository.addHimToMyFriendsAndMeToHisFriends(meAsFriend, himAsFriend)
     }
 
 

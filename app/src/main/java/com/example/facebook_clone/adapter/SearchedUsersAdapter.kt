@@ -32,7 +32,8 @@ class SearchedUsersAdapter(private var users: List<User>, private val searchedIt
         }
 
         override fun onClick(item: View?) {
-           searchedListener.onSearchedUserClicked( users[adapterPosition].id.toString())
+            val searchUser = users[adapterPosition]
+           searchedListener.onSearchedUserClicked( searchUser)
         }
 
         override fun onLongClick(item: View?): Boolean {

@@ -1,18 +1,19 @@
 package com.example.facebook_clone.ui.fragment.signin
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.facebook_clone.R
 import com.example.facebook_clone.helper.Utils
+import com.example.facebook_clone.ui.activity.NewsFeedActivity
 import com.example.facebook_clone.ui.activity.RegisteringActivity
 import com.example.facebook_clone.viewmodel.LoginFragmentViewModel
 import kotlinx.android.synthetic.main.fragment_login.*
 import org.koin.android.ext.android.inject
 
 class LoginFragment : Fragment(R.layout.fragment_login) {
-
     private val loginFragmentViewModel by inject<LoginFragmentViewModel>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -21,6 +22,9 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         loginButton.setOnClickListener {
             val mailOrPhone = phoneOrEmailTextInputInLoginFragment.editText?.text.toString()
             val password = passwordTextInputInLoginFragment.editText?.text.toString()
+            /*
+                SAVE MAIL, PASSWORD, NAME, AND IMAGE URL --> FOR RECENT USERS
+             */
 
             validateUserInputAndNavigateToNewsFeed(mailOrPhone, password)
         }
@@ -46,10 +50,11 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         activity?.finish()
     }
 
-    private fun navigateToNewsFeedActivity(){
-        val action = LoginFragmentDirections.actionLoginFragmentToNewsFeedActivity()
-        findNavController().navigate(action)
-        activity?.finish()
+    private fun navigateToNewsFeedActivity(email: String, password: String){
+        val intent = Intent(requireContext(), NewsFeedActivity::class.java)
+        intent.putExtra("email", email)
+        intent.putExtra("password", password)
+        startActivity(intent)
     }
 
     private fun validateUserInputAndNavigateToNewsFeed(mailOrPhone :String, password : String){
@@ -71,7 +76,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     private fun signInAndNavigate(mailOrPhone: String, password: String){
         loginFragmentViewModel.signIn(mailOrPhone, password).addOnCompleteListener {task ->
             if (task.isSuccessful){
-                navigateToNewsFeedActivity()
+                navigateToNewsFeedActivity(mailOrPhone, password)
             }else{
                 Utils.toastMessage(requireContext(), task.exception?.message.toString())
             }

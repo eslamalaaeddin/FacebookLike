@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.facebook_clone.R
 import com.example.facebook_clone.helper.Utils
+import com.example.facebook_clone.model.user.recentloggedinuser.RecentLoggedInUser
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.ui.activity.ProfilePictureActivity
 import com.example.facebook_clone.viewmodel.PasswordFragmentViewModel
@@ -38,6 +39,10 @@ class NewPasswordFragment : Fragment(R.layout.fragment_password) {
     private lateinit var gender: String
     private lateinit var email: String
     private lateinit var phone: String
+    private lateinit var password: String
+
+    private lateinit var userName: String
+    private lateinit var userImageUrl: String
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -52,7 +57,7 @@ class NewPasswordFragment : Fragment(R.layout.fragment_password) {
         phone = args.phone
 
         nextButtonInPasswordFragment.setOnClickListener {
-            val password = passwordTextInputInPasswordFragment.editText?.text.toString()
+             password = passwordTextInputInPasswordFragment.editText?.text.toString()
             validateUserInputAndCreateAccount(password)
         }
 
@@ -93,23 +98,39 @@ class NewPasswordFragment : Fragment(R.layout.fragment_password) {
         } else {
             passwordTextInputInPasswordFragment.error = null
             progressDialog = Utils.showProgressDialog(requireContext(), "Please wait...")
-            passFragViewModel.createAccountWithMailAndPassword(email, password)
+            passFragViewModel.createAccountWithMailAndPassword(args.email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         getUserToken().addOnSuccessListener {
-                                userToken = it.token
+                            userToken = it.token
                             val user = createUser()
-                            passFragViewModel.uploadUserDataToDB(user).addOnCompleteListener { task ->
-                                if (task.isSuccessful) {
-                                    progressDialog?.dismiss()
-                                    navigateToProfilePictureActivity()
-                                } else {
-                                    Utils.toastMessage(
-                                        requireContext(),
-                                        task.exception?.message.toString()
-                                    )
+                            passFragViewModel.uploadUserDataToDB(user)
+                                .addOnCompleteListener { task ->
+                                    if (task.isSuccessful) {
+                                        progressDialog?.dismiss()
+                                        //Create recent users collection
+                                         userName = user.name.orEmpty()
+                                         userImageUrl = user.profileImageUrl.orEmpty()
+                                        val currentUser = RecentLoggedInUser(
+                                            email,
+                                            password,
+                                            userName,
+                                            userImageUrl
+                                        )
+                                        passFragViewModel.createRecentUsersCollection(
+                                            userToken.toString(),
+                                            currentUser
+                                        ).addOnCompleteListener {
+                                            navigateToProfilePictureActivity()
+                                        }
+
+                                    } else {
+                                        Utils.toastMessage(
+                                            requireContext(),
+                                            task.exception?.message.toString()
+                                        )
+                                    }
                                 }
-                            }
                         }
 
                     } else {
@@ -123,6 +144,11 @@ class NewPasswordFragment : Fragment(R.layout.fragment_password) {
     private fun navigateToProfilePictureActivity() {
         val intent = Intent(requireContext(), ProfilePictureActivity::class.java)
         intent.putExtra("gender", gender)
+        intent.putExtra("name", userName)
+        intent.putExtra("imageUrl", userImageUrl)
+        intent.putExtra("email", email)
+        intent.putExtra("password", password)
+        intent.putExtra("token", userToken)
         startActivity(intent)
         activity?.finish()
     }
@@ -136,6 +162,7 @@ class NewPasswordFragment : Fragment(R.layout.fragment_password) {
             token = userToken
         )
     }
+
     private fun getUserToken(): Task<InstanceIdResult> {
         return FirebaseInstanceId.getInstance().instanceId
     }

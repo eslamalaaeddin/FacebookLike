@@ -34,7 +34,7 @@ val firebaseStorageModule = module {
 //////////////////////////////////////////////////VIEW MODELS///////////////////////////////////////
 val passFragViewModelModule = module { viewModel { PasswordFragmentViewModel(get(),get()) }}
 
-val loginFragViewModelModule = module {viewModel { LoginFragmentViewModel(get()) } }
+val loginFragViewModelModule = module {viewModel { LoginFragmentViewModel(get(), get()) } }
 
 val forgetPasswordFragViewModelModule = module { viewModel { ForgetPasswordFragmentViewModel(get()) } }
 
@@ -49,6 +49,9 @@ val searchActivityViewModelModule = module { viewModel { SearchActivityViewModel
 val othersProfileActivityViewModelModule = module { viewModel { OthersProfileActivityViewModel(get()) } }
 
 val notificationsFragmentViewModelModule = module { viewModel { NotificationsFragmentViewModel(get()) } }
+
+val newsFeedActivityViewModelModule = module { viewModel { NewsFeedActivityViewModel(get()) } }
+val recentUsersActivityViewModelModule = module { viewModel { RecentUsersActivityViewModel(get()) } }
 
 /////////////////////////////////////////////////REPOSITORIES///////////////////////////////////////
 

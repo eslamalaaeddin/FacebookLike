@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -16,7 +15,6 @@ import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.comment.ReactionsAndSubComments
 import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.viewmodel.PostViewModel
-import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.comment_item_layout.view.*
 import kotlinx.android.synthetic.main.comment_item_layout.view.reactsCountTextView
@@ -24,7 +22,7 @@ import kotlinx.android.synthetic.main.comment_item_layout.view.reactsCountTextVi
 private const val TAG = "CommentsAdapter"
 
 class CommentsAdapter(
-    private val commenterId: String,
+    private val interactorId: String,
     private var comments: List<Comment>,
     private var reacts: List<React>?,
     private val commentClickListener: CommentClickListener,
@@ -53,12 +51,12 @@ class CommentsAdapter(
                 var currentReact: React? = null
                 var reacted: Boolean = false
 
-                postViewModel.getCommentById(postPublisherId, comment.id.toString())
+                postViewModel.getCommentById(comment.commenterId.toString(), comment.id.toString())
                     .addOnCompleteListener {
                         val commentDoc = it.result?.toObject(ReactionsAndSubComments::class.java)
                         commentDoc?.reactions?.let { reacts ->
                             for (react in reacts) {
-                                if (react.reactorId == commenterId) {
+                                if (react.reactorId == interactorId) {
                                     currentReact = react
                                     reacted = true
                                     break
@@ -80,12 +78,12 @@ class CommentsAdapter(
                 var currentReact: React? = null
                 var reacted: Boolean = false
 
-                postViewModel.getCommentById(postPublisherId, comment.id.toString())
+                postViewModel.getCommentById(comment.commenterId.toString(), comment.id.toString())
                     .addOnCompleteListener {
                         val commentDoc = it.result?.toObject(ReactionsAndSubComments::class.java)
                         commentDoc?.reactions?.let { reacts ->
                             for (react in reacts) {
-                                if (react.reactorId == commenterId) {
+                                if (react.reactorId == interactorId) {
                                     currentReact = react
                                     reacted = true
                                     break
@@ -108,13 +106,13 @@ class CommentsAdapter(
                 var reacted: Boolean = false
 
                 //I HAVE TO GET COMMENT DOCUMENT
-                postViewModel.getCommentById(postPublisherId, comment.id.toString())
+                postViewModel.getCommentById(comment.commenterId.toString(), comment.id.toString())
                     .addOnCompleteListener {
                         val commentDoc =
                             it.result?.toObject(ReactionsAndSubComments::class.java)
                         commentDoc?.reactions?.let { reacts ->
                             for (react in reacts) {
-                                if (react.reactorId == commenterId) {
+                                if (react.reactorId == interactorId) {
                                     currentReact = react
                                     reacted = true
                                     break
@@ -136,13 +134,13 @@ class CommentsAdapter(
                 var reacted: Boolean = false
 
                 //I HAVE TO GET COMMENT DOCUMENT
-                postViewModel.getCommentById(postPublisherId, comment.id.toString())
+                postViewModel.getCommentById(comment.commenterId.toString(), comment.id.toString())
                     .addOnCompleteListener {
                         val commentDoc =
                             it.result?.toObject(ReactionsAndSubComments::class.java)
                         commentDoc?.reactions?.let { reacts ->
                             for (react in reacts) {
-                                if (react.reactorId == commenterId) {
+                                if (react.reactorId == interactorId) {
                                     currentReact = react
                                     reacted = true
                                     break
@@ -217,7 +215,7 @@ class CommentsAdapter(
                 itemView.mediaCommentCardView.visibility = View.GONE
             }
 
-            postViewModel.getCommentById(postPublisherId, comment.id.toString())
+            postViewModel.getCommentById(comment.commenterId.toString(), comment.id.toString())
                 .addOnCompleteListener {
                     val commentDoc = it.result?.toObject(ReactionsAndSubComments::class.java)
                     //Comments
@@ -234,7 +232,7 @@ class CommentsAdapter(
                             itemView.reactsCountTextView.text = reacts.size.toString()
                         }
                         for (react in reacts) {
-                            if (react.reactorId == commenterId) {
+                            if (react.reactorId == interactorId) {
                                 itemView.myReactPlaceHolder.visibility = View.VISIBLE
 //                                itemView.likeReactPlaceHolder.visibility = View.GONE
 //                                itemView.loveReactPlaceHolder.visibility = View.GONE
@@ -396,9 +394,7 @@ class CommentsAdapter(
 
         override fun onLongClick(p0: View?): Boolean {
             val comment = comments[adapterPosition]
-            //commenter id == interactor id
-            Log.i(TAG, "UUUU onLongClick: $comment")
-            if (commenterId == comment.commenterId) {
+            if (interactorId == comment.commenterId || interactorId == postPublisherId) {
                 cClickListener.onCommentLongClicked(comment)
             }
                 return true

@@ -9,18 +9,18 @@ import com.google.firebase.storage.UploadTask
 class ProfilePictureActivityViewModel(private val usersRepository: UsersRepository) : ViewModel() {
 
     fun uploadProfileImageToCloudStorage(bitmap: Bitmap): UploadTask {
-        return usersRepository.uploadImageToCloudStorage(bitmap,"profile")
+        return usersRepository.addImageToCloudStorage(bitmap,"profile")
     }
 
     fun uploadCoverImageToCloudStorage(bitmap: Bitmap): UploadTask {
-        return usersRepository.uploadCoverImageToCloudStorage(bitmap)
+        return usersRepository.addCoverImageToCloudStorage(bitmap)
     }
 
     fun uploadProfileImageToUserCollection(photoUrl: String): Task<Void> {
-        return usersRepository.uploadProfileImageToUserCollection(photoUrl)
+        return usersRepository.addProfileImageToUserCollection(photoUrl)
     }
 
     fun uploadCoverImageToUserCollection(photoUrl: String): Task<Void> {
-        return usersRepository.uploadCoverImageToUserCollection(photoUrl)
+        return usersRepository.addCoverImageToUserCollection(photoUrl)
     }
 }

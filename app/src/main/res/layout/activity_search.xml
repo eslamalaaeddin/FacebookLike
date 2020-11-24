@@ -54,9 +54,9 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_height="196dp"
-        android:background="@color/dark_blue"
-        android:id="@+id/recentSearchRecyclerView"/>
+        android:layout_height="wrap_content"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:id="@+id/usersRecentSearchRecyclerView"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"

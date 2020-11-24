@@ -83,7 +83,8 @@ class NotificationsHandler(
             //userIAmViewing.token.toString()
             val pushNotification = PushNotification(
                 data = notification,
-                to = notifiedToken.toString()
+//                to = notifiedToken
+                to = "ff9jw4VpQB6UGgmw8pb7yv:APA91bF9nQk-5BcheHo_kPwPkLDHw9kZ1_4TuSZ4wOV9bHKW9GJMM1ZBh5bBFZiIBUeegM9zg6mx9ngUnBXJhITv4mjAsYkQNl9gr7GyU7QoxeHGWOy1Jd8uwBWe5LD5VSzj4G-mjxNz"
             )
             val response = RetrofitInstance.api.postNotification(pushNotification)
             if(response.isSuccessful) {

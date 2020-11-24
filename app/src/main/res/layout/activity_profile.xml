@@ -132,7 +132,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
-        android:text="19 mutual"
+        tools:text="19 "
         app:layout_constraintStart_toStartOf="@+id/textView3"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
@@ -222,7 +222,6 @@
         android:layout_height="56dp"
         android:layout_marginTop="8dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_user_picture"
         app:civ_border_overlay="true"
         app:layout_constraintEnd_toEndOf="@+id/textView7"
         app:layout_constraintStart_toStartOf="@+id/textView7"
