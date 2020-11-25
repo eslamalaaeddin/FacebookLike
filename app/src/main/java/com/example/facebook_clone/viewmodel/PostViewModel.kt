@@ -11,6 +11,7 @@ import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.model.post.share.Share
 import com.example.facebook_clone.repository.PostsRepository
 import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.storage.UploadTask
 
@@ -38,6 +39,10 @@ class PostViewModel(private val repository: PostsRepository): ViewModel() {
 
     fun getCommentLiveDataById(commenterId: String, commentId: String):LiveData<ReactionsAndSubComments>{
         return repository.getCommentLiveDataById(commenterId, commentId)
+    }
+
+    fun getCommentUpdates(commenterId: String, commentId: String): DocumentReference?{
+        return repository.getCommentUpdates(commenterId, commentId)
     }
 
     fun addSubCommentToCommentById(commenterId: String, commentId: String, comment: Comment): Task<Void>{

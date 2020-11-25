@@ -72,34 +72,6 @@ class CommentsAdapter(
                         )
                     }
             }
-
-            itemView.viewPreviousComments.setOnClickListener {
-                val comment = comments[adapterPosition]
-                var currentReact: React? = null
-                var reacted: Boolean = false
-
-                postViewModel.getCommentById(comment.commenterId.toString(), comment.id.toString())
-                    .addOnCompleteListener {
-                        val commentDoc = it.result?.toObject(ReactionsAndSubComments::class.java)
-                        commentDoc?.reactions?.let { reacts ->
-                            for (react in reacts) {
-                                if (react.reactorId == interactorId) {
-                                    currentReact = react
-                                    reacted = true
-                                    break
-                                }
-                            }
-                        }
-
-                        cClickListener.onReplyToCommentClicked(
-                            comment,
-                            adapterPosition,
-                            reacted,
-                            currentReact
-                        )
-                    }
-            }
-
             itemView.reactOnCommentTextView.setOnClickListener {
                 val comment = comments[adapterPosition]
                 var currentReact: React? = null
@@ -127,7 +99,6 @@ class CommentsAdapter(
                         )
                     }
             }
-
             itemView.reactOnCommentTextView.setOnLongClickListener {
                 val comment = comments[adapterPosition]
                 var currentReact: React? = null
@@ -157,16 +128,41 @@ class CommentsAdapter(
                 true
             }
 
+
             itemView.mediaCommentCardView.setOnClickListener {
                 val comment = comments[adapterPosition]
                 cClickListener.onMediaCommentClicked(comment.attachmentCommentUrl.toString())
             }
-
             itemView.whoReactedOnCommentLayout.setOnClickListener {
                 val commentId = comments[adapterPosition].id.toString()
                 cClickListener.onCommentReactionsLayoutClicked(commentId)
             }
+            itemView.viewPreviousComments.setOnClickListener {
+                val comment = comments[adapterPosition]
+                var currentReact: React? = null
+                var reacted: Boolean = false
 
+                postViewModel.getCommentById(comment.commenterId.toString(), comment.id.toString())
+                    .addOnCompleteListener {
+                        val commentDoc = it.result?.toObject(ReactionsAndSubComments::class.java)
+                        commentDoc?.reactions?.let { reacts ->
+                            for (react in reacts) {
+                                if (react.reactorId == interactorId) {
+                                    currentReact = react
+                                    reacted = true
+                                    break
+                                }
+                            }
+                        }
+
+                        cClickListener.onReplyToCommentClicked(
+                            comment,
+                            adapterPosition,
+                            reacted,
+                            currentReact
+                        )
+                    }
+            }
 
         }
 
@@ -219,13 +215,13 @@ class CommentsAdapter(
                 .addOnCompleteListener {
                     val commentDoc = it.result?.toObject(ReactionsAndSubComments::class.java)
                     //Comments
-//                    if (commentDoc?.subComments != null){
-//                        if (commentDoc.subComments!!.isNotEmpty()){
-//                            itemView.viewPreviousComments.visibility = View.VISIBLE
-//                        }else{
-//                            itemView.viewPreviousComments.visibility = View.GONE
-//                        }
-//                    }
+                    if (commentDoc?.subComments != null){
+                        if (commentDoc.subComments!!.isNotEmpty()){
+                            itemView.viewPreviousComments.visibility = View.VISIBLE
+                        }else{
+                            itemView.viewPreviousComments.visibility = View.GONE
+                        }
+                    }
                     //Reacts
                     commentDoc?.reactions?.let { reacts ->
                         if (reacts.isNotEmpty()) {

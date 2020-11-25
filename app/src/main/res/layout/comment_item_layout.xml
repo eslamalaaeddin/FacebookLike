@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:background="@drawable/round_background"
-        android:backgroundTint="#F3F3F3"
+        android:backgroundTint="#C8F4F4F4"
         android:orientation="vertical"
         android:padding="8dp"
         app:layout_constraintBottom_toTopOf="@+id/commentCreationTimeTextView"

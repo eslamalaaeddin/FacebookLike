@@ -133,6 +133,15 @@ class BaseApplication : Application() {
                     destination = PostViewerActivity::class.java
                 }
 
+                "commentOnComment" -> {
+                    remoteView.setTextViewText(
+                        R.id.notificationContentTextView,
+                        "${notifier.name} replied to your Comment"
+                    )
+                    //temp
+                    destination = PostViewerActivity::class.java
+                }
+
 
                 "reactOnPost" -> {
                     remoteView.setTextViewText(

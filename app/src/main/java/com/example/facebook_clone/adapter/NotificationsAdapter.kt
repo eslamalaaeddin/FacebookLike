@@ -98,6 +98,12 @@ class NotificationsAdapter(private var notifications: List<Notification>,
                     itemView.notificationVisualDescription.setImageResource(R.drawable.ic_notification_comment)
                 }
 
+                if (notification.notificationType == "commentOnComment"){
+                    itemView.notifierName.text = notification.notifierName
+                    itemView.notificationDescription.text = "replied to your comment"
+                    itemView.notificationVisualDescription.setImageResource(R.drawable.ic_notification_comment)
+                }
+
                 if (notification.notificationType == "share"){
                     itemView.notifierName.text = notification.notifierName
                     itemView.notificationDescription.text = "shared your post"
@@ -130,6 +136,11 @@ class NotificationsAdapter(private var notifications: List<Notification>,
                     postId = postId
                 )
                 "commentOnPost" -> notListener.onClickCommentOnPostNotification(
+                    postPublisherId = notifiedId,
+                    postId = postId,
+                    commentPosition = commentPosition!!
+                )
+                "commentOnComment" -> notListener.onClickCommentOnPostNotification(
                     postPublisherId = notifiedId,
                     postId = postId,
                     commentPosition = commentPosition!!

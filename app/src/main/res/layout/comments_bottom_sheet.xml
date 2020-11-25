@@ -130,7 +130,7 @@
         <ImageView
             android:id="@+id/sendCommentImageView"
             android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_height="match_parent"
             android:layout_margin="4dp"
             android:src="@drawable/ic_comment_send"
              />
@@ -138,6 +138,45 @@
     </LinearLayout>
 
 </LinearLayout>
+
+
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/mediaCommentLayoutPrev"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/commentLayout"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="4dp"
+        android:visibility="gone"
+        android:layout_marginTop="4dp"
+        app:cardCornerRadius="16dp">
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            >
+            <ImageView
+                android:id="@+id/mediaCommentPreviewImg"
+                android:layout_width="96dp"
+                android:layout_height="120dp"
+                android:scaleType="centerCrop"
+                />
+
+            <ImageView
+                android:id="@+id/dismissMediaComment"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:scaleType="centerCrop"
+                android:layout_gravity="end"
+                android:background="@color/white"
+                app:srcCompat="@drawable/ic_cancel" />
+
+        </FrameLayout>
+
+    </androidx.cardview.widget.CardView>
 
 
 </RelativeLayout>

@@ -40,6 +40,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.comments_bottom_sheet.*
+import kotlinx.android.synthetic.main.comments_bottom_sheet.addAttachmentToComment
+import kotlinx.android.synthetic.main.comments_bottom_sheet.commentEditText
+import kotlinx.android.synthetic.main.comments_bottom_sheet.myReactPlaceHolder
+import kotlinx.android.synthetic.main.comments_bottom_sheet.sendCommentImageView
 import kotlinx.android.synthetic.main.long_clicked_reacts_button.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -107,6 +111,8 @@ class CommentsBottomSheet(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        commentEditText.requestFocus()
+
         notificationsHandler = NotificationsHandler(
             othersProfileActivityViewModel = othersProfileActivityViewModel,
             notificationsFragmentViewModel = notificationsFragmentViewModel
@@ -147,6 +153,7 @@ class CommentsBottomSheet(
                                 commentData!!.data
                             )
                         }
+                        mediaCommentPreviewImg.setImageBitmap(bitmap)
 //                    postAtachmentImageView.setImageBitmap(bitmap)
                         progressDialog =
                             Utils.showProgressDialog(requireContext(), "Please wait...")
@@ -182,6 +189,8 @@ class CommentsBottomSheet(
                                                 )
                                             if (task.isSuccessful) {
                                                 //if you are not the commenter
+                                                mediaCommentLayoutPrev.visibility = View.GONE
+                                                commentData = null
                                                 if (interactorId != postPublisherId) {
                                                     comBottomSheetListener.onAnotherUserCommented(
                                                         commentsList.size - 1,
@@ -242,6 +251,8 @@ class CommentsBottomSheet(
                                                 )
                                             if (task.isSuccessful) {
                                                 //if you are not the commenter
+                                                mediaCommentLayoutPrev.visibility = View.GONE
+                                                commentData = null
                                                 if (interactorId != postPublisherId) {
                                                     comBottomSheetListener.onAnotherUserCommented(
                                                         commentsList.size - 1,
@@ -315,6 +326,11 @@ class CommentsBottomSheet(
         addAttachmentToComment.setOnClickListener {
             val addToPostBottomSheet = AddToPostBottomSheet(this)
             addToPostBottomSheet.show(activity?.supportFragmentManager!!, addToPostBottomSheet.tag)
+        }
+
+        dismissMediaComment.setOnClickListener {
+            mediaCommentLayoutPrev.visibility = View.GONE
+            commentData = null
         }
     }
 
@@ -392,7 +408,7 @@ class CommentsBottomSheet(
 
     override fun onCommentLongClicked(comment: Comment) {
         val longClickedCommentBottomSheet =
-            LongClickedCommentBottomSheet(comment, postId, postPublisherId, "comment")
+            LongClickedCommentBottomSheet(null, comment, postId, postPublisherId, "comment")
         longClickedCommentBottomSheet.show(activity?.supportFragmentManager!!, "signature")
     }
 
@@ -455,7 +471,7 @@ class CommentsBottomSheet(
         if (!reacted) {
             val myReact = createReact(interactorId, interactorName, interactorImageUrl, 1)
             addReactOnComment(
-                postPublisherId,
+                comment.commenterId.toString(),//this comments is the super comment so :(
                 comment.id.toString(),
                 myReact
             ).addOnCompleteListener { task ->
@@ -592,7 +608,37 @@ class CommentsBottomSheet(
             commentData = data
             commentDataType = dataType
             bitmapFromCamera = fromCamera
+
+            if (commentData != null) {
+            }
+            mediaCommentLayoutPrev.visibility = View.VISIBLE
+            if (commentDataType == "image") {
+                var bitmap: Bitmap? = null
+                if (bitmapFromCamera) {
+                    bitmap = commentData?.extras?.get("data") as Bitmap
+                } else {
+                    bitmap = MediaStore.Images.Media.getBitmap(
+                        activity?.contentResolver,
+                        commentData!!.data
+                    )
+                }
+                mediaCommentPreviewImg.setImageBitmap(bitmap)
+            } else if (commentDataType == "video") {
+//                val interval: Long = 1 * 1000
+//                val options: RequestOptions = RequestOptions().frame(interval)
+//                Glide.with(requireContext())
+//                    .asBitmap().load(comment.attachmentCommentUrl).apply(options)
+//                    .into(mediaCommentPreviewImage)
+
+                Toast.makeText(requireContext(), "Video comment", Toast.LENGTH_SHORT).show()
+            }
+
+
+        } else {
+            mediaCommentLayoutPrev.visibility = View.GONE
         }
+
+
     }
 
     private fun createReact(
@@ -657,7 +703,7 @@ class CommentsBottomSheet(
                         it.notificationType = "reactOnComment"
                         it.commentPosition = commentPosition
                         it.postId = postId
-                        it.reactType = 2
+                        it.reactType = react.react
                         it.handleNotificationCreationAndFiring()
                     }
                 }
@@ -666,12 +712,6 @@ class CommentsBottomSheet(
                     .show()
             }
         }
-        Log.i(TAG, "ISLAM handleLongReactOnCommentCreationAndDeletion: $currentReact")
-        Log.i(TAG, "ISLAM handleLongReactOnCommentCreationAndDeletion: $react")
-        Log.i(TAG, "ISLAM handleLongReactOnCommentCreationAndDeletion: $commentId")
-        Log.i(TAG, "ISLAM handleLongReactOnCommentCreationAndDeletion: $commenterId")
-        Log.i(TAG, "ISLAM handleLongReactOnCommentCreationAndDeletion: $commenterId")
-        Log.i(TAG, "ISLAM handleLongReactOnCommentCreationAndDeletion: $commentPosition")
     }
 
     private fun showReactsChooserDialog(
@@ -738,14 +778,15 @@ class CommentsBottomSheet(
     }
 
     override fun reactOnCommentFromRepliesDataProvider(
-        comment: Comment,
+        superComment: Comment,
         commentPosition: Int,
         reacted: Boolean,
         currentReact: React?,
         clickType: String
     ) {
         if (clickType == "click") {
-            onReactOnCommentClickedFromReplies(comment, commentPosition, reacted, currentReact)
+            onReactOnCommentClickedFromReplies(superComment, commentPosition, reacted, currentReact)
+            Toast.makeText(requireContext(), "Click", Toast.LENGTH_SHORT).show()
         }
         else if (clickType == "longClick") {
             showReactsChooserDialog(
@@ -754,21 +795,13 @@ class CommentsBottomSheet(
                 interactorImageUrl,
                 postId,
                 postPublisherId,
-                comment.id.toString(),
-                comment.commenterId.toString(),
+                superComment.id.toString(),
+                superComment.commenterId.toString(),
                 currentReact,
                 commentPosition
             )
+            Toast.makeText(requireContext(), "LongClick", Toast.LENGTH_SHORT).show()
 
-            Log.i(TAG, "IIIII reactOnCommentFromRepliesDataProvider: $interactorId")
-            Log.i(TAG, "IIIII reactOnCommentFromRepliesDataProvider: $interactorName")
-            Log.i(TAG, "IIIII reactOnCommentFromRepliesDataProvider: $interactorImageUrl")
-            Log.i(TAG, "IIIII reactOnCommentFromRepliesDataProvider: $postId")
-            Log.i(TAG, "IIIII reactOnCommentFromRepliesDataProvider: $postPublisherId")
-            Log.i(TAG, "IIIII reactOnCommentFromRepliesDataProvider: ${comment.id.toString()}")
-            Log.i(TAG, "IIIII reactOnCommentFromRepliesDataProvider: ${comment.commenterId.toString()}")
-            Log.i(TAG, "IIIII reactOnCommentFromRepliesDataProvider: $currentReact")
-            Log.i(TAG, "IIIII reactOnCommentFromRepliesDataProvider: $commentPosition")
         }
     }
 

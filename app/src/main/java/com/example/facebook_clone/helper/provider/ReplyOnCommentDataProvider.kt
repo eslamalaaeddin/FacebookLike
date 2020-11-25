@@ -5,7 +5,7 @@ import com.example.facebook_clone.model.post.react.React
 
 interface ReplyOnCommentDataProvider {
     fun reactOnCommentFromRepliesDataProvider(
-        comment: Comment,
+        superComment: Comment,
         commentPosition: Int,
         reacted: Boolean,
         currentReact: React?,

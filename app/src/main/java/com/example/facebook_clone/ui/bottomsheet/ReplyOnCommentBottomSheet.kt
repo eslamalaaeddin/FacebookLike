@@ -7,7 +7,6 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.format.DateFormat
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -53,11 +52,11 @@ private const val TAG = "ReplyOnCommentBottomShe"
 class ReplyOnCommentBottomSheet(
     private val clicksConsumer: ReplyOnCommentDataProvider,
     private val postPublisherId: String,
-    private val comment: Comment,
+    private val superComment: Comment,
     private val commentPosition: Int,
-    private val commenterId: String,
-    private val commenterName: String,
-    private val commenterImageUrl: String,
+    private val interactorId: String,
+    private val interactorName: String,
+    private val interactorImageUrl: String,
     private val commenterToken: String,//the person whom you are replying to
     private val postId: String,
     private val reacted: Boolean,
@@ -65,8 +64,7 @@ class ReplyOnCommentBottomSheet(
 ) : BottomSheetDialogFragment(),
     CommentClickListener,
     ReactClickListener,
-    PostAttachmentListener
-{
+    PostAttachmentListener {
     private val postViewModel by viewModel<PostViewModel>()
     private val othersProfileActivityViewModel by viewModel<OthersProfileActivityViewModel>()
     private val notificationsFragmentViewModel by viewModel<NotificationsFragmentViewModel>()
@@ -115,9 +113,9 @@ class ReplyOnCommentBottomSheet(
             notificationsFragmentViewModel = notificationsFragmentViewModel
         )
 
-        notificationsHandler.notifierId = commenterId
-        notificationsHandler.notifierName = commenterName
-        notificationsHandler.notifierImageUrl = commenterImageUrl
+        notificationsHandler.notifierId = interactorId
+        notificationsHandler.notifierName = interactorName
+        notificationsHandler.notifierImageUrl = interactorImageUrl
         notificationsHandler.notifiedId = postPublisherId
         notificationsHandler.notifiedToken = commenterToken
 
@@ -130,9 +128,7 @@ class ReplyOnCommentBottomSheet(
 
             if (commentContent.isEmpty() && commentData == null) {
                 Toast.makeText(requireContext(), "Add comment first", Toast.LENGTH_SHORT).show()
-            }
-
-            else {
+            } else {
                 if (commentData != null) {
                     mediaCommentLayoutPreview.visibility = View.VISIBLE
                     if (commentDataType == "image") {
@@ -145,7 +141,7 @@ class ReplyOnCommentBottomSheet(
                                 commentData!!.data
                             )
                         }
-                      mediaCommentPreviewImage.setImageBitmap(bitmap)
+                        mediaCommentPreviewImage.setImageBitmap(bitmap)
 //                    postAtachmentImageView.setImageBitmap(bitmap)
                         progressDialog =
                             Utils.showProgressDialog(requireContext(), "Please wait...")
@@ -157,20 +153,25 @@ class ReplyOnCommentBottomSheet(
 
                                         val textComment = commentEditText.text.toString()
                                         val comment = if (textComment.isEmpty()) {
-                                            createComment(commentAttachmentUrl!!, null, "image",superCommentId = this.comment.id.toString())
+                                            createComment(
+                                                commentAttachmentUrl!!,
+                                                null,
+                                                "image",
+                                                superCommentId = this.superComment.id.toString()
+                                            )
                                         } else {
                                             createComment(
                                                 commentAttachmentUrl!!,
                                                 commentContent,
                                                 "textWithImage",
-                                                superCommentId = this.comment.id.toString()
+                                                superCommentId = this.superComment.id.toString()
                                             )
                                         }
 //                                        change 1
 
                                         postViewModel.addSubCommentToCommentById(
-                                            this.comment.commenterId.toString(),
-                                            this.comment.id.toString(),
+                                            this.superComment.commenterId.toString(),
+                                            this.superComment.id.toString(),
                                             comment
                                         ).addOnCompleteListener { task ->
                                             commentEditText.text.clear()
@@ -183,12 +184,22 @@ class ReplyOnCommentBottomSheet(
                                             if (task.isSuccessful) {
                                                 //if you are not the commenter
                                                 mediaCommentLayoutPreview.visibility = View.GONE
-                                                if (commenterId != postPublisherId) {
+                                                commentData = null
+                                                // TODO: 11/24/2020  
+                                                if (this.superComment.commenterId.toString() != interactorId) {
 //                                                    comBottomSheetListener.onAnotherUserCommented(
 //                                                        commentsList.size - 1,
 //                                                        comment.id!!,
 //                                                        postId
-//                                                    )
+////                                                    )
+
+                                                    notificationsHandler.also {
+                                                        it.notificationType = "commentOnComment"
+                                                        it.postId = postId
+                                                        it.commentPosition = commentPosition
+                                                        it.handleNotificationCreationAndFiring()
+                                                    }
+
                                                     Toast.makeText(
                                                         requireContext(),
                                                         "I have to notify the user",
@@ -214,8 +225,7 @@ class ReplyOnCommentBottomSheet(
                                     }
                                 }
                             }
-                    }
-                    else if (commentDataType == "video") {
+                    } else if (commentDataType == "video") {
                         val videoUri = commentData!!.data!!
                         progressDialog =
                             Utils.showProgressDialog(requireContext(), "Please wait...")
@@ -227,19 +237,24 @@ class ReplyOnCommentBottomSheet(
 
                                         val textComment = commentEditText.text.toString()
                                         val comment = if (textComment.isEmpty()) {
-                                            createComment(commentAttachmentUrl!!, null, "video", superCommentId = this.comment.id.toString())
+                                            createComment(
+                                                commentAttachmentUrl!!,
+                                                null,
+                                                "video",
+                                                superCommentId = this.superComment.id.toString()
+                                            )
                                         } else {
                                             createComment(
                                                 commentAttachmentUrl!!,
                                                 commentContent,
                                                 "textWithVideo",
-                                                superCommentId = this.comment.id.toString()
+                                                superCommentId = this.superComment.id.toString()
                                             )
                                         }
                                         //change 2
                                         postViewModel.addSubCommentToCommentById(
-                                            this.comment.commenterId.toString(),
-                                            this.comment.id.toString(),
+                                            this.superComment.commenterId.toString(),
+                                            this.superComment.id.toString(),
                                             comment
                                         ).addOnCompleteListener { task ->
                                             commentEditText.text.clear()
@@ -252,12 +267,21 @@ class ReplyOnCommentBottomSheet(
                                             if (task.isSuccessful) {
                                                 //if you are not the commenter
                                                 mediaCommentLayoutPreview.visibility = View.GONE
-                                                if (commenterId != postPublisherId) {
+                                                commentData = null
+                                                // TODO: 11/24/2020  
+                                                if (this.superComment.commenterId.toString() != interactorId) {
 //                                                    comBottomSheetListener.onAnotherUserCommented(
 //                                                        commentsList.size - 1,
 //                                                        comment.id!!,
 //                                                        postId
 //                                                    )
+                                                    notificationsHandler.also {
+                                                        it.notificationType = "commentOnComment"
+                                                        it.postId = postId
+                                                        it.commentPosition = commentPosition
+                                                        it.handleNotificationCreationAndFiring()
+                                                    }
+
                                                     Toast.makeText(
                                                         requireContext(),
                                                         "I have to notify the user",
@@ -283,23 +307,21 @@ class ReplyOnCommentBottomSheet(
                                 }
                             }
                     }
-                }
-
-                else {
+                } else {
 //                    mediaCommentLayoutPreview.visibility = View.GONE
                     val comment =
                         createComment(
                             commentContent = commentContent,
                             commentType = "text",
                             attachmentCommentUrl = null,
-                            superCommentId = this.comment.id.toString()
+                            superCommentId = this.superComment.id.toString()
                         )
 
                     commentEditText.text.clear()
 
                     postViewModel.addSubCommentToCommentById(
-                        this.comment.commenterId.toString(),
-                        this.comment.id.toString(),
+                        this.superComment.commenterId.toString(),
+                        this.superComment.id.toString(),
                         comment
                     )
                         .addOnCompleteListener {
@@ -312,21 +334,28 @@ class ReplyOnCommentBottomSheet(
                                 )
                                 .addOnCompleteListener { task ->
                                     if (task.isSuccessful) {
+                                        // TODO: 11/24/2020  
                                         //if you are not the commenter
                                         //commenterId
                                         //NOTIFICATIONS
-                                    if (comment.commenterId != postPublisherId) {
+                                        if (this.superComment.commenterId.toString() != interactorId) {
 //                                        comBottomSheetListener.onAnotherUserCommented(
 //                                            0,//temp
 //                                            comment.id!!,
 //                                            postId
 //                                        )
-                                        Toast.makeText(
-                                            requireContext(),
-                                            "I have no notify the user who commented",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
+                                            notificationsHandler.also {
+                                                it.notificationType = "commentOnComment"
+                                                it.postId = postId
+                                                it.commentPosition = commentPosition
+                                                it.handleNotificationCreationAndFiring()
+                                            }
+                                            Toast.makeText(
+                                                requireContext(),
+                                                "I have no notify the user who commented",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
 
                                     } else {
                                         Utils.toastMessage(
@@ -345,7 +374,6 @@ class ReplyOnCommentBottomSheet(
                         }
                 }
             }
-                updateCommentsUI()
         }
 
         cancelMediaComment.setOnClickListener {
@@ -359,7 +387,7 @@ class ReplyOnCommentBottomSheet(
         }
 
         mediaCommentImageView.setOnClickListener {
-            val mediaUrl = comment.attachmentCommentUrl.toString()
+            val mediaUrl = superComment.attachmentCommentUrl.toString()
             if (mediaUrl.contains("jpeg")) {
                 val imageViewerDialog = ImageViewerDialog()
                 imageViewerDialog.show(activity?.supportFragmentManager!!, "signature")
@@ -372,8 +400,9 @@ class ReplyOnCommentBottomSheet(
         }
 
         constraintLayout.setOnLongClickListener {
-//            Toast.makeText(requireContext(), "Remove super comment", Toast.LENGTH_SHORT).show()
-//            this.onCommentLongClicked(comment,)
+            val longClickedCommentBottomSheet =
+                LongClickedCommentBottomSheet(null ,superComment, postId, postPublisherId, "comment")
+            longClickedCommentBottomSheet.show(activity?.supportFragmentManager!!, "signature")
             true
         }
 
@@ -381,49 +410,7 @@ class ReplyOnCommentBottomSheet(
             var currentReact: React? = null
             var reacted: Boolean = false
 
-            postViewModel.getCommentById(comment.commenterId.toString(), comment.id.toString())
-                .addOnCompleteListener {
-                    val commentDoc =
-                        it.result?.toObject(ReactionsAndSubComments::class.java)
-                    if (commentDoc?.reactions != null){
-                    commentDoc?.reactions?.let { reacts ->
-                        for (react in reacts) {
-                            if (react.reactorId == auth.currentUser?.uid.toString()) {
-                                currentReact = react
-                                reacted = true
-                                break
-                            }
-                        }
-
-                        clicksConsumer.reactOnCommentFromRepliesDataProvider(
-                            comment,
-                            commentPosition,
-                            reacted,
-                            currentReact,
-                            "click"
-                        )
-                    }
-                    }
-                    else{
-                        clicksConsumer.reactOnCommentFromRepliesDataProvider(
-                            comment,
-                            commentPosition,
-                            false,
-                            null,
-                            "click"
-                        )
-                    }
-                    updateCommentsUI()
-
-                }
-
-        }
-
-        reactOnCommentTextView.setOnLongClickListener {
-            var currentReact: React? = null
-            var reacted: Boolean = false
-
-            postViewModel.getCommentById(comment.commenterId.toString(), comment.id.toString())
+            postViewModel.getCommentById(superComment.commenterId.toString(), superComment.id.toString())
                 .addOnCompleteListener {
                     val commentDoc =
                         it.result?.toObject(ReactionsAndSubComments::class.java)
@@ -438,44 +425,85 @@ class ReplyOnCommentBottomSheet(
                             }
 
                             clicksConsumer.reactOnCommentFromRepliesDataProvider(
-                                comment,
+                                superComment,
+                                commentPosition,
+                                reacted,
+                                currentReact,
+                                "click"
+                            )
+                        }
+                    } else {
+                        clicksConsumer.reactOnCommentFromRepliesDataProvider(
+                            superComment,
+                            commentPosition,
+                            false,
+                            null,
+                            "click"
+                        )
+                    }
+                }
+
+        }
+
+        reactOnCommentTextView.setOnLongClickListener {
+            var currentReact: React? = null
+            var reacted: Boolean = false
+
+            postViewModel.getCommentById(superComment.commenterId.toString(), superComment.id.toString())
+                .addOnCompleteListener {
+                    val commentDoc =
+                        it.result?.toObject(ReactionsAndSubComments::class.java)
+                    if (commentDoc?.reactions != null) {
+                        commentDoc?.reactions?.let { reacts ->
+                            for (react in reacts) {
+                                if (react.reactorId == auth.currentUser?.uid.toString()) {
+                                    currentReact = react
+                                    reacted = true
+                                    break
+                                }
+                            }
+                            clicksConsumer.reactOnCommentFromRepliesDataProvider(
+                                superComment,
                                 commentPosition,
                                 reacted,
                                 currentReact,
                                 "longClick"
                             )
                         }
-                    }
-                    else{
+                    } else {
                         clicksConsumer.reactOnCommentFromRepliesDataProvider(
-                            comment,
+                            superComment,
                             commentPosition,
                             false,
                             null,
                             "longClick"
                         )
                     }
-                    updateCommentsUI()
-
                 }
             true
         }
 
-        replyOnCommentTextView.setOnClickListener {  commentEditText.requestFocus() }
+        replyOnCommentTextView.setOnClickListener { commentEditText.requestFocus() }
     }
 
 
     private fun updateCommentsUI() {
-            val commentLiveData = postViewModel.getCommentLiveDataById(comment.commenterId.toString(), comment.id.toString())
-            commentLiveData.observe(viewLifecycleOwner, { reactionsAndComments ->
-                //REACTIONS
-                reactionsAndComments?.reactions?.let { reacts ->
-                    if (reacts.isNotEmpty()) {
-                        reactsCountTextView.text = reacts.size.toString()
-                        reactsCountTextView.visibility = View.VISIBLE
-                        for (react in reacts) {
-                            if (react.reactorId == auth.currentUser?.uid.toString()) {
-                                myReactPlaceHolder.visibility = View.VISIBLE
+        postViewModel.getCommentUpdates(
+            superComment.commenterId.toString(),
+            superComment.id.toString()
+        )?.addSnapshotListener { value, error ->
+            val reactionsAndComments = value?.toObject(ReactionsAndSubComments::class.java)
+            //if there is not document
+            if (reactionsAndComments == null){
+                dismiss()
+            }
+            reactionsAndComments?.reactions?.let { reacts ->
+                if (reacts.isNotEmpty()) {
+                    reactsCountTextView.text = reacts.size.toString()
+                    reactsCountTextView.visibility = View.VISIBLE
+                    for (react in reacts) {
+                        if (react.reactorId == auth.currentUser?.uid.toString()) {
+                            myReactPlaceHolder.visibility = View.VISIBLE
 //                                itemView.likeReactPlaceHolder.visibility = View.GONE
 //                                itemView.loveReactPlaceHolder.visibility = View.GONE
 //                                itemView.careReactPlaceHolder.visibility = View.GONE
@@ -483,227 +511,224 @@ class ReplyOnCommentBottomSheet(
 //                                itemView.wowReactPlaceHolder.visibility = View.GONE
 //                                itemView.sadReactPlaceHolder.visibility = View.GONE
 //                                itemView.angryReactPlaceHolder.visibility = View.GONE
-                                when (react.react) {
-                                    1 -> {
-                                        reactOnCommentTextView.text = "Like"
-                                        reactOnCommentTextView.setTextColor(
-                                            activity?.resources?.getColor(
-                                                R.color.dark_blue
-                                            )!!
-                                        )
-                                        myReactPlaceHolder.setImageResource(R.drawable.ic_like_react)
-                                    }
-                                    2 -> {
-                                        reactOnCommentTextView.text = "Love"
-                                        reactOnCommentTextView.setTextColor(
-                                            activity?.resources?.getColor(
-                                                R.color.red
-                                            )!!
-                                        )
-                                        myReactPlaceHolder.setImageResource(R.drawable.ic_love_react)
-                                    }
-                                    3 -> {
-                                        reactOnCommentTextView.text = "Care"
-                                        reactOnCommentTextView.setTextColor(
-                                            activity?.resources?.getColor(
-                                                R.color.orange
-                                            )!!
-                                        )
-                                        myReactPlaceHolder.setImageResource(R.drawable.ic_care_react)
-                                    }
-                                    4 -> {
-                                        reactOnCommentTextView.text = "Haha"
-                                        reactOnCommentTextView.setTextColor(
-                                            activity?.resources?.getColor(
-                                                R.color.orange
-                                            )!!
-                                        )
-                                        myReactPlaceHolder.setImageResource(R.drawable.ic_haha_react)
-                                    }
-                                    5 -> {
-                                        reactOnCommentTextView.text = "Wow"
-                                        reactOnCommentTextView.setTextColor(
-                                            activity?.resources?.getColor(
-                                                R.color.orange
-                                            )!!
-                                        )
-                                        myReactPlaceHolder.setImageResource(R.drawable.ic_wow_react)
-                                    }
-                                    6 -> {
-                                        reactOnCommentTextView.text = "Sad"
-                                        reactOnCommentTextView.setTextColor(
-                                            activity?.resources?.getColor(
-                                                R.color.yellow
-                                            )!!
-                                        )
-                                        myReactPlaceHolder.setImageResource(R.drawable.ic_sad_react)
-                                    }
-                                    7 -> {
-                                        reactOnCommentTextView.text = "Angry"
-                                        reactOnCommentTextView.setTextColor(
-                                            activity?.resources?.getColor(
-                                                R.color.orange
-                                            )!!
-                                        )
-                                        myReactPlaceHolder.setImageResource(R.drawable.ic_angry_angry)
-                                    }
+                            when (react.react) {
+                                1 -> {
+                                    reactOnCommentTextView.text = "Like"
+                                    reactOnCommentTextView.setTextColor(
+                                        activity?.resources?.getColor(
+                                            R.color.dark_blue
+                                        )!!
+                                    )
+                                    myReactPlaceHolder.setImageResource(R.drawable.ic_like_react)
                                 }
+                                2 -> {
+                                    reactOnCommentTextView.text = "Love"
+                                    reactOnCommentTextView.setTextColor(
+                                        activity?.resources?.getColor(
+                                            R.color.red
+                                        )!!
+                                    )
+                                    myReactPlaceHolder.setImageResource(R.drawable.ic_love_react)
+                                }
+                                3 -> {
+                                    reactOnCommentTextView.text = "Care"
+                                    reactOnCommentTextView.setTextColor(
+                                        activity?.resources?.getColor(
+                                            R.color.orange
+                                        )!!
+                                    )
+                                    myReactPlaceHolder.setImageResource(R.drawable.ic_care_react)
+                                }
+                                4 -> {
+                                    reactOnCommentTextView.text = "Haha"
+                                    reactOnCommentTextView.setTextColor(
+                                        activity?.resources?.getColor(
+                                            R.color.orange
+                                        )!!
+                                    )
+                                    myReactPlaceHolder.setImageResource(R.drawable.ic_haha_react)
+                                }
+                                5 -> {
+                                    reactOnCommentTextView.text = "Wow"
+                                    reactOnCommentTextView.setTextColor(
+                                        activity?.resources?.getColor(
+                                            R.color.orange
+                                        )!!
+                                    )
+                                    myReactPlaceHolder.setImageResource(R.drawable.ic_wow_react)
+                                }
+                                6 -> {
+                                    reactOnCommentTextView.text = "Sad"
+                                    reactOnCommentTextView.setTextColor(
+                                        activity?.resources?.getColor(
+                                            R.color.yellow
+                                        )!!
+                                    )
+                                    myReactPlaceHolder.setImageResource(R.drawable.ic_sad_react)
+                                }
+                                7 -> {
+                                    reactOnCommentTextView.text = "Angry"
+                                    reactOnCommentTextView.setTextColor(
+                                        activity?.resources?.getColor(
+                                            R.color.orange
+                                        )!!
+                                    )
+                                    myReactPlaceHolder.setImageResource(R.drawable.ic_angry_angry)
+                                }
+                            }
 //                                itemView.reactOnCommentTextView.text = "Like"
 //                                itemView.reactOnCommentTextView.setTextColor(
 //                                    itemView.context.resources.getColor(
 //                                        R.color.dark_blue
 //                                    )
 //                                )
-                                break
-                            } else {
-                                //Visible to me
-                                myReactPlaceHolder.visibility = View.INVISIBLE
-                                //itemView.likeReactPlaceHolder.visibility = View.GONE
+                            break
+                        } else {
+                            //Visible to me
+                            myReactPlaceHolder.visibility = View.INVISIBLE
+                            //itemView.likeReactPlaceHolder.visibility = View.GONE
 //                                itemView.loveReactPlaceHolder.visibility = View.GONE
 //                                itemView.careReactPlaceHolder.visibility = View.GONE
 //                                itemView.hahaReactPlaceHolder.visibility = View.GONE
 //                                itemView.wowReactPlaceHolder.visibility = View.GONE
 //                                itemView.sadReactPlaceHolder.visibility = View.GONE
 //                                itemView.angryReactPlaceHolder.visibility = View.GONE
-                                reactOnCommentTextView.text = "Like"
-                                when (react.react) {
-                                    1 -> {
-                                        likeReactPlaceHolder.visibility = View.VISIBLE
-                                        loveReactPlaceHolder.visibility = View.GONE
-                                        careReactPlaceHolder.visibility = View.GONE
-                                        hahaReactPlaceHolder.visibility = View.GONE
-                                        wowReactPlaceHolder.visibility = View.GONE
-                                        sadReactPlaceHolder.visibility = View.GONE
-                                        angryReactPlaceHolder.visibility = View.GONE
-                                    }
-                                    2 -> {
-                                        likeReactPlaceHolder.visibility = View.GONE
-                                        loveReactPlaceHolder.visibility = View.VISIBLE
-                                        careReactPlaceHolder.visibility = View.GONE
-                                        hahaReactPlaceHolder.visibility = View.GONE
-                                        wowReactPlaceHolder.visibility = View.GONE
-                                        sadReactPlaceHolder.visibility = View.GONE
-                                        angryReactPlaceHolder.visibility = View.GONE
-                                    }
-                                    3 -> {
-                                        likeReactPlaceHolder.visibility = View.GONE
-                                        loveReactPlaceHolder.visibility = View.GONE
-                                        careReactPlaceHolder.visibility = View.VISIBLE
-                                        hahaReactPlaceHolder.visibility = View.GONE
-                                        wowReactPlaceHolder.visibility = View.GONE
-                                        sadReactPlaceHolder.visibility = View.GONE
-                                        angryReactPlaceHolder.visibility = View.GONE
-                                    }
-                                    4 -> {
-                                        likeReactPlaceHolder.visibility = View.GONE
-                                        loveReactPlaceHolder.visibility = View.GONE
-                                        careReactPlaceHolder.visibility = View.GONE
-                                        hahaReactPlaceHolder.visibility = View.VISIBLE
-                                        wowReactPlaceHolder.visibility = View.GONE
-                                        sadReactPlaceHolder.visibility = View.GONE
-                                        angryReactPlaceHolder.visibility = View.GONE
-                                    }
-                                    5 -> {
-                                        likeReactPlaceHolder.visibility = View.GONE
-                                        loveReactPlaceHolder.visibility = View.GONE
-                                        careReactPlaceHolder.visibility = View.GONE
-                                        hahaReactPlaceHolder.visibility = View.GONE
-                                        wowReactPlaceHolder.visibility = View.VISIBLE
-                                        sadReactPlaceHolder.visibility = View.GONE
-                                        angryReactPlaceHolder.visibility = View.GONE
-                                    }
-                                    6 -> {
-                                        likeReactPlaceHolder.visibility = View.GONE
-                                        loveReactPlaceHolder.visibility = View.GONE
-                                        careReactPlaceHolder.visibility = View.GONE
-                                        hahaReactPlaceHolder.visibility = View.GONE
-                                        wowReactPlaceHolder.visibility = View.GONE
-                                        sadReactPlaceHolder.visibility = View.VISIBLE
-                                        angryReactPlaceHolder.visibility = View.GONE
-                                    }
-                                    7 -> {
-                                        likeReactPlaceHolder.visibility = View.GONE
-                                        loveReactPlaceHolder.visibility = View.GONE
-                                        careReactPlaceHolder.visibility = View.GONE
-                                        hahaReactPlaceHolder.visibility = View.GONE
-                                        wowReactPlaceHolder.visibility = View.GONE
-                                        sadReactPlaceHolder.visibility = View.GONE
-                                        angryReactPlaceHolder.visibility = View.VISIBLE
-                                    }
+                            reactOnCommentTextView.text = "Like"
+                            when (react.react) {
+                                1 -> {
+                                    likeReactPlaceHolder.visibility = View.VISIBLE
+                                    loveReactPlaceHolder.visibility = View.GONE
+                                    careReactPlaceHolder.visibility = View.GONE
+                                    hahaReactPlaceHolder.visibility = View.GONE
+                                    wowReactPlaceHolder.visibility = View.GONE
+                                    sadReactPlaceHolder.visibility = View.GONE
+                                    angryReactPlaceHolder.visibility = View.GONE
+                                }
+                                2 -> {
+                                    likeReactPlaceHolder.visibility = View.GONE
+                                    loveReactPlaceHolder.visibility = View.VISIBLE
+                                    careReactPlaceHolder.visibility = View.GONE
+                                    hahaReactPlaceHolder.visibility = View.GONE
+                                    wowReactPlaceHolder.visibility = View.GONE
+                                    sadReactPlaceHolder.visibility = View.GONE
+                                    angryReactPlaceHolder.visibility = View.GONE
+                                }
+                                3 -> {
+                                    likeReactPlaceHolder.visibility = View.GONE
+                                    loveReactPlaceHolder.visibility = View.GONE
+                                    careReactPlaceHolder.visibility = View.VISIBLE
+                                    hahaReactPlaceHolder.visibility = View.GONE
+                                    wowReactPlaceHolder.visibility = View.GONE
+                                    sadReactPlaceHolder.visibility = View.GONE
+                                    angryReactPlaceHolder.visibility = View.GONE
+                                }
+                                4 -> {
+                                    likeReactPlaceHolder.visibility = View.GONE
+                                    loveReactPlaceHolder.visibility = View.GONE
+                                    careReactPlaceHolder.visibility = View.GONE
+                                    hahaReactPlaceHolder.visibility = View.VISIBLE
+                                    wowReactPlaceHolder.visibility = View.GONE
+                                    sadReactPlaceHolder.visibility = View.GONE
+                                    angryReactPlaceHolder.visibility = View.GONE
+                                }
+                                5 -> {
+                                    likeReactPlaceHolder.visibility = View.GONE
+                                    loveReactPlaceHolder.visibility = View.GONE
+                                    careReactPlaceHolder.visibility = View.GONE
+                                    hahaReactPlaceHolder.visibility = View.GONE
+                                    wowReactPlaceHolder.visibility = View.VISIBLE
+                                    sadReactPlaceHolder.visibility = View.GONE
+                                    angryReactPlaceHolder.visibility = View.GONE
+                                }
+                                6 -> {
+                                    likeReactPlaceHolder.visibility = View.GONE
+                                    loveReactPlaceHolder.visibility = View.GONE
+                                    careReactPlaceHolder.visibility = View.GONE
+                                    hahaReactPlaceHolder.visibility = View.GONE
+                                    wowReactPlaceHolder.visibility = View.GONE
+                                    sadReactPlaceHolder.visibility = View.VISIBLE
+                                    angryReactPlaceHolder.visibility = View.GONE
+                                }
+                                7 -> {
+                                    likeReactPlaceHolder.visibility = View.GONE
+                                    loveReactPlaceHolder.visibility = View.GONE
+                                    careReactPlaceHolder.visibility = View.GONE
+                                    hahaReactPlaceHolder.visibility = View.GONE
+                                    wowReactPlaceHolder.visibility = View.GONE
+                                    sadReactPlaceHolder.visibility = View.GONE
+                                    angryReactPlaceHolder.visibility = View.VISIBLE
                                 }
                             }
-
                         }
-                    } else {
-                        myReactPlaceHolder.visibility = View.INVISIBLE
-                        reactsCountTextView.visibility = View.INVISIBLE
 
-                        reactOnCommentTextView.text = "Like"
-                        reactOnCommentTextView.setTextColor(
-                            activity?.resources?.getColor(
-                                R.color.gray
-                            )!!
-                        )
                     }
+                } else {
+                    myReactPlaceHolder.visibility = View.INVISIBLE
+                    reactsCountTextView.visibility = View.INVISIBLE
 
-                }
-
-                //SUBCOMMENTS
-                Log.i(TAG, "ISLAM updateCommentsUI: ${reactionsAndComments}")
-                reactionsAndComments?.let {
-//                    if (it.subComments != null){
-                    commentsAdapter = CommentsAdapter(
-                        auth.currentUser?.uid.toString(),
-                        reactionsAndComments.subComments.orEmpty(),
-                        null,
-                        this,
-                        this,
-                        postViewModel,
-                        postPublisherId
+                    reactOnCommentTextView.text = "Like"
+                    reactOnCommentTextView.setTextColor(
+                        activity?.resources?.getColor(
+                            R.color.gray
+                        )!!
                     )
-                    subCommentsRecyclerView.adapter = commentsAdapter
-//                    }
                 }
 
-            })
-
-
-            picasso.load(comment.commenterImageUrl).into(commenterImageView)
-            commenterNameTextView.text = comment.commenterName
-            commentCreationTimeTextView.text =
-                DateFormat.format("EEE, MMM d, h:mm a", comment.commentTime.toDate())
-
-            val interval: Long = 1 * 1000
-            val options: RequestOptions = RequestOptions().frame(interval)
-
-            if (comment.commentType == "text") {
-                commentTextView.text = comment.textComment
-                mediaCommentCardView.visibility = View.GONE
-            } else if (comment.commentType == "textWithImage") {
-                commentTextView.text = comment.textComment
-                picasso.load(comment.attachmentCommentUrl).into(mediaCommentImageView)
-                mediaCommentCardView.visibility = View.VISIBLE
-            } else if (comment.commentType == "textWithVideo") {
-                commentTextView.text = comment.textComment
-                Glide.with(requireContext())
-                    .asBitmap().load(comment.attachmentCommentUrl).apply(options)
-                    .into(mediaCommentImageView)
-                mediaCommentCardView.visibility = View.VISIBLE
-            } else if (comment.commentType == "image") {
-                picasso.load(comment.attachmentCommentUrl).into(mediaCommentImageView)
-                mediaCommentCardView.visibility = View.VISIBLE
-            } else if (comment.commentType == "video") {
-                Glide.with(requireContext())
-                    .asBitmap().load(comment.attachmentCommentUrl).apply(options)
-                    .into(mediaCommentImageView)
-                mediaCommentCardView.visibility = View.VISIBLE
             }
 
+            reactionsAndComments?.let {
+//                    if (it.subComments != null){
+                commentsAdapter = CommentsAdapter(
+                    auth.currentUser?.uid.toString(),
+                    reactionsAndComments.subComments.orEmpty(),
+                    null,
+                    this,
+                    this,
+                    postViewModel,
+                    postPublisherId
+                )
+                if (subCommentsRecyclerView != null){
+                    subCommentsRecyclerView.adapter = commentsAdapter
+                }
+            }
         }
+
+        picasso.load(superComment.commenterImageUrl).into(commenterImageView)
+        commenterNameTextView.text = superComment.commenterName
+        commentCreationTimeTextView.text =
+            DateFormat.format("EEE, MMM d, h:mm a", superComment.commentTime.toDate())
+
+        val interval: Long = 1 * 1000
+        val options: RequestOptions = RequestOptions().frame(interval)
+
+        if (superComment.commentType == "text") {
+            commentTextView.text = superComment.textComment
+            mediaCommentCardView.visibility = View.GONE
+        } else if (superComment.commentType == "textWithImage") {
+            commentTextView.text = superComment.textComment
+            picasso.load(superComment.attachmentCommentUrl).into(mediaCommentImageView)
+            mediaCommentCardView.visibility = View.VISIBLE
+        } else if (superComment.commentType == "textWithVideo") {
+            commentTextView.text = superComment.textComment
+            Glide.with(requireContext())
+                .asBitmap().load(superComment.attachmentCommentUrl).apply(options)
+                .into(mediaCommentImageView)
+            mediaCommentCardView.visibility = View.VISIBLE
+        } else if (superComment.commentType == "image") {
+            picasso.load(superComment.attachmentCommentUrl).into(mediaCommentImageView)
+            mediaCommentCardView.visibility = View.VISIBLE
+        } else if (superComment.commentType == "video") {
+            Glide.with(requireContext())
+                .asBitmap().load(superComment.attachmentCommentUrl).apply(options)
+                .into(mediaCommentImageView)
+            mediaCommentCardView.visibility = View.VISIBLE
+        }
+
+    }
 
     override fun onCommentLongClicked(comment: Comment) {
         val longClickedCommentBottomSheet =
-            LongClickedCommentBottomSheet(comment, postId, postPublisherId, "subComment")
+            LongClickedCommentBottomSheet(superComment,comment, postId, postPublisherId, "subComment")
         longClickedCommentBottomSheet.show(activity?.supportFragmentManager!!, "signature")
 
     }
@@ -716,15 +741,15 @@ class ReplyOnCommentBottomSheet(
     ) {
         //I did not react
         if (!reacted) {
-            val myReact = createReact(commenterId, commenterName, commenterImageUrl, 1)
+            val myReact = createReact(interactorId, interactorName, interactorImageUrl, 1)
             addReactOnComment(
-                postPublisherId,
+                comment.commenterId.toString(),
                 comment.id.toString(),
                 myReact
             ).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     updateCommentsUI()
-                    if (comment.commenterId  != commenterId) {
+                    if (comment.commenterId.toString() != interactorId) {
                         notificationsHandler.also {
                             it.notificationType = "reactOnComment"
                             it.commentPosition = commentPosition
@@ -744,7 +769,7 @@ class ReplyOnCommentBottomSheet(
         //If you have reacted --> delete react
         else {
             deleteReactFromComment(
-                postPublisherId,
+                comment.commenterId.toString(),
                 comment.id.toString(),
                 currentReact
             ).addOnCompleteListener { task ->
@@ -764,9 +789,9 @@ class ReplyOnCommentBottomSheet(
         currentReact: React?
     ) {
         showReactsChooserDialog(
-            commenterId,//Interactor
-            commenterName,
-            commenterImageUrl,
+            interactorId,//Interactor
+            interactorName,
+            interactorImageUrl,
             postId,
             postPublisherId,
             comment.id.toString(),
@@ -823,9 +848,9 @@ class ReplyOnCommentBottomSheet(
         superCommentId: String?
     ): Comment {
         return Comment(
-            commenterId = commenterId,
-            commenterName = commenterName,
-            commenterImageUrl = commenterImageUrl,
+            commenterId = interactorId,
+            commenterName = interactorName,
+            commenterImageUrl = interactorImageUrl,
             textComment = commentContent,
             commentType = commentType,
             attachmentCommentUrl = attachmentCommentUrl,
@@ -849,12 +874,12 @@ class ReplyOnCommentBottomSheet(
     }
 
     private fun addReactOnComment(
-        postPublisherId: String,
+        commenterId: String,
         commentId: String,
         react: React?
     ): Task<Void> {
         return postViewModel.addReactToReactsListInCommentDocument(
-            postPublisherId,
+            commenterId,
             commentId,
             react
         )
@@ -862,15 +887,45 @@ class ReplyOnCommentBottomSheet(
     }
 
     private fun deleteReactFromComment(
-        postPublisherId: String,
+        commenterId: String,
         commentId: String,
         react: React?
     ): Task<Void> {
         return postViewModel.removeReactFromReactsListInCommentDocument(
-            postPublisherId,
+            commenterId,
             commentId,
             react
         )
+    }
+
+    private fun handleLongReactOnCommentCreationAndDeletion(
+        currentReact: React?,
+        react: React,
+        commentId: String,
+        postPublisherId: String,
+        commenterId: String,
+        commentPosition: Int
+    ) {
+        if (currentReact != null) {
+            deleteReactFromComment(commenterId, commentId,currentReact )
+        }
+        addReactOnComment(commenterId, commentId, react).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                if (superComment.commenterId.toString() != interactorId) {
+                    notificationsHandler.also {
+                        it.notificationType = "reactOnComment"
+                        it.commentPosition = commentPosition
+                        it.postId = postId
+                        it.reactType = react.react
+                        it.handleNotificationCreationAndFiring()
+                    }
+                }
+            } else {
+                Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT)
+                    .show()
+            }
+            updateCommentsUI()
+        }
     }
 
     private fun showReactsChooserDialog(
@@ -895,158 +950,35 @@ class ReplyOnCommentBottomSheet(
         )
         dialog.loveReactButton.setOnClickListener {
             react.react = 2
-            if (currentReact != null) {
-                deleteReactFromComment(postPublisherId, commentId, currentReact)
-            }
-            //postViewModel.updateReactedValue(postPublisherId, postId,2)
-            addReactOnComment(postPublisherId, commentId, react).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    updateCommentsUI()
-                    Log.i(TAG, "YYYY showReactsChooserDialog: $commenterId")
-                    Log.i(TAG, "YYYY showReactsChooserDialog: $interactorId")
-                    if (commenterId != interactorId) {
-                        notificationsHandler.also {
-                            it.notificationType = "reactOnComment"
-                            it.commentPosition = commentPosition
-                            it.postId = postId
-                            it.reactType = 2
-                            it.handleNotificationCreationAndFiring()
-                        }
-                    }
-                } else {
-                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT)
-                        .show()
-                }
-            }
+            handleLongReactOnCommentCreationAndDeletion(currentReact, react, commentId, postPublisherId, commenterId, commentPosition)
             dialog.dismiss()
         }
         dialog.careReactButton.setOnClickListener {
             react.react = 3
-            if (currentReact != null) {
-                deleteReactFromComment(postPublisherId, commentId, currentReact)
-            }
-            //postViewModel.updateReactedValue(postPublisherId, postId,3)
-            addReactOnComment(postPublisherId, commentId, react).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    updateCommentsUI()
-                    if (commenterId != interactorId) {
-                        notificationsHandler.also {
-                            it.notificationType = "reactOnComment"
-                            it.commentPosition = commentPosition
-                            it.postId = postId
-                            it.reactType = 3
-                            it.handleNotificationCreationAndFiring()
-                        }
-                    }
-                } else {
-                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT)
-                        .show()
-                }
-            }
+            handleLongReactOnCommentCreationAndDeletion(currentReact, react, commentId, postPublisherId, commenterId, commentPosition)
             dialog.dismiss()
         }
         dialog.hahaReactButton.setOnClickListener {
             react.react = 4
-            if (currentReact != null) {
-                deleteReactFromComment(postPublisherId, commentId, currentReact)
-            }
-            //postViewModel.updateReactedValue(postPublisherId, postId,4)
-            addReactOnComment(postPublisherId, commentId, react).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    updateCommentsUI()
-                    if (commenterId != interactorId) {
-                        notificationsHandler.also {
-                            it.notificationType = "reactOnComment"
-                            it.commentPosition = commentPosition
-                            it.postId = postId
-                            it.reactType = 4
-                            it.handleNotificationCreationAndFiring()
-                        }
-                    }
-                } else {
-                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT)
-                        .show()
-                }
-            }
+            handleLongReactOnCommentCreationAndDeletion(currentReact, react, commentId, postPublisherId, commenterId, commentPosition)
             dialog.dismiss()
         }
         dialog.wowReactButton.setOnClickListener {
             react.react = 5
-            if (currentReact != null) {
-                deleteReactFromComment(postPublisherId, commentId, currentReact)
-            }
-            //postViewModel.updateReactedValue(postPublisherId, postId,5)
-            addReactOnComment(postPublisherId, commentId, react).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    updateCommentsUI()
-                    if (commenterId != interactorId) {
-                        notificationsHandler.also {
-                            it.notificationType = "reactOnComment"
-                            it.commentPosition = commentPosition
-                            it.postId = postId
-                            it.reactType = 5
-                            it.handleNotificationCreationAndFiring()
-                        }
-                    }
-                } else {
-                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT)
-                        .show()
-                }
-            }
+            handleLongReactOnCommentCreationAndDeletion(currentReact, react, commentId, postPublisherId, commenterId, commentPosition)
             dialog.dismiss()
         }
         dialog.sadReactButton.setOnClickListener {
             react.react = 6
-            if (currentReact != null) {
-                deleteReactFromComment(postPublisherId, commentId, currentReact)
-            }
-            //postViewModel.updateReactedValue(postPublisherId, postId,6)
-            addReactOnComment(postPublisherId, commentId, react).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    updateCommentsUI()
-                    if (commenterId!= interactorId) {
-                        notificationsHandler.also {
-                            it.notificationType = "reactOnComment"
-                            it.commentPosition = commentPosition
-                            it.postId = postId
-                            it.reactType = 6
-                            it.handleNotificationCreationAndFiring()
-                        }
-                    }
-                } else {
-                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT)
-                        .show()
-                }
-            }
+            handleLongReactOnCommentCreationAndDeletion(currentReact, react, commentId, postPublisherId, commenterId, commentPosition)
             dialog.dismiss()
         }
         dialog.angryReactButton.setOnClickListener {
             react.react = 7
-            if (currentReact != null) {
-                deleteReactFromComment(postPublisherId, commentId, currentReact)
-            }
-            //postViewModel.updateReactedValue(postPublisherId, postId,7)
-            addReactOnComment(postPublisherId, commentId, react).addOnCompleteListener { task ->
-                updateCommentsUI() // to update
-                if (task.isSuccessful) {
-                    if (commenterId!= interactorId) {
-                        notificationsHandler.also {
-                            it.notificationType = "reactOnComment"
-                            it.commentPosition = commentPosition
-                            it.postId = postId
-                            it.reactType = 7
-                            it.handleNotificationCreationAndFiring()
-                        }
-                    }
-                } else {
-                    Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT)
-                        .show()
-                }
-            }
+            handleLongReactOnCommentCreationAndDeletion(currentReact, react, commentId, postPublisherId, commenterId, commentPosition)
             dialog.dismiss()
         }
         dialog.show()
-
     }
 
     override fun onAttachmentAdded(data: Intent?, dataType: String, fromCamera: Boolean) {
@@ -1069,8 +1001,7 @@ class ReplyOnCommentBottomSheet(
                     )
                 }
                 mediaCommentPreviewImage.setImageBitmap(bitmap)
-            }
-            else if (commentDataType == "video"){
+            } else if (commentDataType == "video") {
 //                val interval: Long = 1 * 1000
 //                val options: RequestOptions = RequestOptions().frame(interval)
 //                Glide.with(requireContext())
@@ -1081,8 +1012,7 @@ class ReplyOnCommentBottomSheet(
             }
 
 
-        }
-        else{
+        } else {
             mediaCommentLayoutPreview.visibility = View.GONE
         }
     }

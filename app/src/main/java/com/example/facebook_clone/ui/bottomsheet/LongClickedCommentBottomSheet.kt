@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.TextView
+import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.facebook_clone.R
@@ -25,6 +26,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 private const val TAG = "LongClickedCommentBotto"
 
 class LongClickedCommentBottomSheet(
+    private val superComment: Comment?,
     private val comment: Comment,
     private val postId: String,
     private val postPublisherId: String,
@@ -147,8 +149,8 @@ class LongClickedCommentBottomSheet(
 
     private fun deleteSubCommentAndItsDocument(comment: Comment) {
             postViewModel.deleteSubCommentFromCommentById(
-                comment.commenterId.toString(),
-                comment.superCommentId.toString(),
+                superComment?.commenterId.toString(),
+                superComment?.id.toString(),
                 comment
             ).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -158,10 +160,11 @@ class LongClickedCommentBottomSheet(
                             comment.id.toString()
                         )
                 } else {
-                    Utils.toastMessage(requireContext(), task.exception?.message.toString())
+                    Toast.makeText(requireContext(), task.exception?.message.toString(), Toast.LENGTH_SHORT).show()
                 }
+                dismiss()
             }
-        dismiss()
+
     }
 
 

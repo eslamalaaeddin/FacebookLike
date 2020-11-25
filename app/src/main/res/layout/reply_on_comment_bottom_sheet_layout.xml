@@ -17,7 +17,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="?android:attr/actionBarSize"
+            android:layout_height="48dp"
             android:elevation="12dp"
             android:orientation="horizontal">
 
@@ -57,14 +57,16 @@
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
         android:layout_below="@id/linearLayout3"
         >
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/commenterImageView"
-            android:layout_width="36dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="8dp"
+            android:layout_width="48dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="4dp"
             android:layout_marginTop="8dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -76,7 +78,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:background="@drawable/round_background"
-            android:backgroundTint="#F3F3F3"
+            android:backgroundTint="#C8F4F4F4"
             android:orientation="vertical"
             android:padding="8dp"
             app:layout_constraintBottom_toTopOf="@+id/commentCreationTimeTextView"
@@ -90,6 +92,7 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="2dp"
                 android:paddingEnd="2dp"
+                android:textStyle="bold"
                 android:textColor="@color/black"
                 android:textSize="14sp"
                 tools:text="Islam AlaaEddin" />
@@ -124,14 +127,6 @@
                         android:layout_gravity="center"
                         android:scaleType="fitXY"
                          />
-
-                    <ImageView
-                        android:id="@+id/playButtonImgView"
-                        android:layout_width="match_parent"
-                        android:layout_height="96dp"
-                        app:srcCompat="@drawable/ic_baseline_play_arrow_24"
-                        app:tint="#EAEAEA"
-                        tools:visibility="gone" />
                 </FrameLayout>
 
             </androidx.cardview.widget.CardView>

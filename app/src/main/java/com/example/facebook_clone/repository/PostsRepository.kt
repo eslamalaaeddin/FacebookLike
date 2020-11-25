@@ -2,6 +2,7 @@ package com.example.facebook_clone.repository
 
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.facebook_clone.helper.Utils.COMMENTS_COLLECTION
@@ -91,6 +92,11 @@ class PostsRepository(
 
 
         return liveData
+    }
+
+    fun getCommentUpdates(commenterId: String, commentId: String): DocumentReference{
+        return database.collection(COMMENTS_COLLECTION).document(commenterId)
+            .collection(MY_COMMENTS_COLLECTION).document(commentId)
     }
 
     fun addSubCommentToCommentById(commenterId: String, commentId: String, comment: Comment): Task<Void>{
