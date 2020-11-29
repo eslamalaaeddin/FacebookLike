@@ -23,6 +23,8 @@ import com.example.facebook_clone.model.post.share.Share
 import com.example.facebook_clone.model.user.friend.Friend
 import com.example.facebook_clone.model.user.friendrequest.FriendRequest
 import com.example.facebook_clone.ui.bottomsheet.CommentsBottomSheet
+import com.example.facebook_clone.ui.bottomsheet.PeopleWhoReactedBottomSheet
+import com.example.facebook_clone.ui.bottomsheet.UserRelationsBottomSheet
 import com.example.facebook_clone.ui.dialog.ImageViewerDialog
 import com.example.facebook_clone.viewmodel.NotificationsFragmentViewModel
 import com.example.facebook_clone.viewmodel.OthersProfileActivityViewModel
@@ -87,17 +89,17 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
 
                 //Check for friend requests
                 if (!currentUser.friendRequests.isNullOrEmpty()) {
-                    Toast.makeText(this, "a", Toast.LENGTH_SHORT).show()
+                   // Toast.makeText(this, "a", Toast.LENGTH_SHORT).show()
                     currentUser.friendRequests?.forEach { friendRequest ->
                         if (friendRequest.fromId == currentUser.id) {
-                            Toast.makeText(this, "b", Toast.LENGTH_SHORT).show()
+                         //   Toast.makeText(this, "b", Toast.LENGTH_SHORT).show()
                             addFriendButton.visibility = View.INVISIBLE
                             addFriendButton.isEnabled = false
                             cancelRequestButton.isEnabled = true
                             cancelRequestButton.visibility = View.VISIBLE
                             currentFriendRequest = friendRequest
                         } else {
-                            Toast.makeText(this, "c", Toast.LENGTH_SHORT).show()
+                          //  Toast.makeText(this, "c", Toast.LENGTH_SHORT).show()
                             addFriendButton.isEnabled = true
                             cancelRequestButton.isEnabled = false
                             addFriendButton.visibility = View.VISIBLE
@@ -108,12 +110,12 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
 
                 //there might be a friendship
                 else if (currentUser.friends != null) {
-                    Toast.makeText(this, "d", Toast.LENGTH_SHORT).show()
+                   // Toast.makeText(this, "d", Toast.LENGTH_SHORT).show()
                     if (currentUser.friends!!.isNotEmpty()) {
-                        Toast.makeText(this, "e", Toast.LENGTH_SHORT).show()
+                      //  Toast.makeText(this, "e", Toast.LENGTH_SHORT).show()
                         currentUser.friends?.forEach { friend ->
                             if (friend.id == userIdIAmViewing) {
-                                Toast.makeText(this, "f", Toast.LENGTH_SHORT).show()
+                             //   Toast.makeText(this, "f", Toast.LENGTH_SHORT).show()
                                 addFriendButton.isEnabled = false
                                 cancelRequestButton.isEnabled = false
                                 addFriendButton.visibility = View.INVISIBLE
@@ -136,7 +138,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
                     }
 
                 } else {
-                    Toast.makeText(this, "g", Toast.LENGTH_SHORT).show()
+                   // Toast.makeText(this, "g", Toast.LENGTH_SHORT).show()
                     addFriendButton.isEnabled = true
                     cancelRequestButton.isEnabled = false
                     addFriendButton.visibility = View.VISIBLE
@@ -158,7 +160,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         userLiveDate?.observe(this, { user ->
             user?.let {
                 userIAmViewing = user
-               // notificationsHandler.notifiedToken = userIAmViewing.token
+                // notificationsHandler.notifiedToken = userIAmViewing.token
                 notificationsHandler.notifiedToken = user.token
                 updateUserInfo(user)
                 updateUserFriends(user.friends.orEmpty())
@@ -219,6 +221,35 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
 
         messageButton.setOnClickListener {
             Toast.makeText(this, "ههه؟", Toast.LENGTH_SHORT).show()
+        }
+        /*
+
+         */
+        userRelationsButton.setOnClickListener {
+            userIAmViewing.friends?.let { friends ->
+                if (friends.isEmpty()) {
+                    val usersRelationsBottomSheet =
+                        UserRelationsBottomSheet(userIdIAmViewing.toString(), null)
+                    usersRelationsBottomSheet.show(
+                        supportFragmentManager,
+                        usersRelationsBottomSheet.tag
+                    )
+
+                } else {
+                    for (friend in friends) {
+                        if (friend.id == auth.currentUser?.uid.toString()) {
+                            val usersRelationsBottomSheet =
+                                UserRelationsBottomSheet(userIdIAmViewing.toString(), friend)
+                            usersRelationsBottomSheet.show(
+                                supportFragmentManager,
+                                usersRelationsBottomSheet.tag
+                            )
+                            break
+                        }
+                    }
+                }
+            }
+
         }
     }
 
@@ -502,32 +533,62 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         )
         dialog.loveReactButton.setOnClickListener {
             react.react = 2
-            handleLongReactCreationAndDeletionAndUserNotification(currentReact, react, postId, postPublisherId)
+            handleLongReactCreationAndDeletionAndUserNotification(
+                currentReact,
+                react,
+                postId,
+                postPublisherId
+            )
             dialog.dismiss()
         }
         dialog.careReactButton.setOnClickListener {
             react.react = 3
-            handleLongReactCreationAndDeletionAndUserNotification(currentReact, react, postId, postPublisherId)
+            handleLongReactCreationAndDeletionAndUserNotification(
+                currentReact,
+                react,
+                postId,
+                postPublisherId
+            )
             dialog.dismiss()
         }
         dialog.hahaReactButton.setOnClickListener {
             react.react = 4
-            handleLongReactCreationAndDeletionAndUserNotification(currentReact, react, postId, postPublisherId)
+            handleLongReactCreationAndDeletionAndUserNotification(
+                currentReact,
+                react,
+                postId,
+                postPublisherId
+            )
             dialog.dismiss()
         }
         dialog.wowReactButton.setOnClickListener {
             react.react = 5
-            handleLongReactCreationAndDeletionAndUserNotification(currentReact, react, postId, postPublisherId)
+            handleLongReactCreationAndDeletionAndUserNotification(
+                currentReact,
+                react,
+                postId,
+                postPublisherId
+            )
             dialog.dismiss()
         }
         dialog.sadReactButton.setOnClickListener {
             react.react = 6
-            handleLongReactCreationAndDeletionAndUserNotification(currentReact, react, postId, postPublisherId)
+            handleLongReactCreationAndDeletionAndUserNotification(
+                currentReact,
+                react,
+                postId,
+                postPublisherId
+            )
             dialog.dismiss()
         }
         dialog.angryReactButton.setOnClickListener {
             react.react = 7
-            handleLongReactCreationAndDeletionAndUserNotification(currentReact, react, postId, postPublisherId)
+            handleLongReactCreationAndDeletionAndUserNotification(
+                currentReact,
+                react,
+                postId,
+                postPublisherId
+            )
             dialog.dismiss()
         }
         dialog.show()
@@ -546,7 +607,12 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
 
     }
 
-    private fun handleLongReactCreationAndDeletionAndUserNotification(currentReact: React?, react: React, postId: String, postPublisherId: String) {
+    private fun handleLongReactCreationAndDeletionAndUserNotification(
+        currentReact: React?,
+        react: React,
+        postId: String,
+        postPublisherId: String
+    ) {
         if (currentReact != null) {
             deleteReactFromPost(currentReact, postId, postPublisherId)
         }

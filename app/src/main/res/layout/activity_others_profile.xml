@@ -56,34 +56,32 @@
             android:layout_width="0dp"
             android:layout_height="36dp"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="4dp"
+            android:layout_marginEnd="8dp"
             android:background="@color/medium_blue"
-            android:text="Add Friend"
-            android:visibility="invisible"
             android:enabled="false"
+            android:text="Add Friend"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            app:layout_constraintBottom_toBottomOf="@+id/profileSettingsButton"
-            app:layout_constraintEnd_toStartOf="@+id/profileSettingsButton"
-            app:layout_constraintHorizontal_bias="0.5"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/userRelationsButton"
+            app:layout_constraintEnd_toStartOf="@+id/userRelationsButton"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/profileSettingsButton" />
+            app:layout_constraintTop_toTopOf="@+id/userRelationsButton" />
 
         <Button
             android:id="@+id/cancelRequestButton"
             android:layout_width="0dp"
             android:layout_height="36dp"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="4dp"
+            android:layout_marginEnd="8dp"
             android:background="@color/medium_blue"
-            android:text="Cancel Request"
-            android:visibility="gone"
             android:enabled="false"
+            android:text="Cancel Request"
             android:textAllCaps="false"
             android:textColor="@color/white"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/profileSettingsButton"
-            app:layout_constraintEnd_toStartOf="@+id/profileSettingsButton"
-            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintEnd_toStartOf="@+id/userRelationsButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/profileSettingsButton" />
 
@@ -92,18 +90,28 @@
             android:layout_width="0dp"
             android:layout_height="36dp"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="4dp"
+            android:layout_marginEnd="8dp"
             android:background="@color/medium_blue"
-            android:text="Message "
-            android:visibility="gone"
             android:enabled="false"
+            android:text="Message "
             android:textAllCaps="false"
             android:textColor="@color/white"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/profileSettingsButton"
-            app:layout_constraintEnd_toStartOf="@+id/profileSettingsButton"
-            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintEnd_toStartOf="@+id/userRelationsButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/profileSettingsButton" />
+
+        <Button
+            android:id="@+id/userRelationsButton"
+            android:layout_width="56dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:text="R"
+            app:layout_constraintBottom_toBottomOf="@+id/profileSettingsButton"
+            app:layout_constraintEnd_toStartOf="@+id/profileSettingsButton"
+            app:layout_constraintTop_toTopOf="@+id/profileSettingsButton" />
+
 
         <Button
             android:id="@+id/profileSettingsButton"
@@ -114,8 +122,6 @@
             android:text="..."
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/addFriendButton"
             app:layout_constraintTop_toBottomOf="@+id/bioTextView" />
 
         <ImageView

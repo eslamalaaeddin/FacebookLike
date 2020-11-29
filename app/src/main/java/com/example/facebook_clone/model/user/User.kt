@@ -1,5 +1,7 @@
 package com.example.facebook_clone.model.user
 
+import com.example.facebook_clone.model.user.followed.Followed
+import com.example.facebook_clone.model.user.follower.Follower
 import com.example.facebook_clone.model.user.friend.Friend
 import com.example.facebook_clone.model.user.friendrequest.FriendRequest
 import com.example.facebook_clone.model.user.search.Search
@@ -16,8 +18,8 @@ data class User(
     var coverImageUrl: String? = null,
     var postsIds: List<String>? = null,
     var friends: List<Friend>? = null,
-    var followersIds: List<String>? = null,
-    var followingIds: List<String>? = null,
+    var followers: List<Follower>? = null,
+    var followings: List<Followed>? = null,
     var groupsIds: List<String>? = null,
     var favPagesIds: List<String>? = null,
     var friendRequests: List<FriendRequest>? = null,

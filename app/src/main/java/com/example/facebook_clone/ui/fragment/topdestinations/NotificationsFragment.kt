@@ -1,14 +1,18 @@
 package com.example.facebook_clone.ui.fragment.topdestinations
 
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.Window
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.NotificationsAdapter
 import com.example.facebook_clone.helper.listener.NotificationListener
+import com.example.facebook_clone.model.notification.Notification
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.model.user.friend.Friend
 import com.example.facebook_clone.model.user.friendrequest.FriendRequest
@@ -118,6 +122,10 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), Notific
         navigateToComment(postPublisherId, postId, commentPosition)
     }
 
+    override fun onNotificationLongClicked(notification: Notification) {
+        showDeleteNotificationConfirmationDialog(notification)
+    }
+
     private fun deleteFriendRequestFromMeAndHim(notificationId: String) {
         if (currentFriendRequest != null) {
             othersProfileActivityViewModel.removeFriendRequestFromHisDocument(currentFriendRequest!!)
@@ -181,6 +189,25 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), Notific
         intent.putExtra("postId", postId)
         intent.putExtra("commentPosition", commentPosition)
         startActivity(intent)
+    }
+
+    private fun showDeleteNotificationConfirmationDialog(notification: Notification) {
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+        dialog.setContentView(R.layout.delete_notification_dialog)
+
+        val deleteButton = dialog.findViewById(R.id.deleteNotificationTextView) as TextView
+        val cancelButton = dialog.findViewById(R.id.cancelNotificationDeletionTextView) as TextView
+        cancelButton.setOnClickListener {
+            dialog.dismiss()
+        }
+        deleteButton.setOnClickListener {
+           deleteNotification(notification.notifiedId.toString(), notification.id.toString())
+            dialog.dismiss()
+        }
+        dialog.show()
+
     }
 
 

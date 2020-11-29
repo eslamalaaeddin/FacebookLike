@@ -12,15 +12,15 @@
         android:layout_height="wrap_content"
         android:elevation="12dp"
         android:orientation="horizontal"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/upButtonImageView"
-            android:layout_width="28dp"
+            android:layout_width="32dp"
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_marginStart="8dp"
@@ -31,7 +31,7 @@
 
 
     <LinearLayout
-        android:id="@+id/reactsLayout"
+        android:id="@+id/postViewerReactsLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
@@ -220,15 +220,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        app:layout_constraintBottom_toBottomOf="@+id/addCommentTextView"
-        app:layout_constraintEnd_toStartOf="@+id/addShareTextView"
+        app:layout_constraintBottom_toBottomOf="@+id/addCommentOnPostTextView"
+        app:layout_constraintEnd_toStartOf="@+id/addShareOnPostTextView"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/addCommentTextView"
-        app:layout_constraintTop_toTopOf="@+id/addCommentTextView"
+        app:layout_constraintStart_toEndOf="@+id/addCommentOnPostTextView"
+        app:layout_constraintTop_toTopOf="@+id/addCommentOnPostTextView"
         app:srcCompat="@drawable/ic_share" />
 
     <TextView
-        android:id="@+id/addShareTextView"
+        android:id="@+id/addShareOnPostTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
@@ -279,7 +279,7 @@
         app:srcCompat="@drawable/ic_thumb_up_grey" />
 
     <TextView
-        android:id="@+id/addCommentTextView"
+        android:id="@+id/addCommentOnPostTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Comment"
@@ -296,7 +296,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         app:layout_constraintBottom_toBottomOf="@+id/reactImageViewGrey"
-        app:layout_constraintEnd_toStartOf="@+id/addCommentTextView"
+        app:layout_constraintEnd_toStartOf="@+id/addCommentOnPostTextView"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/addReactTextView"
         app:layout_constraintTop_toTopOf="@+id/reactImageViewGrey"
@@ -379,6 +379,7 @@
         android:layout_alignParentBottom="true"
         android:layout_gravity="bottom"
         android:gravity="center"
+        android:visibility="gone"
         android:orientation="horizontal"
         android:padding="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -419,7 +420,7 @@
                 android:layout_height="28dp"
                 android:layout_margin="4dp"
                 android:src="@drawable/ic_comment_send"
-                android:visibility="gone" />
+                android:visibility="visible" />
 
         </LinearLayout>
 
@@ -435,13 +436,25 @@
         app:layout_constraintBottom_toTopOf="@+id/commentLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/reactsLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/postViewerReactsLayout" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="168dp" />
+        app:layout_constraintGuide_begin="196dp" />
+
+    <ImageButton
+        android:id="@+id/moreOnPost"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="56dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="4dp"
+        android:scaleType="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout4"
+        app:srcCompat="@drawable/ic_more"
+        app:tint="#595959" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

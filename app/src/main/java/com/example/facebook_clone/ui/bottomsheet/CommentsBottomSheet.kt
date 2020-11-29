@@ -423,13 +423,13 @@ class CommentsBottomSheet(
         if (!reacted) {
             val myReact = createReact(interactorId, interactorName, interactorImageUrl, 1)
             addReactOnComment(
-                postPublisherId,
+                comment.commenterId.toString(),
                 comment.id.toString(),
                 myReact
             ).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     updateCommentsUI()
-                    if (auth.currentUser?.uid.toString() != comment.commenterId) {
+                    if (comment.commenterId.toString() != interactorId && interactorId != auth.currentUser?.uid.toString()) {
                         notificationsHandler.also {
                             it.notificationType = "reactOnComment"
                             it.commentPosition = commentPosition
@@ -448,7 +448,7 @@ class CommentsBottomSheet(
         //If you have reacted --> delete react
         else {
             deleteReactFromComment(
-                postPublisherId,
+                comment.commenterId.toString(),
                 comment.id.toString(),
                 currentReact
             ).addOnCompleteListener { task ->
@@ -698,7 +698,7 @@ class CommentsBottomSheet(
         addReactOnComment(commenterId, commentId, react).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 updateCommentsUI()
-                if (commenterId != interactorId) {
+                if (commenterId != interactorId  && interactorId != auth.currentUser?.uid.toString()) {
                     notificationsHandler.also {
                         it.notificationType = "reactOnComment"
                         it.commentPosition = commentPosition

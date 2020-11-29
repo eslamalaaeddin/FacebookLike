@@ -1,12 +1,16 @@
 package com.example.facebook_clone
 
-fun main(){
-    val map = hashMapOf<String, Any>("islam" to "Islam AlaaEddin")
-    println(map)
-    val key: String = map.keys.toList()[0]
-    val value: String = map.values.toList()[0] as String
+import android.util.Log
+import kotlinx.coroutines.*
+import kotlin.system.measureTimeMillis
 
-    println(key)
-    println(value)
+private const val TAG = "Test"
+fun main() = runBlocking {
+        val one = GlobalScope.async { doSomethingUsefulOne() }
+        println("The answer is ${one.await()}")
+}
 
+suspend fun doSomethingUsefulOne(): Int {
+    delay(3000)
+    return 159
 }

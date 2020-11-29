@@ -9,6 +9,7 @@ import com.example.facebook_clone.helper.Utils.COMMENTS_COLLECTION
 import com.example.facebook_clone.helper.Utils.MY_COMMENTS_COLLECTION
 import com.example.facebook_clone.helper.Utils.POSTS_COLLECTION
 import com.example.facebook_clone.helper.Utils.PROFILE_POSTS_COLLECTION
+import com.example.facebook_clone.livedata.PostLiveData
 import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.comment.ReactionsAndSubComments
@@ -139,7 +140,15 @@ class PostsRepository(
         return database.collection(POSTS_COLLECTION).document(publisherId)
             .collection(PROFILE_POSTS_COLLECTION)
             .document(postId).get()
+    }
 
+    fun getPostLiveDataById(publisherId: String, postId: String): PostLiveData {
+
+        val postDocRef = database.collection(POSTS_COLLECTION).document(publisherId)
+            .collection(PROFILE_POSTS_COLLECTION)
+            .document(postId)
+
+        return PostLiveData(postDocRef)
     }
 
     fun updatePostWithNewEdits(publisherId: String, postId: String, post: Post): Task<Void>{

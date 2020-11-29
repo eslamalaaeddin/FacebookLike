@@ -5,18 +5,21 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.facebook_clone.R
+import com.example.facebook_clone.helper.listener.PeopleWhoReactedClickListener
 import com.example.facebook_clone.model.post.react.React
+import com.example.facebook_clone.ui.bottomsheet.PeopleWhoReactedBottomSheet
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.user_who_reacted_item.view.*
 
-class ReactsAdapter(private var reacts: List<React>) :
+class ReactsAdapter(private var reacts: List<React>,private val peopleWhoReactedClickListener: PeopleWhoReactedClickListener) :
     RecyclerView.Adapter<ReactsAdapter.ReactsHolder>() {
+    private lateinit var pClickListener: PeopleWhoReactedClickListener
     private val picasso = Picasso.get()
     inner class ReactsHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
         View.OnClickListener, View.OnLongClickListener {
 
-
         init {
+            pClickListener = peopleWhoReactedClickListener
             itemView.setOnClickListener(this)
             itemView.setOnLongClickListener(this)
         }
@@ -53,7 +56,8 @@ class ReactsAdapter(private var reacts: List<React>) :
         }
 
         override fun onClick(item: View?) {
-
+            val currentReactorId = reacts[adapterPosition].reactorId
+            pClickListener.onPeopleWhoReactedClickListener(currentReactorId.toString())
         }
 
         override fun onLongClick(item: View?): Boolean {

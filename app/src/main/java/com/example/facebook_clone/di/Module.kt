@@ -51,7 +51,10 @@ val othersProfileActivityViewModelModule = module { viewModel { OthersProfileAct
 val notificationsFragmentViewModelModule = module { viewModel { NotificationsFragmentViewModel(get()) } }
 
 val newsFeedActivityViewModelModule = module { viewModel { NewsFeedActivityViewModel(get()) } }
+
 val recentUsersActivityViewModelModule = module { viewModel { RecentUsersActivityViewModel(get()) } }
+
+val postViewerActivityViewModelModule = module { viewModel { PostViewerViewModel(get(), get()) } }
 
 /////////////////////////////////////////////////REPOSITORIES///////////////////////////////////////
 

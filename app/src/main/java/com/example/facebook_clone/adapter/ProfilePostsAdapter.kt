@@ -160,7 +160,7 @@ class ProfilePostsAdapter(
                 )
             }
 
-            itemView.moreOnPostButton.setOnClickListener {
+            itemView.moreOnPost.setOnClickListener {
                 val post = postsList[adapterPosition]
                 listener.onPostMoreDotsClicked(post)
             }
@@ -353,9 +353,9 @@ class ProfilePostsAdapter(
             }
 
             if (auth.currentUser?.uid.toString() == post.publisherId){
-                itemView.moreOnPostButton.visibility = View.VISIBLE
+                itemView.moreOnPost.visibility = View.VISIBLE
             }else{
-                itemView.moreOnPostButton.visibility = View.GONE
+                itemView.moreOnPost.visibility = View.GONE
             }
         }
 

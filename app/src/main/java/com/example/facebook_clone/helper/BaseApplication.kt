@@ -68,7 +68,8 @@ class BaseApplication : Application() {
                     othersProfileActivityViewModelModule,
                     notificationsFragmentViewModelModule,
                     newsFeedActivityViewModelModule,
-                    recentUsersActivityViewModelModule
+                    recentUsersActivityViewModelModule,
+                    postViewerActivityViewModelModule
                 )
             )
         }

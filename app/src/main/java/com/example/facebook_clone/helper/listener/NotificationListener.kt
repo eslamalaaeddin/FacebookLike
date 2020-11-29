@@ -8,6 +8,7 @@ interface NotificationListener {
     fun onClickDeleteFriendRequestNotification(notifiedId: String, notificationId: String)
     fun onClickConfirmFriendRequestNotification(notifiedId: String, notificationId: String,userId:String, userName:String, userImageUrl:String)
 
+
     fun onClickReactOnPostNotification(
         postPublisherId: String,
         postId: String,
@@ -29,6 +30,8 @@ interface NotificationListener {
         postId: String,
         commentPosition: Int
     )
+
+    fun onNotificationLongClicked(notification: Notification)
 
 
 }

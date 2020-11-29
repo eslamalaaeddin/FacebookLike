@@ -12,6 +12,8 @@ import com.example.facebook_clone.livedata.UserLiveData
 import com.example.facebook_clone.model.notification.Notification
 import com.example.facebook_clone.model.user.recentloggedinuser.RecentLoggedInUser
 import com.example.facebook_clone.model.user.User
+import com.example.facebook_clone.model.user.followed.Followed
+import com.example.facebook_clone.model.user.follower.Follower
 import com.example.facebook_clone.model.user.friend.Friend
 import com.example.facebook_clone.model.user.friendrequest.FriendRequest
 import com.example.facebook_clone.model.user.search.Search
@@ -65,6 +67,26 @@ class UsersRepository(
             .update("recentUsers", FieldValue.arrayRemove(recentUser))
     }
 
+    fun addMeAsAFollowerToHisDocument(followedId: String, follower: Follower): Task<Void>{
+        return database.collection(USERS_COLLECTION).document(followedId)
+            .update("followers", FieldValue.arrayUnion(follower))
+    }
+
+    fun deleteMeAsAFollowerFromHisDocument(followedId: String, follower: Follower): Task<Void>{
+        return database.collection(USERS_COLLECTION).document(followedId)
+            .update("followers", FieldValue.arrayRemove(follower))
+    }
+
+    fun addHimAsAFollowingToMyDocument(myId: String, followed: Followed): Task<Void>{
+        return database.collection(USERS_COLLECTION).document(myId)
+            .update("followings", FieldValue.arrayUnion(followed))
+    }
+
+    fun deleteHimAsAFollowingFromMyDocument(myId: String, followed: Followed): Task<Void>{
+        return database.collection(USERS_COLLECTION).document(myId)
+            .update("followings", FieldValue.arrayRemove(followed))
+    }
+
     fun addHimToMyFriendsAndMeToHisFriends(meAsFriend: Friend, himAsFriend: Friend): Task<Void>{
 
         return database.collection(USERS_COLLECTION).document(meAsFriend.id.toString()).
@@ -74,6 +96,11 @@ class UsersRepository(
                 update("friends", FieldValue.arrayUnion(meAsFriend))
             }
         }
+    }
+
+    fun deleteFriendFromFriends(friend: Friend, userId: String): Task<Void>{
+        return database.collection(USERS_COLLECTION).document(userId)
+            .update("friends", FieldValue.arrayRemove(friend))
     }
 
     //AddingImages
