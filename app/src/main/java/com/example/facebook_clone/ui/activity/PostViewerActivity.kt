@@ -16,7 +16,9 @@ import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.CommentsAdapter
 import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.helper.listener.CommentClickListener
+import com.example.facebook_clone.helper.listener.CommentsBottomSheetListener
 import com.example.facebook_clone.helper.listener.ReactClickListener
+import com.example.facebook_clone.helper.notification.NotificationsHandler
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.react.React
@@ -25,9 +27,7 @@ import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.ui.bottomsheet.CommentsBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.PostConfigurationsBottomSheet
 import com.example.facebook_clone.ui.dialog.ImageViewerDialog
-import com.example.facebook_clone.viewmodel.PostViewModel
-import com.example.facebook_clone.viewmodel.PostViewerViewModel
-import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
+import com.example.facebook_clone.viewmodel.*
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
@@ -51,10 +51,14 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 private const val TAG = "PostViewerActivity"
 
-class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClickListener {
+class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClickListener,
+    CommentsBottomSheetListener {
     private val postViewModel by viewModel<PostViewModel>()
     private val profileActivityViewModel by viewModel<ProfileActivityViewModel>()
     private val postViewerActivityViewModel by viewModel<PostViewerViewModel>()
+    private val othersProfileActivityViewModel by viewModel<OthersProfileActivityViewModel>()
+    private val notificationsFragmentViewModel by viewModel<NotificationsFragmentViewModel>()
+    private lateinit var notificationsHandler: NotificationsHandler
     private val picasso = Picasso.get()
     private var commentsAdapter: CommentsAdapter? = null
     private var post: Post? = null
@@ -73,11 +77,19 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
         setContentView(R.layout.activity_post_viewer)
         //71951780018
 
+        notificationsHandler = NotificationsHandler(
+            othersProfileActivityViewModel = othersProfileActivityViewModel,
+            notificationsFragmentViewModel = notificationsFragmentViewModel
+        )
+
         val postPublisherId = intent.getStringExtra("postPublisherId").toString()
         val postId = intent.getStringExtra("postId").toString()
         val commentPosition = intent.getIntExtra("commentPosition", -1)
         val publisherName = intent.getStringExtra("publisherName").toString()
         val publisherImageUrl = intent.getStringExtra("publisherImageUrl").toString()
+
+        //Each coment and post should wrap user token
+//        notificationsHandler.notifiedToken = user.token
 
         val postLiveData = postViewerActivityViewModel.getPostLiveData(postPublisherId, postId)
         postLiveData?.observe(this, { post ->
@@ -85,6 +97,9 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                 this.post = post
                 this.postId = post.id.toString()
                 this.postPublisherId = post.publisherId.toString()
+
+                notificationsHandler.postPublisherId = post.publisherId.toString()
+
 
                 picasso.load(post.publisherImageUrl).into(circleImageView)
                 userNameTextView.text = post.publisherName
@@ -161,7 +176,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                     }
                     for (react in reacts) {
                         // || post.reacts?.isEmpty()!!
-                        if (react.reactorId == postPublisherId) {
+                        if (react.reactorId == auth.currentUser?.uid.toString()) {
                             reactImageViewGrey.visibility = View.INVISIBLE
                             reactImageViewBlue.visibility = View.VISIBLE
                             when (react.react) {
@@ -246,7 +261,9 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                     }
                 }
             } else {
-                finish()
+                //finish()
+                Toast.makeText(this, postPublisherId, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, postId, Toast.LENGTH_SHORT).show()
                 Toast.makeText(this, "Post was deleted", Toast.LENGTH_SHORT).show()
             }
 
@@ -255,27 +272,20 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
         val userLiveDate = profileActivityViewModel.getMe(auth.currentUser?.uid.toString())
         userLiveDate?.observe(this, { user ->
             currentUser = user
+            notificationsHandler.notifierId = currentUser.id
+            notificationsHandler.notifierName = currentUser.name
+            notificationsHandler.notifierImageUrl = currentUser.profileImageUrl
             interactorId = user.id.toString()
             interactorName = user.name.toString()
             interactorImageUrl = user.profileImageUrl.toString()
         })
 
         circleImageView.setOnClickListener {
-            startActivity(
-                Intent(
-                    this,
-                    ProfileActivity::class.java
-                )
-            )
+            navigateToPostPublisherProfile(postPublisherId)
         }
 
         userNameTextView.setOnClickListener {
-            startActivity(
-                Intent(
-                    this,
-                    ProfileActivity::class.java
-                )
-            )
+            navigateToPostPublisherProfile(postPublisherId)
         }
 
         attachmentImageView.setOnClickListener {
@@ -304,6 +314,16 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                         postId,
                         postPublisherId
                     ).addOnCompleteListener { task ->
+
+//                        if (interactorId != postPublisherId) {
+//                            notificationsHandler.also {
+//                                it.notifiedId = postPublisherId
+//                                it.notificationType = "reactOnPost"
+//                                it.reactType = 1
+//                                it.postId = postId
+//                                it.handleNotificationCreationAndFiring()
+//                            }
+//                        }
                         if (!task.isSuccessful) {
                             Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
                         }
@@ -366,6 +386,103 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                 }
             }
             else{
+                if (postReacts.isEmpty()) {
+                    val myReact = createReact(interactorId, interactorName, interactorImageUrl)
+                    addReactOnPostToDb(
+                        myReact,
+                        postId,
+                        postPublisherId
+                    ).addOnCompleteListener { task ->
+
+                        if (interactorId != postPublisherId) {
+                            notificationsHandler.also {
+                                it.notifiedId = postPublisherId
+                                it.notificationType = "reactOnPost"
+                                it.reactType = 1
+                                it.postId = postId
+                                it.handleNotificationCreationAndFiring()
+                            }
+                        }
+                        if (!task.isSuccessful) {
+                            Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } else {
+                    for ((index, react) in postReacts.withIndex()) {
+                        //I have Reacted
+                        if (react.reactorId == currentUserId) {
+                            Log.i(TAG, "YOYO onCreate: Remove React")
+                            deleteReactFromPost(
+                                react,
+                                postId,
+                                postPublisherId
+                            ).addOnCompleteListener { task ->
+                                if (!task.isSuccessful) {
+                                    Utils.toastMessage(this, task.exception?.message.toString())
+                                }
+                            }
+                            break
+                        }
+                        //I have not reacted and i am in the last react in the list
+                        else if (react.reactorId != currentUserId && index == postReacts.size - 1) {
+                            Log.i(TAG, "YOYO onCreate: Add React")
+                            val myReact =
+                                createReact(interactorId, interactorName, interactorImageUrl)
+                            addReactOnPostToDb(
+                                myReact,
+                                postId,
+                                postPublisherId
+                            ).addOnCompleteListener { task ->
+                                if (interactorId != postPublisherId) {
+                                    notificationsHandler.also {
+                                        it.notifiedId = postPublisherId
+                                        it.notificationType = "reactOnPost"
+                                        it.reactType = 1
+                                        it.postId = postId
+                                        it.handleNotificationCreationAndFiring()
+                                    }
+                                }
+
+                                if (!task.isSuccessful) {
+                                    Toast.makeText(
+                                        this,
+                                        task.exception?.message,
+                                        Toast.LENGTH_SHORT
+                                    )
+                                        .show()
+                                }
+                            }
+
+                        } else if (postReacts.isEmpty()) {
+                            val myReact =
+                                createReact(interactorId, interactorName, interactorImageUrl)
+                            addReactOnPostToDb(
+                                myReact,
+                                postId,
+                                postPublisherId
+                            ).addOnCompleteListener { task ->
+                                if (interactorId != postPublisherId) {
+                                    notificationsHandler.also {
+                                        it.notifiedId = postPublisherId
+                                        it.notificationType = "reactOnPost"
+                                        it.reactType = 1
+                                        it.postId = postId
+                                        it.handleNotificationCreationAndFiring()
+                                    }
+                                }
+
+                                if (!task.isSuccessful) {
+                                    Toast.makeText(
+                                        this,
+                                        task.exception?.message,
+                                        Toast.LENGTH_SHORT
+                                    )
+                                        .show()
+                                }
+                            }
+                        }
+                    }
+                }
                 Toast.makeText(this, "Notify the post publisher", Toast.LENGTH_SHORT).show()
             }
         }
@@ -413,6 +530,44 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                 }
             }
             else{
+                if (postReacts.isEmpty()) {
+                    showReactsChooserDialog(
+                        interactorId,
+                        interactorName,
+                        interactorImageUrl,
+                        postId,
+                        postPublisherId,
+                        null
+                    )
+                } else {
+                    for ((index, react) in postReacts.withIndex()) {
+                        //I have Reacted
+                        if (react.reactorId == currentUserId) {
+                            showReactsChooserDialog(
+                                interactorId,
+                                interactorName,
+                                interactorImageUrl,
+                                postId,
+                                postPublisherId,
+                                react
+                            )
+                            break
+                        }
+                        //I have not reacted and i am in the last react in the list
+                        else if (react.reactorId != currentUserId && index == postReacts.size - 1) {
+                            showReactsChooserDialog(
+                                interactorId,
+                                interactorName,
+                                interactorImageUrl,
+                                postId,
+                                postPublisherId,
+                                null
+                            )
+                        }
+
+
+                    }
+                }
                 Toast.makeText(this, "Notify the post publisher", Toast.LENGTH_SHORT).show()
             }
             true
@@ -426,7 +581,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                 interactorId,
                 interactorName,
                 interactorImageUrl,
-                null,//used to handle notification so, no need for it in my profile.
+                this,//used to handle notification so, no need for it in my profile.
                 currentUser.token.toString()
             ).apply {
                 show(supportFragmentManager, tag)
@@ -440,7 +595,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                 interactorId,
                 interactorName,
                 interactorImageUrl,
-                null,
+                this,
                 currentUser.token.toString(),
             ).apply {
                 show(supportFragmentManager, tag)
@@ -458,7 +613,23 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                     Utils.doAfterFinishing(this, task, "You shared this post")
                 }
             } else {
-                Toast.makeText(this, "Share with notify", Toast.LENGTH_SHORT).show()
+                val share = Share(
+                    sharerId = interactorId,
+                    sharerName = interactorName,
+                    sharerImageUrl = interactorImageUrl,
+                )
+                addShareToPost(share, postId, postPublisherId).addOnCompleteListener { task ->
+                    Utils.doAfterFinishing(this, task, "You shared this post")
+                    if (interactorId != postPublisherId) {
+                        notificationsHandler.also {
+                            it.notifiedId = postPublisherId
+                            it.notificationType = "share"
+                            it.postId = postId
+                            it.handleNotificationCreationAndFiring()
+                        }
+                    }
+                }
+
             }
         }
 
@@ -470,6 +641,17 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                     postConfigurationsBottomSheet.tag
                 )
             }
+        }
+    }
+
+    private fun navigateToPostPublisherProfile(postPublisherId: String) {
+        if (postPublisherId == auth.currentUser?.uid.toString()){
+            startActivity(Intent(this, ProfileActivity::class.java))
+        }
+        else{
+            val intent = Intent(this, OthersProfileActivity::class.java)
+            intent.putExtra("userId", postPublisherId)
+            startActivity(intent)
         }
     }
 
@@ -649,7 +831,30 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
         if (currentReact != null) {
             deleteReactFromPost(currentReact, postId, postPublisherId)
         }
-        addReactOnPostToDb(react, postId, postPublisherId)
+        addReactOnPostToDb(react, postId, postPublisherId).addOnCompleteListener {task ->
+            if (task.isSuccessful){
+                if (interactorId != postPublisherId) {
+                    notificationsHandler.also {
+                        it.notifiedId = postPublisherId
+                        it.notificationType = "reactOnPost"
+                        it.reactType = react.react
+                        it.postId = postId
+                        it.handleNotificationCreationAndFiring()
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onAnotherUserCommented(commentPosition: Int, commentId: String, postId: String) {
+        notificationsHandler.also {
+            it.notifiedId = postPublisherId
+            it.notificationType = "commentOnPost"
+            it.postId = postId
+            it.commentPosition = commentPosition
+            it.handleNotificationCreationAndFiring()
+        }
+
     }
 
 }

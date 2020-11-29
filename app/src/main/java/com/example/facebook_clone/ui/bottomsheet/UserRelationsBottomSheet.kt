@@ -1,6 +1,7 @@
 package com.example.facebook_clone.ui.bottomsheet
 
 import android.app.Dialog
+import android.opengl.Visibility
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,11 +21,12 @@ import kotlinx.android.synthetic.main.user_relations_bottom_sheet.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class UserRelationsBottomSheet(private val friendId: String, private val meAsFriend: Friend?): BottomSheetDialogFragment() {
+class UserRelationsBottomSheet(private val friendId: String): BottomSheetDialogFragment() {
     private val othersViewModel by viewModel<OthersProfileActivityViewModel>()
     private val profileActivityViewModel by viewModel<ProfileActivityViewModel>()
     private val auth: FirebaseAuth by inject()
     private lateinit var currentUser: User
+    private var meAsFriend: Friend? = null
     private var currentFriend: Friend? = null
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,14 +49,43 @@ class UserRelationsBottomSheet(private val friendId: String, private val meAsFri
                     break
                 }
             }
+
+            currentUser.followings?.let {followings ->
+                if (followings.isEmpty()) {
+                    followUserLayout.visibility = View.VISIBLE
+                    unFollowUserLayout.visibility = View.GONE
+                }
+
+                else {
+                    for (following in followings) {
+                        if (following.id == friendId) {
+                            followUserLayout.visibility = View.GONE
+                            unFollowUserLayout.visibility = View.VISIBLE
+                            break
+                        }
+                    }
+                }
+
+
+            }
+            currentUser.friends?.let { friends ->
+                if (friends.isEmpty()) {
+                    unFriendLayout.visibility = View.GONE
+                }
+
+                else {
+                    for (friend in friends) {
+                        if (friend.id == friendId) {
+                            unFriendLayout.visibility = View.VISIBLE
+                            meAsFriend = friend
+                            break
+                        }
+                    }
+                }
+            }
         })
 
-        if (meAsFriend == null){
-            unFriendLayout.visibility = View.GONE
-        }
-        else{
-            unFriendLayout.visibility = View.VISIBLE
-        }
+
 
         followUserLayout.setOnClickListener {
             val meAsAFollower = Follower(currentUser.id, currentUser.name, currentUser.profileImageUrl)
@@ -64,6 +95,19 @@ class UserRelationsBottomSheet(private val friendId: String, private val meAsFri
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful){
                         othersViewModel.addHimAsAFollowingToMyDocument(currentUser.id.toString(), himAsAFollowing)
+                    }
+                }
+            dismiss()
+        }
+
+        unFollowUserLayout.setOnClickListener {
+            val meAsAFollower = Follower(currentUser.id, currentUser.name, currentUser.profileImageUrl)
+            //following == followed
+            val himAsAFollowing = Followed(currentFriend?.id, currentFriend?.name, currentFriend?.imageUrl)
+            othersViewModel.deleteMeAsAFollowerFromHisDocument(currentFriend?.id.toString(), meAsAFollower)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful){
+                        othersViewModel.deleteHimAsAFollowingFromMyDocument(currentUser.id.toString(), himAsAFollowing)
                     }
                 }
             dismiss()

@@ -18,6 +18,7 @@ class NotificationsHandler(
     var notifiedToken: String? = null,
     var notificationId: String? = null,
     var notificationType: String? = null,
+    var postPublisherId: String? = null,
     var postId: String? = null,
     var reactType: Int? = null,
     var commentPosition: Int? = null,
@@ -36,7 +37,8 @@ class NotificationsHandler(
             notifierImageUrl = notifierImageUrl,
             postId = postId,
             reactType = reactType,
-            commentPosition = commentPosition
+            commentPosition = commentPosition,
+            postPublisherId = postPublisherId
         )
     }
 

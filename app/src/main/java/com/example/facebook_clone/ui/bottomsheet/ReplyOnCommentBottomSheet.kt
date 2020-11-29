@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.format.DateFormat
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -116,7 +117,7 @@ class ReplyOnCommentBottomSheet(
         notificationsHandler.notifierId = interactorId
         notificationsHandler.notifierName = interactorName
         notificationsHandler.notifierImageUrl = interactorImageUrl
-        notificationsHandler.notifiedId = postPublisherId
+        notificationsHandler.postPublisherId = postPublisherId
         notificationsHandler.notifiedToken = commenterToken
 
         commentEditText.requestFocus()
@@ -423,7 +424,6 @@ class ReplyOnCommentBottomSheet(
                                     break
                                 }
                             }
-
                             clicksConsumer.reactOnCommentFromRepliesDataProvider(
                                 superComment,
                                 commentPosition,
@@ -432,7 +432,8 @@ class ReplyOnCommentBottomSheet(
                                 "click"
                             )
                         }
-                    } else {
+                    }
+                    else {
                         clicksConsumer.reactOnCommentFromRepliesDataProvider(
                             superComment,
                             commentPosition,
@@ -499,11 +500,15 @@ class ReplyOnCommentBottomSheet(
             }
             reactionsAndComments?.reactions?.let { reacts ->
                 if (reacts.isNotEmpty()) {
-                    reactsCountTextView.text = reacts.size.toString()
-                    reactsCountTextView.visibility = View.VISIBLE
+                    if (reactsCountTextView != null) {
+                        reactsCountTextView.text = reacts.size.toString()
+                        reactsCountTextView.visibility = View.VISIBLE
+                    }
                     for (react in reacts) {
                         if (react.reactorId == auth.currentUser?.uid.toString()) {
-                            myReactPlaceHolder.visibility = View.VISIBLE
+                            if (myReactPlaceHolder != null) {
+                                myReactPlaceHolder.visibility = View.VISIBLE
+                            }
 //                                itemView.likeReactPlaceHolder.visibility = View.GONE
 //                                itemView.loveReactPlaceHolder.visibility = View.GONE
 //                                itemView.careReactPlaceHolder.visibility = View.GONE
@@ -663,15 +668,21 @@ class ReplyOnCommentBottomSheet(
 
                     }
                 } else {
+                    if (myReactPlaceHolder != null){
                     myReactPlaceHolder.visibility = View.INVISIBLE
-                    reactsCountTextView.visibility = View.INVISIBLE
+                    }
 
-                    reactOnCommentTextView.text = "Like"
-                    reactOnCommentTextView.setTextColor(
-                        activity?.resources?.getColor(
-                            R.color.gray
-                        )!!
-                    )
+                    if (reactsCountTextView != null) {
+                        reactsCountTextView.visibility = View.INVISIBLE
+                    }
+                    if (reactsCountTextView != null) {
+                        reactOnCommentTextView.text = "Like"
+                        reactOnCommentTextView.setTextColor(
+                            activity?.resources?.getColor(
+                                R.color.gray
+                            )!!
+                        )
+                    }
                 }
 
             }
@@ -749,6 +760,9 @@ class ReplyOnCommentBottomSheet(
             ).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     updateCommentsUI()
+                    Log.i(TAG, "TOOT onReactOnCommentClicked: ${comment.commenterId.toString()}")
+                    Log.i(TAG, "TOOT onReactOnCommentClicked: $interactorId")
+                    notificationsHandler.notifiedId = comment.commenterId.toString()
                     if (comment.commenterId.toString() != interactorId) {
                         notificationsHandler.also {
                             it.notificationType = "reactOnComment"
@@ -911,7 +925,9 @@ class ReplyOnCommentBottomSheet(
         }
         addReactOnComment(commenterId, commentId, react).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                if (superComment.commenterId.toString() != interactorId) {
+                notificationsHandler.notifiedId = commenterId
+                Log.i(TAG, "TOOT handleLongReactOnCommentCreationAndDeletion: $commenterId")
+                if (commenterId!= interactorId) {
                     notificationsHandler.also {
                         it.notificationType = "reactOnComment"
                         it.commentPosition = commentPosition

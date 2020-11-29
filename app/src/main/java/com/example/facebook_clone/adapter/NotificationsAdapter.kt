@@ -120,6 +120,7 @@ class NotificationsAdapter(private var notifications: List<Notification>,
             val notificationType = currentNotification.notificationType.toString()
             val notifierId = currentNotification.notifierId.toString()
             val notifiedId = currentNotification.notifiedId.toString()
+            val postPublisherId = currentNotification.postPublisherId.toString()
             val notifierName = currentNotification.notifierName.toString()
             val notifierImageUrl = currentNotification.notifierImageUrl.toString()
             //val whereTheActionOccurred = currentNotification.whereTheActionOccurred.toString()
@@ -133,25 +134,25 @@ class NotificationsAdapter(private var notifications: List<Notification>,
             when (notificationType){
                 "friendRequest" ->  notListener.onClickFriendRequestNotification(notifierId)
                 "reactOnPost" -> notListener.onClickReactOnPostNotification(
-                    postPublisherId = notifiedId,
+                    postPublisherId = postPublisherId,
                     postId = postId
                 )
                 "commentOnPost" -> notListener.onClickCommentOnPostNotification(
-                    postPublisherId = notifiedId,
+                    postPublisherId = postPublisherId,
                     postId = postId,
                     commentPosition = commentPosition!!
                 )
                 "commentOnComment" -> notListener.onClickCommentOnPostNotification(
-                    postPublisherId = notifiedId,
+                    postPublisherId = postPublisherId,
                     postId = postId,
                     commentPosition = commentPosition!!
                 )
                 "share" -> notListener.onClickShareOnPostNotification(
-                    postPublisherId = notifiedId,
+                    postPublisherId = postPublisherId,
                     postId = postId,
                 )
                 "reactOnComment" -> notListener.onClickReactsOnCommentNotification(
-                    postPublisherId = notifiedId,
+                    postPublisherId = postPublisherId,
                     postId = postId,
                     commentPosition = commentPosition!!
                 )

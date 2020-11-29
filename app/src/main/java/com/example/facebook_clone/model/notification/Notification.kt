@@ -6,6 +6,7 @@ import com.google.firebase.firestore.Exclude
 import java.util.*
 
 data class Notification(
+    var postPublisherId: String? = null,
     var notificationType: String? = null,
     var notifierId: String? = null,
     var notifiedId: String? = null,//it is used to delete notificatoin

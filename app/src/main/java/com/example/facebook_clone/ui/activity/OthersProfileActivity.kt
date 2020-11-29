@@ -22,9 +22,7 @@ import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.model.post.share.Share
 import com.example.facebook_clone.model.user.friend.Friend
 import com.example.facebook_clone.model.user.friendrequest.FriendRequest
-import com.example.facebook_clone.ui.bottomsheet.CommentsBottomSheet
-import com.example.facebook_clone.ui.bottomsheet.PeopleWhoReactedBottomSheet
-import com.example.facebook_clone.ui.bottomsheet.UserRelationsBottomSheet
+import com.example.facebook_clone.ui.bottomsheet.*
 import com.example.facebook_clone.ui.dialog.ImageViewerDialog
 import com.example.facebook_clone.viewmodel.NotificationsFragmentViewModel
 import com.example.facebook_clone.viewmodel.OthersProfileActivityViewModel
@@ -156,6 +154,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         }
 
         notificationsHandler.notifiedId = userIdIAmViewing
+        notificationsHandler.postPublisherId = userIdIAmViewing
         val userLiveDate = profileActivityViewModel.getAnotherUser(userIdIAmViewing!!)
         userLiveDate?.observe(this, { user ->
             user?.let {
@@ -194,6 +193,14 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             }
         })
 
+        profileImageView.setOnClickListener {
+            showUserImage(userIAmViewing.profileImageUrl.toString())
+        }
+
+        coverImageView.setOnClickListener {
+            showUserImage(userIAmViewing.coverImageUrl.toString())
+        }
+
         addFriendButton.setOnClickListener { sendUserFriendRequest() }
 
         cancelRequestButton.setOnClickListener {
@@ -226,31 +233,15 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
 
          */
         userRelationsButton.setOnClickListener {
-            userIAmViewing.friends?.let { friends ->
-                if (friends.isEmpty()) {
-                    val usersRelationsBottomSheet =
-                        UserRelationsBottomSheet(userIdIAmViewing.toString(), null)
-                    usersRelationsBottomSheet.show(
-                        supportFragmentManager,
-                        usersRelationsBottomSheet.tag
-                    )
-
-                } else {
-                    for (friend in friends) {
-                        if (friend.id == auth.currentUser?.uid.toString()) {
-                            val usersRelationsBottomSheet =
-                                UserRelationsBottomSheet(userIdIAmViewing.toString(), friend)
-                            usersRelationsBottomSheet.show(
-                                supportFragmentManager,
-                                usersRelationsBottomSheet.tag
-                            )
-                            break
-                        }
-                    }
-                }
-            }
-
+            val usersRelationsBottomSheet = UserRelationsBottomSheet(userIdIAmViewing.toString())
+            usersRelationsBottomSheet.show(supportFragmentManager, usersRelationsBottomSheet.tag)
         }
+    }
+
+    private fun showUserImage(imageUrl: String){
+        val imageViewerDialog = ImageViewerDialog()
+        imageViewerDialog.show(supportFragmentManager, "signature")
+        imageViewerDialog.setMediaUrl(imageUrl)
     }
 
 

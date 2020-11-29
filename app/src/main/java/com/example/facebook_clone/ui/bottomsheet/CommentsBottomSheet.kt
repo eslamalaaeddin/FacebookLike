@@ -121,7 +121,7 @@ class CommentsBottomSheet(
         notificationsHandler.notifierId = interactorId
         notificationsHandler.notifierName = interactorName
         notificationsHandler.notifierImageUrl = interactorImageUrl
-        notificationsHandler.notifiedId = postPublisherId
+        notificationsHandler.postPublisherId = postPublisherId
         notificationsHandler.notifiedToken = postPublisherToken
 
 
@@ -429,7 +429,10 @@ class CommentsBottomSheet(
             ).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     updateCommentsUI()
-                    if (comment.commenterId.toString() != interactorId && interactorId != auth.currentUser?.uid.toString()) {
+                    Log.i(TAG, "KOKO onReactOnCommentClicked: ${comment.commenterId.toString()}")
+                    Log.i(TAG, "KOKO onReactOnCommentClicked: $interactorId")
+                    notificationsHandler.notifiedId = comment.commenterId.toString()
+                    if (comment.commenterId.toString() != interactorId ) {
                         notificationsHandler.also {
                             it.notificationType = "reactOnComment"
                             it.commentPosition = commentPosition
@@ -467,6 +470,8 @@ class CommentsBottomSheet(
         reacted: Boolean,
         currentReact: React?
     ) {
+        Log.i(TAG, "ISLAM onReactOnCommentClickedFromReplies: ${comment.commenterId}")
+        Log.i(TAG, "ISLAM onReactOnCommentClickedFromReplies: $interactorId")
         //I did not react
         if (!reacted) {
             val myReact = createReact(interactorId, interactorName, interactorImageUrl, 1)
@@ -477,6 +482,7 @@ class CommentsBottomSheet(
             ).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     updateCommentsUI()
+
                     if (comment.commenterId != interactorId) {
                         notificationsHandler.also {
                             it.notificationType = "reactOnComment"
@@ -698,7 +704,11 @@ class CommentsBottomSheet(
         addReactOnComment(commenterId, commentId, react).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 updateCommentsUI()
-                if (commenterId != interactorId  && interactorId != auth.currentUser?.uid.toString()) {
+                Log.i(TAG, "ISLAM handleLongReactOnCommentCreationAndDeletion: $commenterId")
+                Log.i(TAG, "ISLAM handleLongReactOnCommentCreationAndDeletion: $interactorId")
+//                if (commenterId != interactorId  && interactorId != auth.currentUser?.uid.toString()) {
+                notificationsHandler.notifiedId = commenterId
+                if (commenterId != interactorId ) {
                     notificationsHandler.also {
                         it.notificationType = "reactOnComment"
                         it.commentPosition = commentPosition
@@ -786,7 +796,6 @@ class CommentsBottomSheet(
     ) {
         if (clickType == "click") {
             onReactOnCommentClickedFromReplies(superComment, commentPosition, reacted, currentReact)
-            Toast.makeText(requireContext(), "Click", Toast.LENGTH_SHORT).show()
         }
         else if (clickType == "longClick") {
             showReactsChooserDialog(
@@ -800,7 +809,6 @@ class CommentsBottomSheet(
                 currentReact,
                 commentPosition
             )
-            Toast.makeText(requireContext(), "LongClick", Toast.LENGTH_SHORT).show()
 
         }
     }
