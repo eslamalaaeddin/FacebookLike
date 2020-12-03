@@ -17,6 +17,7 @@ import com.example.facebook_clone.helper.listener.FriendClickListener
 import com.example.facebook_clone.helper.listener.PostListener
 import com.example.facebook_clone.helper.notification.NotificationsHandler
 import com.example.facebook_clone.model.post.Post
+import com.example.facebook_clone.model.post.SharedPost
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.model.post.share.Share
@@ -252,7 +253,8 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             this,
             currentUser.name.toString(),
             currentUser.profileImageUrl.toString(),
-            iAmFriend
+            iAmFriend,
+            userIdIAmViewing.toString()
         )
         profilePostsRecyclerView.adapter = profilePostsAdapter
         if (currentEditedPostPosition != -1) {
@@ -391,8 +393,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
     }
 
     override fun onShareButtonClicked(
-        postPublisherId: String,
-        postId: String,
+        post: Post,
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
@@ -403,9 +404,44 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             sharerId = interactorId,
             sharerName = interactorName,
             sharerImageUrl = interactorImageUrl,
+            sharedPost = SharedPost(
+                id = post.id,
+                content = post.content,
+                attachmentUrl = post.attachmentUrl,
+                attachmentType = post.attachmentType,
+                publisherId = post.publisherId,
+                publisherImageUrl = post.publisherImageUrl,
+                publisherName = post.publisherName,
+                visibility = post.visibility,
+                creationTime =post.creationTime
+            )
         )
+        val postId = post.id.toString()
+        val postPublisherId = post.publisherId.toString()
+        post.shares?.add(share)
+        post.reacts = null
+        post.comments = null
+
+
         addShareToPost(share, postId, postPublisherId).addOnCompleteListener { task ->
+            val myPost = Post(
+                id = share.id,
+                publisherId = auth.currentUser?.uid.toString(),
+                content = null,
+                visibility = 0,
+                publisherName = currentUser.name,
+                publisherImageUrl = currentUser.profileImageUrl,
+                shares = mutableListOf(share),
+                reacts = null,
+                comments = null,
+                publisherToken = NewsFeedActivity.getTokenFromSharedPreference(this)
+            )
             if (task.isSuccessful) {
+                //post.shares?.add(share)
+                Log.i(TAG, "YOYO onShareButtonClicked: $myPost")
+
+                //this trick is to add recent share data to my post collections also
+                addSharedPostToMyPosts(myPost, auth.currentUser?.uid.toString())
                 notificationsHandler.also {
                     it.notificationType = "share"
                     it.postId = postId
@@ -443,7 +479,11 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         }
     }
 
-    override fun onPostMoreDotsClicked(post: Post) {
+    override fun onPostMoreDotsClicked(post: Post, shared: Boolean?) {
+
+    }
+
+    override fun onSharedPostClicked(originalPostPublisherId: String, postId: String) {
 
     }
 
@@ -619,6 +659,10 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
                 Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun addSharedPostToMyPosts(post: Post, myId: String){
+        postViewModel.addSharedPostToMyPosts(post, myId)
     }
 
 

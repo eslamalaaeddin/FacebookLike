@@ -29,16 +29,20 @@ import com.example.facebook_clone.model.post.comment.CommentDocument
 import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.model.post.react.ReactDocument
 import com.example.facebook_clone.model.post.share.Share
+import com.example.facebook_clone.ui.activity.NewsFeedActivity
 import com.example.facebook_clone.ui.activity.VideoPlayerActivity
 import com.example.facebook_clone.ui.dialog.ImageViewerDialog
 import com.example.facebook_clone.viewmodel.NotificationsFragmentViewModel
 import com.example.facebook_clone.viewmodel.OthersProfileActivityViewModel
 import com.example.facebook_clone.viewmodel.PostViewModel
+import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.iid.InstanceIdResult
 import kotlinx.android.synthetic.main.comments_bottom_sheet.*
 import kotlinx.android.synthetic.main.comments_bottom_sheet.addAttachmentToComment
 import kotlinx.android.synthetic.main.comments_bottom_sheet.commentEditText
@@ -66,6 +70,7 @@ class CommentsBottomSheet(
     private val postViewModel by viewModel<PostViewModel>()
     private val othersProfileActivityViewModel by viewModel<OthersProfileActivityViewModel>()
     private val notificationsFragmentViewModel by viewModel<NotificationsFragmentViewModel>()
+    private val profileActivityViewModel by viewModel<ProfileActivityViewModel>()
     private lateinit var comBottomSheetListener: CommentsBottomSheetListener
     private lateinit var commentsList: List<Comment>
     private lateinit var reactsList: List<React>
@@ -126,7 +131,7 @@ class CommentsBottomSheet(
 
 
         reactorsLayout.setOnClickListener {
-            openPeopleWhoReactedLayout(null, "post")
+            openPeopleWhoReactedLayout(null,null, "post")
         }
 
 
@@ -485,6 +490,7 @@ class CommentsBottomSheet(
 
                     if (comment.commenterId != interactorId) {
                         notificationsHandler.also {
+                            it.notifiedId = comment.commenterId.toString()
                             it.notificationType = "reactOnComment"
                             it.commentPosition = commentPosition
                             it.reactType = 1
@@ -541,28 +547,34 @@ class CommentsBottomSheet(
         reacted: Boolean,
         currentReact: React?
     ) {
-        val replyOnCommentBottomSheet = ReplyOnCommentBottomSheet(
-            this,
-            postPublisherId,
-            comment,
-            commentPosition,
-            interactorId,
-            interactorName,
-            interactorImageUrl,
-            "ff9jw4VpQB6UGgmw8pb7yv:APA91bF9nQk-5BcheHo_kPwPkLDHw9kZ1_4TuSZ4wOV9bHKW9GJMM1ZBh5bBFZiIBUeegM9zg6mx9ngUnBXJhITv4mjAsYkQNl9gr7GyU7QoxeHGWOy1Jd8uwBWe5LD5VSzj4G-mjxNz",
-            postId,
-            reacted,
-            currentReact
-        )
-        replyOnCommentBottomSheet.show(
-            activity?.supportFragmentManager!!,
-            replyOnCommentBottomSheet.tag
-        )
+        val commenterId = comment.commenterId
+        val commenterLiveData = profileActivityViewModel.getAnotherUser(commenterId.toString())
+        commenterLiveData?.observe(this, {commenter ->
+            val commenterToken = commenter.token
+            val replyOnCommentBottomSheet = ReplyOnCommentBottomSheet(
+                this,
+                postPublisherId,
+                comment,
+                commentPosition,
+                interactorId,
+                interactorName,
+                interactorImageUrl,
+                commenterToken.toString(),
+                postId,
+                reacted,
+                currentReact
+            )
+            replyOnCommentBottomSheet.show(
+                activity?.supportFragmentManager!!,
+                replyOnCommentBottomSheet.tag
+            )
+        })
+
     }
 
 
-    override fun onCommentReactionsLayoutClicked(commentId: String) {
-        openPeopleWhoReactedLayout(commentId, "comment")
+    override fun onCommentReactionsLayoutClicked(commenterId: String, commentId: String) {
+        openPeopleWhoReactedLayout(commenterId, commentId, "comment")
     }
 
     override fun onMediaCommentClicked(mediaUrl: String) {
@@ -605,7 +617,8 @@ class CommentsBottomSheet(
             commenterImageUrl = interactorImageUrl,
             textComment = commentContent,
             commentType = commentType,
-            attachmentCommentUrl = attachmentCommentUrl
+            attachmentCommentUrl = attachmentCommentUrl,
+            commenterToken = NewsFeedActivity.getTokenFromSharedPreference(requireContext())
         )
     }
 
@@ -778,9 +791,9 @@ class CommentsBottomSheet(
 
     }
 
-    private fun openPeopleWhoReactedLayout(commentId: String?, reactedOn: String) {
+    private fun openPeopleWhoReactedLayout(commenterId: String?, commentId: String?, reactedOn: String) {
         val peopleWhoReactedDialog =
-            PeopleWhoReactedBottomSheet(commentId.toString(), postId, postPublisherId, reactedOn)
+            PeopleWhoReactedBottomSheet(commenterId.toString(), commentId.toString(), postId, postPublisherId, reactedOn)
         peopleWhoReactedDialog.show(
             activity?.supportFragmentManager!!,
             peopleWhoReactedDialog.tag
@@ -812,6 +825,7 @@ class CommentsBottomSheet(
 
         }
     }
+
 
 
 }

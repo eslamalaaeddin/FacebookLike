@@ -13,7 +13,6 @@ data class Comment(
     var textComment: String? = null,
     var commentType: String? = null,
     var superCommentId: String? = null,
-   // var subComments: List<Comment>? = null,
-  //  var reacts: List<React>? = null,
-    val commentTime: Timestamp = Timestamp(Date())
+    val commentTime: Timestamp = Timestamp(Date()),
+    var commenterToken: String? = null
 )

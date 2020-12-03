@@ -47,20 +47,6 @@
         app:layout_constraintTop_toTopOf="@+id/postTimeTextView"
         app:srcCompat="@drawable/ic_public_visibility" />
 
-    <TextView
-        android:id="@+id/postContentTextView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        android:textColor="@color/black"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/circleImageView"
-        tools:text='عندما كنت بالمرحلة الابتدائية كتبت على حائط المدرسة: لا تأتي غدا؛ فأنا قادم لخطبتكِ فلم تحضر مائة طالبة وعشرون معلمة والمديرة. ' />
-
 
     <View
         android:id="@+id/view5"
@@ -169,29 +155,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/reactsLayout" />
 
-    <ImageView
-        android:id="@+id/attachmentImageView"
-        android:layout_width="0dp"
-        android:layout_height="360dp"
-        android:layout_marginTop="4dp"
-        android:scaleType="fitXY"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/postContentTextView"
-         />
-
     <LinearLayout
         android:id="@+id/reactsLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="4dp"
         android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/reactImageViewGrey"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/attachmentImageView">
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout2">
 
 
         <ImageView
@@ -306,17 +280,6 @@
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/playButtonImageView"
-        android:layout_width="128dp"
-        android:layout_height="128dp"
-        app:layout_constraintBottom_toBottomOf="@+id/attachmentImageView"
-        app:layout_constraintEnd_toEndOf="@+id/attachmentImageView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/attachmentImageView"
-        app:srcCompat="@drawable/ic_baseline_play_arrow_24"
-        tools:visibility="gone" />
-
     <ImageButton
         android:id="@+id/moreOnPost"
         style="@style/Widget.AppCompat.Button.Borderless"
@@ -327,6 +290,93 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_more"
         app:tint="#595959" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/stroked_background"
+        android:padding="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/postVisibilityImageView">
+
+        <TextView
+            android:id="@+id/postContentTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:textColor="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/sharedPostCreationTimeTextView"
+            tools:text="aosdjao;daod;nasiodnasidnaiodnadionadiansdi;ansdiasdnaisdnaisdnaso;idnas;iodnasidnasiodnasdi" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/postOriginalCreatorImageView"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/sharedPostAttachmentImageView"
+            android:layout_width="0dp"
+            android:layout_height="196dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/sengab"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/postContentTextView"
+            app:layout_constraintStart_toStartOf="@+id/postContentTextView"
+            app:layout_constraintTop_toBottomOf="@+id/postContentTextView" />
+
+        <ImageView
+            android:id="@+id/sharedPostPlayButtonImageView"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            app:layout_constraintBottom_toBottomOf="@+id/sharedPostAttachmentImageView"
+            app:layout_constraintEnd_toEndOf="@+id/sharedPostAttachmentImageView"
+            app:layout_constraintStart_toStartOf="@+id/sharedPostAttachmentImageView"
+            app:layout_constraintTop_toBottomOf="@+id/postContentTextView"
+            app:srcCompat="@drawable/ic_baseline_play_arrow_24"
+            tools:visibility="gone" />
+
+        <TextView
+            android:id="@+id/postOriginalCreatorNameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:layout_constraintStart_toEndOf="@+id/postOriginalCreatorImageView"
+            app:layout_constraintTop_toTopOf="@+id/postOriginalCreatorImageView"
+            tools:text="أسير الأناناس" />
+
+        <TextView
+            android:id="@+id/sharedPostCreationTimeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@+id/postOriginalCreatorNameTextView"
+            app:layout_constraintTop_toBottomOf="@+id/postOriginalCreatorNameTextView"
+            tools:text="22h" />
+
+        <ImageView
+            android:id="@+id/sharedPostVisibilityImageView"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_marginStart="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/sharedPostCreationTimeTextView"
+            app:layout_constraintStart_toEndOf="@+id/sharedPostCreationTimeTextView"
+            app:layout_constraintTop_toTopOf="@+id/sharedPostCreationTimeTextView"
+            app:srcCompat="@drawable/ic_public_visibility" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

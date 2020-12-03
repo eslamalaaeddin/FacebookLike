@@ -107,6 +107,7 @@ class BaseApplication : Application() {
             notificationType: String,
             notifier: Notifier,
             postId: String?,
+            postPublisherId: String?,
             commentPosition: Int?,
             notifiedId: String?
         ) {
@@ -205,8 +206,9 @@ class BaseApplication : Application() {
                 .setAutoCancel(true)
             //3 Create the action
             val actionIntent = Intent(context, destination)
+
             actionIntent.putExtra("friendRequester", notifier.id.toString())
-            actionIntent.putExtra("postPublisherId", notifiedId)
+            actionIntent.putExtra("postPublisherId", postPublisherId)
             actionIntent.putExtra("postId", postId)
             actionIntent.putExtra("commentPosition", commentPosition)
 
@@ -225,14 +227,6 @@ class BaseApplication : Application() {
             notificationManager.notify(Random.nextInt(), builder.build())
         }
 
-        fun getCurrentUserOnlyOnce(){
-//            FirebaseApp.initializeApp(context!!)
-//            usersRepository.getUserAsRegularObjectNotLiveData(FirebaseAuth.getInstance().currentUser?.uid.toString()).addOnCompleteListener {
-//                if (it.isSuccessful){
-//                    singletonUser = it.result?.toObject(User::class.java)
-//                }
-//            }
-        }
     }
 
 

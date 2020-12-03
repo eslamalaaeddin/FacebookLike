@@ -36,7 +36,10 @@ class UsersRepository(
         return database.collection(USERS_COLLECTION).document(user.id.toString()).set(user)
     }
 
-
+    fun updateUserToken(token: String, userId: String): Task<Void>{
+        return database.collection(USERS_COLLECTION).document(userId)
+            .update("token", token)
+    }
 
     fun addSearchToRecentSearches(search: Search, searcherId: String): Task<Void>{
         return database.collection(USERS_COLLECTION).document(searcherId)

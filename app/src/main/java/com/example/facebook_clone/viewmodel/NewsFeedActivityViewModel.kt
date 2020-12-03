@@ -25,6 +25,9 @@ class NewsFeedActivityViewModel(private val usersRepository: UsersRepository): V
         return usersRepository.createRecentUsersCollection(token, recentUser)
     }
 
+    fun updateUserToken(token: String, userId: String): Task<Void>{
+        return usersRepository.updateUserToken(token, userId)
+    }
 
     fun deleteUserFromRecentLoggedInUsers(recentUser: RecentLoggedInUser, token: String): Task<Void> {
         return usersRepository.deleteUserFromRecentLoggedInUsers(recentUser, token)

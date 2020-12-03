@@ -14,6 +14,8 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.AddToPostAdapter
 import com.example.facebook_clone.adapter.PostVisibilityAdapter
@@ -29,6 +31,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.add_to_post_bottom_sheet.view.*
 import kotlinx.android.synthetic.main.post_creator_dialog.*
+import kotlinx.android.synthetic.main.profile_post_item.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -76,6 +79,8 @@ class PostCreatorDialog : DialogFragment(), AdapterView.OnItemSelectedListener, 
         val adapter = PostVisibilityAdapter(requireContext(), visibilities)
         postVisibilitySpinner.adapter = adapter
 
+
+
         postContentTextView.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
@@ -89,7 +94,8 @@ class PostCreatorDialog : DialogFragment(), AdapterView.OnItemSelectedListener, 
                 if (content?.isEmpty()!!) {
                     createPostButton.isEnabled = false
                     createPostButton.setTextColor(resources.getColor(R.color.gray))
-                } else {
+                }
+                else if (content.isNotEmpty() || postData != null) {
                     createPostButton.isEnabled = true
                     createPostButton.setTextColor(resources.getColor(R.color.dark_blue))
                 }
@@ -123,7 +129,8 @@ class PostCreatorDialog : DialogFragment(), AdapterView.OnItemSelectedListener, 
                                 }
                             }
                         }
-                } else if (postDataType == "video") {
+                }
+                else if (postDataType == "video") {
                     val videoUri = postData!!.data!!
                     progressDialog = Utils.showProgressDialog(requireContext(), "Please wait...")
                     postViewModel.uploadPostVideoToCloudStorage(videoUri)
@@ -137,15 +144,16 @@ class PostCreatorDialog : DialogFragment(), AdapterView.OnItemSelectedListener, 
                                         if (!task.isSuccessful) {
                                             Utils.toastMessage(requireContext(), task.exception?.message.toString())
                                         }
+                                        dismiss()
                                     }
-                                    dismiss()
+
                                 }
                             }
                         }
                 }
             }
             //Text post
-            else{
+            else if (postContentTextView.text.toString().isNotEmpty()){
                 val post = createPost(null, null)
                 progressDialog = Utils.showProgressDialog(requireContext(), "Please wait...")
                 postViewModel.createPost(post).addOnCompleteListener { task ->
@@ -197,6 +205,28 @@ class PostCreatorDialog : DialogFragment(), AdapterView.OnItemSelectedListener, 
             postData = data
             postDataType = dataType
             bitmapFromCamera = fromCamera
+
+            if (postDataType == "image") {
+                var bitmap: Bitmap? = null
+                if (bitmapFromCamera) {
+                    bitmap = postData?.extras?.get("data") as Bitmap
+                } else {
+                    bitmap = MediaStore.Images.Media.getBitmap(
+                        activity?.contentResolver,
+                        postData!!.data
+                    )
+                }
+                postAtachmentImageView.setImageBitmap(bitmap)
+            }
+            else if (postDataType == "video"){
+                val videoUri = postData!!.data!!
+                val interval: Long = 1 * 1000
+                val options: RequestOptions = RequestOptions().frame(interval)
+                Glide.with(requireContext())
+                    .asBitmap().load(videoUri).apply(options)
+                    .into(postAtachmentImageView)
+            }
+
         }
 
     }

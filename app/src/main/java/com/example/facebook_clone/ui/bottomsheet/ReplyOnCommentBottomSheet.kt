@@ -28,6 +28,7 @@ import com.example.facebook_clone.helper.provider.ReplyOnCommentDataProvider
 import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.comment.ReactionsAndSubComments
 import com.example.facebook_clone.model.post.react.React
+import com.example.facebook_clone.ui.activity.NewsFeedActivity
 import com.example.facebook_clone.ui.activity.VideoPlayerActivity
 import com.example.facebook_clone.ui.dialog.ImageViewerDialog
 import com.example.facebook_clone.viewmodel.NotificationsFragmentViewModel
@@ -345,7 +346,9 @@ class ReplyOnCommentBottomSheet(
 //                                            comment.id!!,
 //                                            postId
 //                                        )
+
                                             notificationsHandler.also {
+                                                it.notifiedId = this.superComment.commenterId.toString()
                                                 it.notificationType = "commentOnComment"
                                                 it.postId = postId
                                                 it.commentPosition = commentPosition
@@ -485,6 +488,10 @@ class ReplyOnCommentBottomSheet(
         }
 
         replyOnCommentTextView.setOnClickListener { commentEditText.requestFocus() }
+
+        whoReactedOnCommentLayout.setOnClickListener {
+            openPeopleWhoReactedLayout(superComment.commenterId.toString(), superComment.id.toString(),"comment")
+        }
     }
 
 
@@ -509,13 +516,7 @@ class ReplyOnCommentBottomSheet(
                             if (myReactPlaceHolder != null) {
                                 myReactPlaceHolder.visibility = View.VISIBLE
                             }
-//                                itemView.likeReactPlaceHolder.visibility = View.GONE
-//                                itemView.loveReactPlaceHolder.visibility = View.GONE
-//                                itemView.careReactPlaceHolder.visibility = View.GONE
-//                                itemView.hahaReactPlaceHolder.visibility = View.GONE
-//                                itemView.wowReactPlaceHolder.visibility = View.GONE
-//                                itemView.sadReactPlaceHolder.visibility = View.GONE
-//                                itemView.angryReactPlaceHolder.visibility = View.GONE
+
                             when (react.react) {
                                 1 -> {
                                     reactOnCommentTextView.text = "Like"
@@ -581,23 +582,11 @@ class ReplyOnCommentBottomSheet(
                                     myReactPlaceHolder.setImageResource(R.drawable.ic_angry_angry)
                                 }
                             }
-//                                itemView.reactOnCommentTextView.text = "Like"
-//                                itemView.reactOnCommentTextView.setTextColor(
-//                                    itemView.context.resources.getColor(
-//                                        R.color.dark_blue
-//                                    )
-//                                )
+
                             break
                         } else {
                             //Visible to me
                             myReactPlaceHolder.visibility = View.INVISIBLE
-                            //itemView.likeReactPlaceHolder.visibility = View.GONE
-//                                itemView.loveReactPlaceHolder.visibility = View.GONE
-//                                itemView.careReactPlaceHolder.visibility = View.GONE
-//                                itemView.hahaReactPlaceHolder.visibility = View.GONE
-//                                itemView.wowReactPlaceHolder.visibility = View.GONE
-//                                itemView.sadReactPlaceHolder.visibility = View.GONE
-//                                itemView.angryReactPlaceHolder.visibility = View.GONE
                             reactOnCommentTextView.text = "Like"
                             when (react.react) {
                                 1 -> {
@@ -825,8 +814,8 @@ class ReplyOnCommentBottomSheet(
         Toast.makeText(requireContext(), "Focused reply", Toast.LENGTH_SHORT).show()
     }
 
-    override fun onCommentReactionsLayoutClicked(commentId: String) {
-
+    override fun onCommentReactionsLayoutClicked(commenterId: String,commentId: String) {
+        openPeopleWhoReactedLayout(commenterId, commentId, "comment")
     }
 
     override fun onMediaCommentClicked(mediaUrl: String) {
@@ -868,7 +857,8 @@ class ReplyOnCommentBottomSheet(
             textComment = commentContent,
             commentType = commentType,
             attachmentCommentUrl = attachmentCommentUrl,
-            superCommentId = superCommentId
+            superCommentId = superCommentId,
+            commenterToken = NewsFeedActivity.getTokenFromSharedPreference(requireContext())
         )
     }
 
@@ -1031,6 +1021,15 @@ class ReplyOnCommentBottomSheet(
         } else {
             mediaCommentLayoutPreview.visibility = View.GONE
         }
+    }
+
+    private fun openPeopleWhoReactedLayout(commenterId: String?, commentId: String?, reactedOn: String) {
+        val peopleWhoReactedDialog =
+            PeopleWhoReactedBottomSheet(commenterId.toString(), commentId.toString(), postId, postPublisherId, reactedOn)
+        peopleWhoReactedDialog.show(
+            activity?.supportFragmentManager!!,
+            peopleWhoReactedDialog.tag
+        )
     }
 
 

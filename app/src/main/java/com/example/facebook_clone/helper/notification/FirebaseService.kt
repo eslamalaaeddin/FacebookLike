@@ -32,6 +32,7 @@ class FirebaseService : FirebaseMessagingService() {
         val notifiedId = message.data["notifiedId"]
         val notifierImageUrl = message.data["notifierImageUrl"]
         val postId = message.data["postId"]
+        val postPublisherId= message.data["postPublisherId"]
         val commentPosition = message.data["commentPosition"]?.toInt()
 
         Log.i(TAG, "FAWZY onMessageReceived: $message")
@@ -47,6 +48,7 @@ class FirebaseService : FirebaseMessagingService() {
             notifierId,
             notifierImageUrl,
             postId = postId,
+            postPublisherId = postPublisherId,
             commentPosition = commentPosition,
             notifiedId = notifiedId
         )
@@ -59,6 +61,7 @@ class FirebaseService : FirebaseMessagingService() {
         notifierImageUrl: String?,
         notifiedId: String?,
         postId: String?,
+        postPublisherId:String?,
         commentPosition: Int?
     ){
 
@@ -80,7 +83,7 @@ class FirebaseService : FirebaseMessagingService() {
                             imageUrl = notifierImageUrl,
                             imageBitmap = bitmap
                         )
-                        BaseApplication.fireNotification(notificationType!!, notifier, postId, commentPosition, notifiedId)
+                        BaseApplication.fireNotification(notificationType!!, notifier, postId,postPublisherId , commentPosition, notifiedId)
                     }
                 })
         }

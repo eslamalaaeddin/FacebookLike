@@ -38,8 +38,7 @@ interface PostListener{
     )
 
     fun onShareButtonClicked(
-        postPublisherId:String,
-        postId:String,
+        post: Post,
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
@@ -57,5 +56,7 @@ interface PostListener{
 
     fun onMediaPostClicked(mediaUrl: String)
 
-    fun onPostMoreDotsClicked(post: Post)
+    fun onPostMoreDotsClicked(post: Post, shared: Boolean?)
+
+    fun onSharedPostClicked(originalPostPublisherId: String, postId: String)
 }

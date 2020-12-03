@@ -25,6 +25,7 @@ import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.model.post.share.Share
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.ui.bottomsheet.CommentsBottomSheet
+import com.example.facebook_clone.ui.bottomsheet.PeopleWhoReactedBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.PostConfigurationsBottomSheet
 import com.example.facebook_clone.ui.dialog.ImageViewerDialog
 import com.example.facebook_clone.viewmodel.*
@@ -64,6 +65,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
     private var post: Post? = null
     private val auth: FirebaseAuth by inject()
     private lateinit var currentUser: User
+    private lateinit var postPublisherToken: String
     private lateinit var interactorId: String
     private lateinit var interactorName: String
     private lateinit var interactorImageUrl: String
@@ -116,9 +118,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                     postVisibilityImageView.setImageResource(R.drawable.ic_private_visibility)
                 }
 
-                if (post?.reacts?.isNotEmpty()!!) {
-                    reactsCountTextView.text = post.reacts?.size.toString()
-                }
+                reactsCountTextView.text = post.reacts.orEmpty().size.toString()
 
                 if (post.attachmentUrl != null) {
                     attachmentImageView.visibility = View.VISIBLE
@@ -139,13 +139,9 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                 }
 
                 //Shares count
-                if (post.shares != null && post.shares!!.isNotEmpty()) {
-                    sharesCountTextView.text = "${post.shares?.size.toString()} Shares"
-                }
+                    sharesCountTextView.text = "${post.shares.orEmpty().size.toString()} Shares"
                 //Comments count
-                if (post.comments != null && post.comments!!.isNotEmpty()) {
-                    commentsCountsTextView.text = "${post.comments?.size.toString()} Comments"
-                }
+                    commentsCountsTextView.text = "${post.comments.orEmpty().size.toString()} Comments"
 
                 if (post.comments != null) {
                     commentsAdapter =
@@ -267,6 +263,12 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                 Toast.makeText(this, "Post was deleted", Toast.LENGTH_SHORT).show()
             }
 
+        })
+
+        val postPublisherLiveData = profileActivityViewModel.getAnotherUser(postPublisherId)
+        postPublisherLiveData?.observe(this, {
+            notificationsHandler.notifiedToken = it.token
+            postPublisherToken = it.token.toString()
         })
 
         val userLiveDate = profileActivityViewModel.getMe(auth.currentUser?.uid.toString())
@@ -581,8 +583,22 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                 interactorId,
                 interactorName,
                 interactorImageUrl,
-                this,//used to handle notification so, no need for it in my profile.
-                currentUser.token.toString()
+                this,
+                postPublisherToken
+            ).apply {
+                show(supportFragmentManager, tag)
+            }
+        }
+
+        showCommentsTextView.setOnClickListener {
+            CommentsBottomSheet(
+                postPublisherId,
+                postId,
+                interactorId,
+                interactorName,
+                interactorImageUrl,
+                this,
+                postPublisherToken
             ).apply {
                 show(supportFragmentManager, tag)
             }
@@ -596,7 +612,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                 interactorName,
                 interactorImageUrl,
                 this,
-                currentUser.token.toString(),
+                postPublisherToken
             ).apply {
                 show(supportFragmentManager, tag)
             }
@@ -635,7 +651,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
 
         moreOnPost.setOnClickListener {
             post?.let { post ->
-                val postConfigurationsBottomSheet = PostConfigurationsBottomSheet(post)
+                val postConfigurationsBottomSheet = PostConfigurationsBottomSheet(post, null)
                 postConfigurationsBottomSheet.show(
                     supportFragmentManager,
                     postConfigurationsBottomSheet.tag
@@ -685,7 +701,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
 
     }
 
-    override fun onCommentReactionsLayoutClicked(commentId: String) {
+    override fun onCommentReactionsLayoutClicked(commenterId: String,commentId: String) {
 
     }
 
@@ -855,6 +871,15 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
             it.handleNotificationCreationAndFiring()
         }
 
+    }
+
+    private fun openPeopleWhoReactedLayout(commenterId: String?, commentId: String?, reactedOn: String) {
+        val peopleWhoReactedDialog =
+            PeopleWhoReactedBottomSheet(commenterId.toString(), commentId.toString(), postId, postPublisherId, reactedOn)
+        peopleWhoReactedDialog.show(
+            supportFragmentManager,
+            peopleWhoReactedDialog.tag
+        )
     }
 
 }

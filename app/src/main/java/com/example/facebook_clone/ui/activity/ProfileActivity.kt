@@ -146,14 +146,23 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
     }
 
     private fun updateUserPosts(posts: List<Post>) {
-        profilePostsAdapter = ProfilePostsAdapter(
-            auth,
-            posts,
-            this,
-            currentUser.name.toString(),
-            currentUser.profileImageUrl.toString(),
-            true
-        )
+        if(profilePostsAdapter == null){
+            profilePostsAdapter = ProfilePostsAdapter(
+                auth,
+                posts,
+                this,
+                currentUser.name.toString(),
+                currentUser.profileImageUrl.toString(),
+                true,
+                currentUser.id.toString()
+            )
+        }
+       else{
+            profilePostsAdapter?.let {
+                it.setPosts(posts)
+                it.notifyDataSetChanged()
+            }
+        }
         profilePostsRecyclerView.adapter = profilePostsAdapter
         if (currentEditedPostPosition != -1) {
             profilePostsRecyclerView.scrollToPosition(currentEditedPostPosition)
@@ -391,20 +400,21 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
             interactorName,
             interactorImageUrl,
             null,//used to handle notification so, no need for it in my profile.
-            currentUser.token.toString()
+            ""//me
         ).apply {
             show(supportFragmentManager, tag)
         }
     }
 
     override fun onShareButtonClicked(
-        postPublisherId: String,
-        postId: String,
+        post: Post,
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
         postPosition: Int
     ) {
+        val postId = post.id.toString()
+        val postPublisherId = post.publisherId.toString()
         currentEditedPostPosition = postPosition
         val share = Share(
             sharerId = interactorId,
@@ -432,7 +442,7 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
             interactorName,
             interactorImageUrl,
             null,
-            currentUser.token.toString(),
+            "",
         ).apply {
             show(supportFragmentManager, tag)
         }
@@ -454,12 +464,19 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
 
     }
 
-    override fun onPostMoreDotsClicked(post: Post) {
-        val postConfigurationsBottomSheet = PostConfigurationsBottomSheet(post)
+    override fun onPostMoreDotsClicked(post: Post, shared: Boolean?) {
+        val postConfigurationsBottomSheet = PostConfigurationsBottomSheet(post, shared)
         postConfigurationsBottomSheet.show(
             supportFragmentManager,
             postConfigurationsBottomSheet.tag
         )
+    }
+
+    override fun onSharedPostClicked(originalPostPublisherId: String, postId: String) {
+        val intent = Intent(this, PostViewerActivity::class.java)
+        intent.putExtra("postPublisherId", originalPostPublisherId)
+        intent.putExtra("postId", postId)
+        startActivity(intent)
     }
 
     override fun onFriendClicked(friendId: String) {

@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.comment.ReactionsAndSubComments
@@ -21,6 +22,10 @@ class PostViewModel(private val repository: PostsRepository): ViewModel() {
         return repository.createPost(post)
     }
 
+    fun addSharedPostToMyPosts(post: Post, myId: String): Task<Void>{
+        return repository.addSharedPostToMyPosts(post, myId)
+    }
+
     fun getUserProfilePostsLiveData(userId: String) : LiveData<List<Post>> {
         return repository.getUserProfilePostsLiveData(userId)
     }
@@ -28,6 +33,18 @@ class PostViewModel(private val repository: PostsRepository): ViewModel() {
     fun updatePostWithNewEdits(publisherId: String, postId: String, post: Post): Task<Void>{
         return repository.updatePostWithNewEdits(publisherId, postId, post)
     }
+
+    fun updateSharedPostVisibilityWithNewEdits(sharerId: String, sharedPostId: String, post: Post, visibility: Int): Task<Void> {
+        return repository.updateSharedPostVisibilityWithNewEdits(sharerId, sharedPostId, post, visibility)
+    }
+
+    fun updateTokenInPost(userId: String, token: String){
+         repository.updateTokenInPost(userId, token)
+    }
+    fun updateTokenInComment(userId: String, token: String){
+         repository.updateTokenInComment(userId, token)
+    }
+
 
     fun addCommentToPostComments(postId: String, postPublisherId: String, comment: Comment): Task<Void>{
         return repository.addCommentToPostComments(postId,postPublisherId, comment)

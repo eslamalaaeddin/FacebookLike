@@ -19,9 +19,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.post_configurations_bottom_sheet.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class PostConfigurationsBottomSheet(private val post: Post) : BottomSheetDialogFragment() {
+class PostConfigurationsBottomSheet(private val post: Post, private val shared: Boolean?) : BottomSheetDialogFragment() {
     private val postViewModel by viewModel<PostViewModel>()
-    private val postPublisherId = post.publisherId.toString()
+    private lateinit var postPublisherId: String
     private val postId = post.id.toString()
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,6 +33,16 @@ class PostConfigurationsBottomSheet(private val post: Post) : BottomSheetDialogF
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        if (shared != null) {
+            if (shared) {
+                postPublisherId = post.shares?.get(0)?.sharerId.toString()
+            }
+        }
+            else{
+                postPublisherId = post.publisherId.toString()
+            }
+
 
         editPostLayout.setOnClickListener {
             Toast.makeText(
@@ -65,6 +75,18 @@ class PostConfigurationsBottomSheet(private val post: Post) : BottomSheetDialogF
         publicLayout.setOnClickListener {
             post.visibility = 0
             postViewModel.updatePostWithNewEdits(postPublisherId, postId, post).addOnCompleteListener {
+                if (!post.shares.isNullOrEmpty()){
+                    post.shares?.let {shares ->
+                        shares.forEach { share ->
+                            val sharerId = share.sharerId.toString()
+                            val sharedPostId = share.id.toString()
+                            post.visibility = 0
+                            val updatedPost = post
+                            postViewModel.updateSharedPostVisibilityWithNewEdits(sharerId, sharedPostId, updatedPost, 0)
+
+                        }
+                    }
+                }
                 dialog.dismiss()
                 dismiss()
             }
@@ -73,6 +95,18 @@ class PostConfigurationsBottomSheet(private val post: Post) : BottomSheetDialogF
         friendsLayout.setOnClickListener {
             post.visibility = 1
             postViewModel.updatePostWithNewEdits(postPublisherId, postId, post).addOnCompleteListener {
+                if (!post.shares.isNullOrEmpty()){
+                    post.shares?.let {shares ->
+                        shares.forEach { share ->
+                            val sharerId = share.sharerId.toString()
+                            val sharedPostId = share.id.toString()
+                            post.visibility = 1
+                            val updatedPost = post
+                            postViewModel.updateSharedPostVisibilityWithNewEdits(sharerId, sharedPostId, updatedPost, 1)
+
+                        }
+                    }
+                }
                 dialog.dismiss()
                 dismiss()
             }
@@ -81,6 +115,18 @@ class PostConfigurationsBottomSheet(private val post: Post) : BottomSheetDialogF
         privateLayout.setOnClickListener {
             post.visibility = 2
             postViewModel.updatePostWithNewEdits(postPublisherId, postId, post).addOnCompleteListener {
+                if (!post.shares.isNullOrEmpty()){
+                    post.shares?.let {shares ->
+                        shares.forEach { share ->
+                            val sharerId = share.sharerId.toString()
+                            val sharedPostId = share.id.toString()
+                            post.visibility = -1
+                            val updatedPost = post
+                            postViewModel.updateSharedPostVisibilityWithNewEdits(sharerId, sharedPostId, updatedPost, -1)
+
+                        }
+                    }
+                }
                 dialog.dismiss()
                 dismiss()
             }
@@ -106,11 +152,12 @@ class PostConfigurationsBottomSheet(private val post: Post) : BottomSheetDialogF
                 postViewModel.deletePost(postPublisherId, postId)
                     .addOnCompleteListener {
                         if (it.isSuccessful) {
-                            dialog.dismiss()
-                            Toast.makeText(requireContext(), "Post deleted", Toast.LENGTH_SHORT)
-                                .show()
-                            dismiss()
-                        } else {
+//                            dialog.dismiss()
+//                            Toast.makeText(requireContext(), "Post deleted", Toast.LENGTH_SHORT)
+//                                .show()
+//                            dismiss()
+                        }
+                        else {
                             Toast.makeText(
                                 requireContext(),
                                 it.exception?.message,
@@ -124,9 +171,7 @@ class PostConfigurationsBottomSheet(private val post: Post) : BottomSheetDialogF
                 post.comments!!.forEach { comment ->
                     deleteComment(comment)
                 }
-
-                postViewModel.deletePost(postPublisherId, postId)
-                    .addOnCompleteListener {
+                postViewModel.deletePost(postPublisherId, postId).addOnCompleteListener {
                         if (it.isSuccessful) {
                             dialog.dismiss()
                             Toast.makeText(requireContext(), "Post deleted", Toast.LENGTH_SHORT)
@@ -141,8 +186,47 @@ class PostConfigurationsBottomSheet(private val post: Post) : BottomSheetDialogF
                                 .show()
                         }
                     }
+            }
 
+            if (post.shares.isNullOrEmpty()){
+                postViewModel.deletePost(postPublisherId, postId).addOnCompleteListener {
+                    if (it.isSuccessful) {
+                     //   Toast.makeText(requireContext(), "Post deleted", Toast.LENGTH_SHORT).show()
+                    }
+                    else {
+                        Toast.makeText(
+                            requireContext(),
+                            it.exception?.message,
+                            Toast.LENGTH_SHORT).show()
+                    }
+                }
+                dialog.dismiss()
+                dismiss()
+            }
+            else{
+                post.shares?.let {shares ->
+                    shares.forEach { share ->
+                        val sharerId = share.sharerId.toString()
+                        postViewModel.deletePost(sharerId, postId).addOnCompleteListener {
+                            if (it.isSuccessful) {
+//                                dialog.dismiss()
+//                                Toast.makeText(requireContext(), "Post deleted", Toast.LENGTH_SHORT)
+//                                    .show()
 
+                            }
+                            else {
+                                Toast.makeText(
+                                    requireContext(),
+                                    it.exception?.message,
+                                    Toast.LENGTH_SHORT
+                                )
+                                    .show()
+                            }
+                        }
+                    }
+                }
+                dialog.dismiss()
+                dismiss()
             }
         }
         dialog.show()

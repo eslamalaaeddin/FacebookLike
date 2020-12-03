@@ -135,7 +135,8 @@ class CommentsAdapter(
             }
             itemView.whoReactedOnCommentLayout.setOnClickListener {
                 val commentId = comments[adapterPosition].id.toString()
-                cClickListener.onCommentReactionsLayoutClicked(commentId)
+                val commenterId = comments[adapterPosition].commenterId.toString()
+                cClickListener.onCommentReactionsLayoutClicked(commenterId, commentId)
             }
             itemView.viewPreviousComments.setOnClickListener {
                 val comment = comments[adapterPosition]

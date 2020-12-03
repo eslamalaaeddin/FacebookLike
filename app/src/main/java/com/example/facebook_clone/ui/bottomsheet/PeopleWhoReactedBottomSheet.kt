@@ -29,6 +29,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 private const val TAG = "PeopleWhoReactedBottomS"
 
 class PeopleWhoReactedBottomSheet(
+    private val commenterId: String?,
     private val commentId: String?,
     private val postId: String,
     private val postPublisherId: String,
@@ -76,7 +77,7 @@ class PeopleWhoReactedBottomSheet(
         }
         else if (reactedOn == "comment"){
             //Have to be commenterId
-            postViewModel.getCommentById(postPublisherId, commentId = commentId.toString()).addOnCompleteListener { task ->
+            postViewModel.getCommentById(commenterId.toString(), commentId = commentId.toString()).addOnCompleteListener { task ->
                 if (task.isSuccessful){
                     val comment = task.result?.toObject(ReactionsAndSubComments::class.java)
                     reactsAdapter = ReactsAdapter(comment?.reactions.orEmpty(),this)

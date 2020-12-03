@@ -44,7 +44,7 @@
             android:layout_gravity="center"
             android:layout_marginStart="16dp"
             android:background="@android:color/transparent"
-            android:enabled="false"
+            android:enabled="true"
             android:gravity="center"
             android:text="Post"
             android:textColor="@color/dark_blue"
@@ -162,11 +162,10 @@
         android:layout_height="360dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/view7"
+        android:scaleType="fitXY"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline"
-        app:srcCompat="@drawable/cover" />
+        app:layout_constraintTop_toTopOf="@+id/guideline" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"

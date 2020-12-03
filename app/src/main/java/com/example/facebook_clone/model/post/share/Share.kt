@@ -1,5 +1,7 @@
 package com.example.facebook_clone.model.post.share
 
+import com.example.facebook_clone.model.post.Post
+import com.example.facebook_clone.model.post.SharedPost
 import com.google.firebase.Timestamp
 import java.util.*
 
@@ -9,5 +11,6 @@ data class Share
     var sharerId: String? = null,
     var sharerName: String? = null,
     var sharerImageUrl: String? = null,
-    val sharerTime: Timestamp = Timestamp(Date())
+    var sharedPost: SharedPost? = null,//Yoyo's post
+    val shareTime: Timestamp = Timestamp(Date())
 )

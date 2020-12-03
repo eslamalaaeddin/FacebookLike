@@ -12,8 +12,8 @@
         android:layout_height="wrap_content"
         android:elevation="12dp"
         android:orientation="horizontal"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -435,8 +435,24 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@+id/commentLayout"
         app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/postViewerReactsLayout" />
+
+    <TextView
+        android:id="@+id/showCommentsTextView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/commentLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="Tab to Show Comments"
+        android:textStyle="bold"
+        android:textSize="24sp"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/postViewerReactsLayout"/>
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline2"
