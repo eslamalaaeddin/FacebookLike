@@ -8,6 +8,7 @@ import android.util.Log
 import android.widget.Toast
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.ProfilePostsAdapter
+import com.example.facebook_clone.helper.PostHandler
 import com.example.facebook_clone.helper.Utils.POST_FROM_GROUP
 import com.example.facebook_clone.helper.listener.AdminToolsListener
 import com.example.facebook_clone.helper.listener.PostListener
@@ -25,7 +26,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 private const val TAG = "GroupActivity"
-class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener {
+class GroupActivity : AppCompatActivity(), AdminToolsListener {
     private val groupsViewModel by viewModel<GroupsViewModel>()
     private val profileActivityViewModel by viewModel<ProfileActivityViewModel>()
     private val auth: FirebaseAuth by inject()
@@ -35,6 +36,7 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener {
     private val picasso = Picasso.get()
     private var groupId = ""
     private var groupName = ""
+    private val postHandler = PostHandler(this)
     private lateinit var profilePostsAdapter: ProfilePostsAdapter
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +51,7 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener {
         groupPostsLiveData.observe(this){posts ->
             posts?.let {
                 profilePostsAdapter =
-                    ProfilePostsAdapter(auth, posts, this, currentUserName, currentUserImageUrl, null,currentUserId )
+                    ProfilePostsAdapter(auth, posts, postHandler, currentUserName, currentUserImageUrl, null,currentUserId )
                 groupPostsRecyclerView.adapter = profilePostsAdapter
             }
         }
@@ -130,73 +132,4 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener {
     override fun onAddMemberClicked() {
     }
 
-    override fun onReactButtonClicked(
-        postPublisherId: String,
-        postId: String,
-        interactorId: String,
-        interactorName: String,
-        interactorImageUrl: String,
-        reacted: Boolean,
-        currentReact: React?,
-        postPosition: Int
-    ) {
-
-    }
-
-    override fun onReactButtonLongClicked(
-        postPublisherId: String,
-        postId: String,
-        interactorId: String,
-        interactorName: String,
-        interactorImageUrl: String,
-        reacted: Boolean,
-        currentReact: React?,
-        postPosition: Int
-    ) {
-
-    }
-
-    override fun onCommentButtonClicked(
-        postPublisherId: String,
-        postId: String,
-        interactorId: String,
-        interactorName: String,
-        interactorImageUrl: String,
-        postPosition: Int
-    ) {
-
-    }
-
-    override fun onShareButtonClicked(
-        post: Post,
-        interactorId: String,
-        interactorName: String,
-        interactorImageUrl: String,
-        postPosition: Int
-    ) {
-
-    }
-
-    override fun onReactLayoutClicked(
-        postPublisherId: String,
-        postId: String,
-        interactorId: String,
-        interactorName: String,
-        interactorImageUrl: String,
-        postPosition: Int
-    ) {
-
-    }
-
-    override fun onMediaPostClicked(mediaUrl: String) {
-
-    }
-
-    override fun onPostMoreDotsClicked(post: Post, shared: Boolean?) {
-
-    }
-
-    override fun onSharedPostClicked(originalPostPublisherId: String, postId: String) {
-
-    }
 }

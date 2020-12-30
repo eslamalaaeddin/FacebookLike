@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.FriendsAdapter
 import com.example.facebook_clone.adapter.ProfilePostsAdapter
+import com.example.facebook_clone.helper.PostHandler
 import com.example.facebook_clone.helper.listener.PostListener
 import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.helper.Utils.POST_FROM_PROFILE
