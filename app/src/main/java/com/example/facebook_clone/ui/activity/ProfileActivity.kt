@@ -15,6 +15,7 @@ import com.example.facebook_clone.adapter.FriendsAdapter
 import com.example.facebook_clone.adapter.ProfilePostsAdapter
 import com.example.facebook_clone.helper.listener.PostListener
 import com.example.facebook_clone.helper.Utils
+import com.example.facebook_clone.helper.Utils.POST_FROM_PROFILE
 import com.example.facebook_clone.helper.listener.FriendClickListener
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.model.post.Post
@@ -41,7 +42,7 @@ import kotlinx.android.synthetic.main.activity_profile.profileImageView
 import kotlinx.android.synthetic.main.activity_profile.profilePostsRecyclerView
 import kotlinx.android.synthetic.main.activity_profile.smallUserImageView
 import kotlinx.android.synthetic.main.activity_profile.userNameTextView
-import kotlinx.android.synthetic.main.activity_profile.whatIsInYourMindTextView
+import kotlinx.android.synthetic.main.activity_profile.whatIsInYourMindButton
 import kotlinx.android.synthetic.main.long_clicked_reacts_button.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -115,8 +116,8 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
             }
         }
 
-        whatIsInYourMindTextView.setOnClickListener {
-            val postCreatorDialog = PostCreatorDialog()
+        whatIsInYourMindButton.setOnClickListener {
+            val postCreatorDialog = PostCreatorDialog(POST_FROM_PROFILE)
             postCreatorDialog.show(supportFragmentManager, "signature")
             postCreatorDialog
                 .setUserNameAndProfileImageUrl(

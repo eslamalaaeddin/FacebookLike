@@ -31,10 +31,25 @@ class PostsRepository(
     private val auth: FirebaseAuth,
     private val storage: FirebaseStorage
 ) {
-    fun createPost(post: Post): Task<Void> {
+//    fun createPost(
+//        post: Post, firstCollectionType: String,
+//        creatorReferenceId: String,
+//        secondCollectionType: String
+//    ): Task<Void> {
+//        //Strings only
+//        return database.collection(POSTS_COLLECTION).document(post.publisherId.toString())
+//            .collection(PROFILE_POSTS_COLLECTION).document(post.id.toString()).set(post)
+//    }
+
+    fun createPost(
+        post: Post,
+        firstCollectionType: String,
+        creatorReferenceId: String,
+        secondCollectionType: String
+    ): Task<Void> {
         //Strings only
-        return database.collection(POSTS_COLLECTION).document(post.publisherId.toString())
-            .collection(PROFILE_POSTS_COLLECTION).document(post.id.toString()).set(post)
+        return database.collection(firstCollectionType).document(creatorReferenceId)
+            .collection(secondCollectionType).document(post.id.toString()).set(post)
     }
 
     fun addSharedPostToMyPosts(post: Post, myId: String): Task<Void> {
@@ -196,10 +211,15 @@ class PostsRepository(
             .document(postId).set(post)
     }
 
-    fun updateSharedPostVisibilityWithNewEdits(sharerId: String, sharedPostId: String, post: Post, visibility: Int): Task<Void> {
+    fun updateSharedPostVisibilityWithNewEdits(
+        sharerId: String,
+        sharedPostId: String,
+        post: Post,
+        visibility: Int
+    ): Task<Void> {
         return database.collection(POSTS_COLLECTION).document(sharerId)
             .collection(PROFILE_POSTS_COLLECTION)
-            .document(sharedPostId).update("visibility",visibility)
+            .document(sharedPostId).update("visibility", visibility)
     }
 
     fun deletePost(publisherId: String, postId: String): Task<Void> {

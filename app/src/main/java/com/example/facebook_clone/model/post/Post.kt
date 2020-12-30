@@ -4,6 +4,7 @@ import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.model.post.share.Share
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.Exclude
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -20,5 +21,8 @@ data class Post(
     var publisherName: String? = null,
     var visibility: Int? = 0, // 0 --> public, 1 --> private ......
     val creationTime: Timestamp = Timestamp(Date()),
-    var publisherToken: String? = null
+    var publisherToken: String? = null,
+    @get:Exclude var firstCollectionType: String? = null,
+    @get:Exclude var creatorReferenceId: String? = null,
+    @get:Exclude var secondCollectionType: String? = null
 )

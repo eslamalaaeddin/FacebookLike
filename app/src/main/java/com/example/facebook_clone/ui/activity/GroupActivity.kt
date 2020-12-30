@@ -1,13 +1,16 @@
 package com.example.facebook_clone.ui.activity
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import com.example.facebook_clone.R
+import com.example.facebook_clone.helper.Utils.POST_FROM_GROUP
 import com.example.facebook_clone.helper.listener.AdminToolsListener
 import com.example.facebook_clone.ui.bottomsheet.AdminToolsBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.InviteMembersBottomSheet
+import com.example.facebook_clone.ui.dialog.PostCreatorDialog
 import com.example.facebook_clone.viewmodel.GroupsViewModel
 import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -21,7 +24,10 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener {
     private val profileActivityViewModel by viewModel<ProfileActivityViewModel>()
     private val auth: FirebaseAuth by inject()
     private val currentUserId = auth.currentUser?.uid.toString()
+    private var currentUserName = ""
+    private var currentUserImageUrl = ""
     private val picasso = Picasso.get()
+    private var groupId = ""
     private var groupName = ""
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +36,7 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener {
 
         upButtonImageView.setOnClickListener { finish() }
 
-        val groupId = intent.getStringExtra("groupId").orEmpty()
+         groupId = intent.getStringExtra("groupId").orEmpty()
 
         val groupLiveData = groupsViewModel.getGroupLiveData(groupId)
         groupLiveData.observe(this) { group ->
@@ -52,6 +58,8 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener {
         currentUserLiveData?.let {
             it.observe(this) {user ->
                 picasso.load(user.profileImageUrl).into(smallUserImageView)
+                currentUserName = user.name.orEmpty()
+                currentUserImageUrl = user.profileImageUrl.orEmpty()
             }
         }
 
@@ -67,12 +75,32 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener {
         showGroupMembersLayout.setOnClickListener {
             Toast.makeText(this, "Islam love Alaa", Toast.LENGTH_SHORT).show()
         }
+
+        smallUserImageView.setOnClickListener { navigateToUserProfile()}
+
+        whatIsInYourMindButton.setOnClickListener {showPostCreatorDialog()}
     }
 
     private fun showAdminToolsBottomSheet(groupId: String?) {
         val adminToolsBottomSheet =
             AdminToolsBottomSheet(this, groupId.orEmpty(), groupName = "Friends4Ever")
         adminToolsBottomSheet.show(supportFragmentManager, adminToolsBottomSheet.tag)
+    }
+
+    private fun navigateToUserProfile(){
+        val intent = Intent(this, ProfileActivity::class.java)
+        intent.putExtra("userId", currentUserId)
+        startActivity(intent)
+    }
+
+    private fun showPostCreatorDialog(){
+        val postCreatorDialog = PostCreatorDialog(POST_FROM_GROUP, groupId)
+        postCreatorDialog.show(supportFragmentManager, "signature")
+        postCreatorDialog
+            .setUserNameAndProfileImageUrl(
+                currentUserName,
+                currentUserImageUrl
+            )
     }
 
     override fun onMemberRequestClicked() {

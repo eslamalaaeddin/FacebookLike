@@ -16,130 +16,195 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.storage.UploadTask
 
-class PostViewModel(private val repository: PostsRepository): ViewModel() {
+class PostViewModel(private val repository: PostsRepository) : ViewModel() {
 
-    fun createPost(post: Post): Task<Void>{
-        return repository.createPost(post)
+    fun createPost(post: Post): Task<Void> {
+        val firstCollectionType = post.firstCollectionType.orEmpty()
+        val creatorReferenceId = post.creatorReferenceId.orEmpty()
+        val secondCollectionType = post.secondCollectionType.orEmpty()
+        return repository.createPost(
+            post,
+            firstCollectionType,
+            creatorReferenceId,
+            secondCollectionType
+        )
     }
 
-    fun addSharedPostToMyPosts(post: Post, myId: String): Task<Void>{
+    fun addSharedPostToMyPosts(post: Post, myId: String): Task<Void> {
         return repository.addSharedPostToMyPosts(post, myId)
     }
 
-    fun getUserProfilePostsLiveData(userId: String) : LiveData<List<Post>> {
+    fun getUserProfilePostsLiveData(userId: String): LiveData<List<Post>> {
         return repository.getUserProfilePostsLiveData(userId)
     }
 
-    fun updatePostWithNewEdits(publisherId: String, postId: String, post: Post): Task<Void>{
+    fun updatePostWithNewEdits(publisherId: String, postId: String, post: Post): Task<Void> {
         return repository.updatePostWithNewEdits(publisherId, postId, post)
     }
 
-    fun updateSharedPostVisibilityWithNewEdits(sharerId: String, sharedPostId: String, post: Post, visibility: Int): Task<Void> {
-        return repository.updateSharedPostVisibilityWithNewEdits(sharerId, sharedPostId, post, visibility)
+    fun updateSharedPostVisibilityWithNewEdits(
+        sharerId: String,
+        sharedPostId: String,
+        post: Post,
+        visibility: Int
+    ): Task<Void> {
+        return repository.updateSharedPostVisibilityWithNewEdits(
+            sharerId,
+            sharedPostId,
+            post,
+            visibility
+        )
     }
 
-    fun updateTokenInPost(userId: String, token: String){
-         repository.updateTokenInPost(userId, token)
-    }
-    fun updateTokenInComment(userId: String, token: String){
-         repository.updateTokenInComment(userId, token)
+    fun updateTokenInPost(userId: String, token: String) {
+        repository.updateTokenInPost(userId, token)
     }
 
-
-    fun addCommentToPostComments(postId: String, postPublisherId: String, comment: Comment): Task<Void>{
-        return repository.addCommentToPostComments(postId,postPublisherId, comment)
+    fun updateTokenInComment(userId: String, token: String) {
+        repository.updateTokenInComment(userId, token)
     }
 
-    fun getCommentById(commenterId: String, commentId: String): Task<DocumentSnapshot>{
+
+    fun addCommentToPostComments(
+        postId: String,
+        postPublisherId: String,
+        comment: Comment
+    ): Task<Void> {
+        return repository.addCommentToPostComments(postId, postPublisherId, comment)
+    }
+
+    fun getCommentById(commenterId: String, commentId: String): Task<DocumentSnapshot> {
         return repository.getCommentById(commenterId, commentId)
     }
 
-    fun getCommentLiveDataById(commenterId: String, commentId: String):LiveData<ReactionsAndSubComments>{
+    fun getCommentLiveDataById(
+        commenterId: String,
+        commentId: String
+    ): LiveData<ReactionsAndSubComments> {
         return repository.getCommentLiveDataById(commenterId, commentId)
     }
 
-    fun getCommentUpdates(commenterId: String, commentId: String): DocumentReference?{
+    fun getCommentUpdates(commenterId: String, commentId: String): DocumentReference? {
         return repository.getCommentUpdates(commenterId, commentId)
     }
 
-    fun addSubCommentToCommentById(commenterId: String, commentId: String, comment: Comment): Task<Void>{
+    fun addSubCommentToCommentById(
+        commenterId: String,
+        commentId: String,
+        comment: Comment
+    ): Task<Void> {
         return repository.addSubCommentToCommentById(commenterId, commentId, comment)
     }
 
-    fun deleteSubCommentFromCommentById(commenterId: String, superCommentId: String, comment: Comment): Task<Void>{
+    fun deleteSubCommentFromCommentById(
+        commenterId: String,
+        superCommentId: String,
+        comment: Comment
+    ): Task<Void> {
         return repository.deleteSubCommentFromCommentById(commenterId, superCommentId, comment)
     }
 
-    fun deleteCommentDocumentFromCommentsCollection(commenterId: String, commentId: String): Task<Void>{
+    fun deleteCommentDocumentFromCommentsCollection(
+        commenterId: String,
+        commentId: String
+    ): Task<Void> {
         return repository.deleteCommentDocumentFromCommentsCollection(commenterId, commentId)
     }
 
-    fun addCommentIdToCommentsCollection( commenterId: String,commentId: String): Task<Void>{
+    fun addCommentIdToCommentsCollection(commenterId: String, commentId: String): Task<Void> {
         return repository.addCommentIdToCommentsCollection(commenterId, commentId)
     }
 
 
-    fun addReactToReactsListInCommentDocument(commenterId: String, commentId: String, react: React?): Task<Void>{
+    fun addReactToReactsListInCommentDocument(
+        commenterId: String,
+        commentId: String,
+        react: React?
+    ): Task<Void> {
         return repository.addReactToReactsListInCommentDocument(commenterId, commentId, react)
     }
 
-    fun removeReactFromReactsListInCommentDocument(commenterId: String, commentId: String, react: React?): Task<Void>{
+    fun removeReactFromReactsListInCommentDocument(
+        commenterId: String,
+        commentId: String,
+        react: React?
+    ): Task<Void> {
         return repository.removeReactFromReactsListInCommentDocument(commenterId, commentId, react)
     }
 
-    fun addSubCommentToReactsListInCommentDocument(commenterId: String,commentId: String, comment: Comment?): Task<Void>{
-        return repository.addSubCommentToReactsListInCommentDocument(commenterId, commentId, comment)
+    fun addSubCommentToReactsListInCommentDocument(
+        commenterId: String,
+        commentId: String,
+        comment: Comment?
+    ): Task<Void> {
+        return repository.addSubCommentToReactsListInCommentDocument(
+            commenterId,
+            commentId,
+            comment
+        )
     }
 
-    fun removeSubCommentFromReactsListInCommentDocument(commenterId: String,commentId: String, comment: Comment?): Task<Void>{
-        return repository.removeSubCommentFromReactsListInCommentDocument(commenterId, commentId, comment)
+    fun removeSubCommentFromReactsListInCommentDocument(
+        commenterId: String,
+        commentId: String,
+        comment: Comment?
+    ): Task<Void> {
+        return repository.removeSubCommentFromReactsListInCommentDocument(
+            commenterId,
+            commentId,
+            comment
+        )
     }
 
-    fun getPostById(publisherId: String, postId: String): Task<DocumentSnapshot>{
+    fun getPostById(publisherId: String, postId: String): Task<DocumentSnapshot> {
         return repository.getPostById(publisherId, postId)
     }
 
-    fun deletePost(publisherId: String, postId: String): Task<Void>{
+    fun deletePost(publisherId: String, postId: String): Task<Void> {
         return repository.deletePost(publisherId, postId)
     }
 
-    fun deleteCommentFromPost(comment: Comment, postId: String, postPublisherId: String): Task<Void>{
+    fun deleteCommentFromPost(
+        comment: Comment,
+        postId: String,
+        postPublisherId: String
+    ): Task<Void> {
         return repository.deleteCommentFromPost(comment, postId, postPublisherId)
     }
 
-    fun updateComment(comment: Comment, postId: String, postPublisherId: String): Task<Void>{
+    fun updateComment(comment: Comment, postId: String, postPublisherId: String): Task<Void> {
         return repository.updatePostComment(comment, postId, postPublisherId)
     }
 
-    fun addReactToDB(react: React, postId: String, postPublisherId: String): Task<Void>{
+    fun addReactToDB(react: React, postId: String, postPublisherId: String): Task<Void> {
         return repository.addReactToDB(react, postId, postPublisherId)
     }
 
-    fun deleteReactFromPost(react: React, postId: String, postPublisherId: String): Task<Void>{
+    fun deleteReactFromPost(react: React, postId: String, postPublisherId: String): Task<Void> {
         return repository.deleteReactFromPost(react, postId, postPublisherId)
     }
 
-    fun addShareToPost(share: Share, postId: String, postPublisherId: String): Task<Void>{
+    fun addShareToPost(share: Share, postId: String, postPublisherId: String): Task<Void> {
         return repository.addShareToPost(share, postId, postPublisherId)
     }
 
-    fun uploadPostImageToCloudStorage(bitmap: Bitmap): UploadTask{
+    fun uploadPostImageToCloudStorage(bitmap: Bitmap): UploadTask {
         return repository.uploadPostImageToCloudStorage(bitmap)
     }
 
-    fun uploadPostVideoToCloudStorage(videoUri: Uri): UploadTask{
+    fun uploadPostVideoToCloudStorage(videoUri: Uri): UploadTask {
         return repository.uploadPostVideoToCloudStorage(videoUri)
     }
 
-    fun uploadImageCommentToCloudStorage(bitmap: Bitmap): UploadTask{
+    fun uploadImageCommentToCloudStorage(bitmap: Bitmap): UploadTask {
         return repository.uploadImageCommentToCloudStorage(bitmap)
     }
 
-    fun uploadVideoCommentToCloudStorage(videoUri: Uri): UploadTask{
+    fun uploadVideoCommentToCloudStorage(videoUri: Uri): UploadTask {
         return repository.uploadVideoCommentToCloudStorage(videoUri)
     }
 
-    fun updateReactedValue(postPublisherId: String, postId: String, reacted: Int?): Task<Void>{
+    fun updateReactedValue(postPublisherId: String, postId: String, reacted: Int?): Task<Void> {
         return repository.updateReactedValue(postPublisherId, postId, reacted)
     }
 
