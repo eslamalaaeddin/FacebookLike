@@ -11,6 +11,7 @@ object Utils {
     const val USERS_COLLECTION = "users"
     const val RECENT_USERS_COLLECTION = "recentUsers"
     const val GROUPS_COLLECTION = "groups"
+    const val MY_GROUPS = "my_groups"
     const val PAGES_COLLECTION = "pages"
     const val POSTS_COLLECTION = "posts"
     const val COMMENTS_COLLECTION = "comments"

@@ -36,13 +36,13 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:paddingEnd="8dp"
         android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="@+id/notifierName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/notifierName"
         app:layout_constraintTop_toTopOf="@+id/notifierImageView"
-        tools:text="commented on Your post" />
+        tools:text="invited you to join friend 4 ever" />
 
     <TextView
         android:id="@+id/notificationDateTextView"
@@ -86,13 +86,42 @@
         app:layout_constraintStart_toEndOf="@+id/confirmFriendRequestButton"
         app:layout_constraintTop_toTopOf="@+id/confirmFriendRequestButton" />
 
+    <Button
+        android:id="@+id/acceptGroupInvitationButton"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="#3568D3"
+        android:text="Confirm"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@+id/cancelGroupInvitationButton"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toEndOf="@+id/notifierImageView"
+        app:layout_constraintTop_toBottomOf="@+id/notificationDescription" />
+
+    <Button
+        android:id="@+id/cancelGroupInvitationButton"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="Delete"
+        android:textAllCaps="false"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/acceptGroupInvitationButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/acceptGroupInvitationButton"
+        app:layout_constraintTop_toTopOf="@+id/acceptGroupInvitationButton" />
+
     <TextView
         android:id="@+id/notifierName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="TextView"
+        tools:text="TextView"
         android:textColor="@color/black"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/notifierImageView"

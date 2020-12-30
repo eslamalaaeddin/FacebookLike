@@ -80,6 +80,7 @@ class ReplyOnCommentBottomSheet(
     private var commentAttachmentUrl: String? = null
     private val picasso = Picasso.get()
     private var progressDialog: ProgressDialog? = null
+    private lateinit var commentSubComments: List<Comment>
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
 
@@ -130,7 +131,8 @@ class ReplyOnCommentBottomSheet(
 
             if (commentContent.isEmpty() && commentData == null) {
                 Toast.makeText(requireContext(), "Add comment first", Toast.LENGTH_SHORT).show()
-            } else {
+            }
+            else {
                 if (commentData != null) {
                     mediaCommentLayoutPreview.visibility = View.VISIBLE
                     if (commentDataType == "image") {
@@ -189,24 +191,28 @@ class ReplyOnCommentBottomSheet(
                                                 commentData = null
                                                 // TODO: 11/24/2020  
                                                 if (this.superComment.commenterId.toString() != interactorId) {
-//                                                    comBottomSheetListener.onAnotherUserCommented(
-//                                                        commentsList.size - 1,
-//                                                        comment.id!!,
-//                                                        postId
-////                                                    )
-
                                                     notificationsHandler.also {
+                                                        it.notifiedId = this.superComment.commenterId.toString()
                                                         it.notificationType = "commentOnComment"
                                                         it.postId = postId
                                                         it.commentPosition = commentPosition
                                                         it.handleNotificationCreationAndFiring()
                                                     }
+                                                }
 
-                                                    Toast.makeText(
-                                                        requireContext(),
-                                                        "I have to notify the user",
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
+                                                var tempComment = ""
+                                                for (subComment in commentSubComments){
+                                                    if (subComment.commenterId != this.superComment.commenterId.toString() && subComment.commenterId != tempComment){
+                                                        tempComment = subComment.commenterId.toString()
+                                                        notificationsHandler.also {
+                                                            it.notifiedId = subComment.commenterId
+                                                            it.notifiedToken = subComment.commenterToken
+                                                            it.notificationType = "commentOnComment"
+                                                            it.postId = postId
+                                                            it.commentPosition = commentPosition
+                                                            it.handleNotificationCreationAndFiring()
+                                                        }
+                                                    }
                                                 }
                                                 updateCommentsUI()
 
@@ -227,7 +233,8 @@ class ReplyOnCommentBottomSheet(
                                     }
                                 }
                             }
-                    } else if (commentDataType == "video") {
+                    }
+                    else if (commentDataType == "video") {
                         val videoUri = commentData!!.data!!
                         progressDialog =
                             Utils.showProgressDialog(requireContext(), "Please wait...")
@@ -270,25 +277,30 @@ class ReplyOnCommentBottomSheet(
                                                 //if you are not the commenter
                                                 mediaCommentLayoutPreview.visibility = View.GONE
                                                 commentData = null
-                                                // TODO: 11/24/2020  
+
                                                 if (this.superComment.commenterId.toString() != interactorId) {
-//                                                    comBottomSheetListener.onAnotherUserCommented(
-//                                                        commentsList.size - 1,
-//                                                        comment.id!!,
-//                                                        postId
-//                                                    )
                                                     notificationsHandler.also {
+                                                        it.notifiedId = this.superComment.commenterId.toString()
                                                         it.notificationType = "commentOnComment"
                                                         it.postId = postId
                                                         it.commentPosition = commentPosition
                                                         it.handleNotificationCreationAndFiring()
                                                     }
+                                                }
 
-                                                    Toast.makeText(
-                                                        requireContext(),
-                                                        "I have to notify the user",
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
+                                                var tempComment = ""
+                                                for (subComment in commentSubComments){
+                                                    if (subComment.commenterId != this.superComment.commenterId.toString() && subComment.commenterId != tempComment){
+                                                        tempComment = subComment.commenterId.toString()
+                                                        notificationsHandler.also {
+                                                            it.notifiedId = subComment.commenterId
+                                                            it.notifiedToken = subComment.commenterToken
+                                                            it.notificationType = "commentOnComment"
+                                                            it.postId = postId
+                                                            it.commentPosition = commentPosition
+                                                            it.handleNotificationCreationAndFiring()
+                                                        }
+                                                    }
                                                 }
                                                 updateCommentsUI()
                                             } else {
@@ -296,12 +308,6 @@ class ReplyOnCommentBottomSheet(
                                                     requireContext(),
                                                     task.exception?.message.toString()
                                                 )
-
-                                                Toast.makeText(
-                                                    requireContext(),
-                                                    "FAWZY",
-                                                    Toast.LENGTH_SHORT
-                                                ).show()
                                             }
                                         }
                                         //  dismiss()
@@ -309,7 +315,8 @@ class ReplyOnCommentBottomSheet(
                                 }
                             }
                     }
-                } else {
+                }
+                else {
 //                    mediaCommentLayoutPreview.visibility = View.GONE
                     val comment =
                         createComment(
@@ -336,17 +343,7 @@ class ReplyOnCommentBottomSheet(
                                 )
                                 .addOnCompleteListener { task ->
                                     if (task.isSuccessful) {
-                                        // TODO: 11/24/2020  
-                                        //if you are not the commenter
-                                        //commenterId
-                                        //NOTIFICATIONS
                                         if (this.superComment.commenterId.toString() != interactorId) {
-//                                        comBottomSheetListener.onAnotherUserCommented(
-//                                            0,//temp
-//                                            comment.id!!,
-//                                            postId
-//                                        )
-
                                             notificationsHandler.also {
                                                 it.notifiedId = this.superComment.commenterId.toString()
                                                 it.notificationType = "commentOnComment"
@@ -354,25 +351,24 @@ class ReplyOnCommentBottomSheet(
                                                 it.commentPosition = commentPosition
                                                 it.handleNotificationCreationAndFiring()
                                             }
-                                            Toast.makeText(
-                                                requireContext(),
-                                                "I have no notify the user who commented",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
                                         }
-
-                                    } else {
-                                        Utils.toastMessage(
-                                            requireContext(),
-                                            task.exception?.message.toString()
-                                        )
-
-                                        Toast.makeText(
-                                            requireContext(),
-                                            "FAWZY",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                        var tempComment = ""
+                                        for (subComment in commentSubComments){
+                                            if (subComment.commenterId != this.superComment.commenterId.toString() && subComment.commenterId != tempComment){
+                                                tempComment = subComment.commenterId.toString()
+                                                notificationsHandler.also {
+                                                    it.notifiedId = subComment.commenterId
+                                                    it.notifiedToken = subComment.commenterToken
+                                                    it.notificationType = "commentOnComment"
+                                                    it.postId = postId
+                                                    it.commentPosition = commentPosition
+                                                    it.handleNotificationCreationAndFiring()
+                                                }
+                                            }
+                                        }
                                     }
+
+                                    else { Utils.toastMessage(requireContext(), task.exception?.message.toString()) }
                                 }
 
                         }
@@ -501,6 +497,7 @@ class ReplyOnCommentBottomSheet(
             superComment.id.toString()
         )?.addSnapshotListener { value, error ->
             val reactionsAndComments = value?.toObject(ReactionsAndSubComments::class.java)
+
             //if there is not document
             if (reactionsAndComments == null){
                 dismiss()
@@ -678,6 +675,7 @@ class ReplyOnCommentBottomSheet(
 
             reactionsAndComments?.let {
 //                    if (it.subComments != null){
+                commentSubComments = reactionsAndComments.subComments.orEmpty()
                 commentsAdapter = CommentsAdapter(
                     auth.currentUser?.uid.toString(),
                     reactionsAndComments.subComments.orEmpty(),

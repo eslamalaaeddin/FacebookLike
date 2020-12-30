@@ -39,7 +39,7 @@ import kotlinx.android.synthetic.main.activity_profile.friendsRecyclerView
 import kotlinx.android.synthetic.main.activity_profile.joinDateTextView
 import kotlinx.android.synthetic.main.activity_profile.profileImageView
 import kotlinx.android.synthetic.main.activity_profile.profilePostsRecyclerView
-import kotlinx.android.synthetic.main.activity_profile.smallProfileImageView
+import kotlinx.android.synthetic.main.activity_profile.smallUserImageView
 import kotlinx.android.synthetic.main.activity_profile.userNameTextView
 import kotlinx.android.synthetic.main.activity_profile.whatIsInYourMindTextView
 import kotlinx.android.synthetic.main.long_clicked_reacts_button.*
@@ -133,7 +133,7 @@ class ProfileActivity() : AppCompatActivity(), PostListener, FriendClickListener
         }
         if (user.profileImageUrl != null) {
             picasso.load(user.profileImageUrl).into(profileImageView)
-            picasso.load(user.profileImageUrl).into(smallProfileImageView)
+            picasso.load(user.profileImageUrl).into(smallUserImageView)
         }
         if (user.biography != null) {
             bioTextView.text = user.biography

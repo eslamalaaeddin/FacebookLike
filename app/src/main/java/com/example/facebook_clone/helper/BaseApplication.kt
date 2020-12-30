@@ -69,7 +69,10 @@ class BaseApplication : Application() {
                     notificationsFragmentViewModelModule,
                     newsFeedActivityViewModelModule,
                     recentUsersActivityViewModelModule,
-                    postViewerActivityViewModelModule
+                    postViewerActivityViewModelModule,
+                    groupsFragmentViewModel,
+                    groupsRepositoryModule,
+                    groupsViewModelModule
                 )
             )
         }

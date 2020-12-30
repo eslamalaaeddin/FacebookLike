@@ -36,12 +36,11 @@ import kotlinx.android.synthetic.main.activity_others_profile.*
 import kotlinx.android.synthetic.main.activity_others_profile.friendsCountTextView
 import kotlinx.android.synthetic.main.activity_others_profile.friendsRecyclerView
 import kotlinx.android.synthetic.main.activity_others_profile.profilePostsRecyclerView
-import kotlinx.android.synthetic.main.activity_profile.*
 import kotlinx.android.synthetic.main.activity_profile.bioTextView
 import kotlinx.android.synthetic.main.activity_profile.coverImageView
 import kotlinx.android.synthetic.main.activity_profile.joinDateTextView
 import kotlinx.android.synthetic.main.activity_profile.profileImageView
-import kotlinx.android.synthetic.main.activity_profile.smallProfileImageView
+import kotlinx.android.synthetic.main.activity_profile.smallUserImageView
 import kotlinx.android.synthetic.main.activity_profile.userNameTextView
 import kotlinx.android.synthetic.main.long_clicked_reacts_button.*
 import org.koin.android.ext.android.inject
@@ -53,8 +52,9 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
     FriendClickListener {
     private val profileActivityViewModel by viewModel<ProfileActivityViewModel>()
     private val othersProfileActivityViewModel by viewModel<OthersProfileActivityViewModel>()
-    private val postViewModel by viewModel<PostViewModel>()
     private val notificationsFragmentViewModel by viewModel<NotificationsFragmentViewModel>()
+    private val postViewModel by viewModel<PostViewModel>()
+
     private val auth: FirebaseAuth by inject()
     private lateinit var currentUser: User
     private var currentNotificationId: String? = null
@@ -268,7 +268,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         }
         if (user.profileImageUrl != null) {
             picasso.load(user.profileImageUrl).into(profileImageView)
-            picasso.load(user.profileImageUrl).into(smallProfileImageView)
+            picasso.load(user.profileImageUrl).into(smallUserImageView)
         }
         if (user.biography != null) {
             bioTextView.text = user.biography

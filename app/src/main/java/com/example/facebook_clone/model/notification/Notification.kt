@@ -13,6 +13,8 @@ data class Notification(
     @get:Exclude var imageBitmap: Bitmap? = null,
     var notifierName: String? = null,
     var notifierImageUrl: String? = null,
+    var groupId: String? = null,
+    var groupName: String? = null,
     var postId: String? = null,
     var reactType: Int? = 1,
     var commentPosition: Int? = null,

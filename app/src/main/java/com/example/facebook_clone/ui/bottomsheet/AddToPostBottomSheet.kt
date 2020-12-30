@@ -94,20 +94,6 @@ class AddToPostBottomSheet(private val postAttachmentListener: PostAttachmentLis
         ) {
             pAttachmentListener.onAttachmentAdded(data, "image", false)
 
-//            val pickedImage: Uri = data.data!!
-//            // Let's read picked image path using content resolver
-//            // Let's read picked image path using content resolver
-//            val bitmap = MediaStore.Images.Media.getBitmap(activity?.contentResolver, pickedImage)
-//            //use the bitmap as you like
-//            //use the bitmap as you like
-//            //imageView.setImageBitmap(bitmap)
-//
-//            Log.i(TAG, "DATAAA onAttachmentAdded: $data, ")
-//            Log.i(TAG, "DATAAA onAttachmentAdded: $resultCode, ")
-//            Log.i(TAG, "DATAAA onAttachmentAdded: ${data.data}, ")
-//            Log.i(TAG, "DATAAA onAttachmentAdded: ${bitmap}, ")
-
-
         }
         //VIDEO
         else if (requestCode == VIDEO_REQUEST_CODE && resultCode == AppCompatActivity.RESULT_OK ) {

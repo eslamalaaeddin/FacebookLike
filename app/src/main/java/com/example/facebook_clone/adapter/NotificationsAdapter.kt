@@ -27,10 +27,11 @@ class NotificationsAdapter(private var notifications: List<Notification>,
             itemView.setOnClickListener(this)
             itemView.setOnLongClickListener(this)
 
+
             itemView.confirmFriendRequestButton.setOnClickListener {
                 val notificationId = notifications[adapterPosition].id.toString()
                 val notifierId =notifications[adapterPosition].notifierId.toString()
-                val notifiedId =notifications[adapterPosition].notifierId.toString()
+                val notifiedId =notifications[adapterPosition].notifiedId.toString()
                 val notifierName =notifications[adapterPosition].notifierName.toString()
                 val notifierImageUrl =notifications[adapterPosition].notifierImageUrl.toString()
                 notListener.onClickConfirmFriendRequestNotification(notifiedId, notificationId,notifierId,notifierName, notifierImageUrl)
@@ -40,10 +41,22 @@ class NotificationsAdapter(private var notifications: List<Notification>,
 
             itemView.cancelFriendRequestButton.setOnClickListener {
                 val notificationId = notifications[adapterPosition].id.toString()
-                val notifiedId =notifications[adapterPosition].notifierId.toString()
+                val notifiedId =notifications[adapterPosition].notifiedId.toString()
                 notListener.onClickDeleteFriendRequestNotification(notifiedId, notificationId)
                 itemView.cancelFriendRequestButton.visibility = View.GONE
                 itemView.confirmFriendRequestButton.visibility = View.GONE
+            }
+
+            itemView.acceptGroupInvitationButton.setOnClickListener {
+                val notificationId = notifications[adapterPosition].id.toString()
+                val groupId = notifications[adapterPosition].groupId.toString()
+                notListener.onAcceptGroupInvitationButtonClicked(groupId, notificationId)
+            }
+            itemView.cancelGroupInvitationButton.setOnClickListener {
+                val notificationId = notifications[adapterPosition].id.toString()
+                val notifiedId =notifications[adapterPosition].notifiedId.toString()
+                val groupId = notifications[adapterPosition].groupId.toString()
+                notListener.onCancelGroupInvitationButtonClicked(notifiedId, notificationId)
             }
         }
 
@@ -60,6 +73,8 @@ class NotificationsAdapter(private var notifications: List<Notification>,
                 itemView.notificationVisualDescription.setImageResource(R.drawable.ic_friend_request)
                 itemView.confirmFriendRequestButton.visibility = View.VISIBLE
                 itemView.cancelFriendRequestButton.visibility = View.VISIBLE
+                itemView.acceptGroupInvitationButton.visibility = View.GONE
+                itemView.cancelGroupInvitationButton.visibility = View.GONE
             }else{
                 if (notification.notificationType == "reactOnPost"){
                     val reactType = notification.reactType
@@ -74,7 +89,10 @@ class NotificationsAdapter(private var notifications: List<Notification>,
                         6 -> itemView.notificationVisualDescription.setImageResource(R.drawable.ic_sad_react)
                         7 -> itemView.notificationVisualDescription.setImageResource(R.drawable.ic_angry_angry)
                     }
-
+                    itemView.confirmFriendRequestButton.visibility = View.GONE
+                    itemView.cancelFriendRequestButton.visibility = View.GONE
+                    itemView.acceptGroupInvitationButton.visibility = View.GONE
+                    itemView.cancelGroupInvitationButton.visibility = View.GONE
                 }
 
                 if (notification.notificationType == "reactOnComment"){
@@ -90,28 +108,52 @@ class NotificationsAdapter(private var notifications: List<Notification>,
                         6 -> itemView.notificationVisualDescription.setImageResource(R.drawable.ic_sad_react)
                         7 -> itemView.notificationVisualDescription.setImageResource(R.drawable.ic_angry_angry)
                     }
-
+                    itemView.confirmFriendRequestButton.visibility = View.GONE
+                    itemView.cancelFriendRequestButton.visibility = View.GONE
+                    itemView.acceptGroupInvitationButton.visibility = View.GONE
+                    itemView.cancelGroupInvitationButton.visibility = View.GONE
                 }
 
                 if (notification.notificationType == "commentOnPost"){
                     itemView.notifierName.text = notification.notifierName
                     itemView.notificationDescription.text = "commented on your post"
                     itemView.notificationVisualDescription.setImageResource(R.drawable.ic_notification_comment)
+                    itemView.confirmFriendRequestButton.visibility = View.GONE
+                    itemView.cancelFriendRequestButton.visibility = View.GONE
+                    itemView.acceptGroupInvitationButton.visibility = View.GONE
+                    itemView.cancelGroupInvitationButton.visibility = View.GONE
                 }
 
                 if (notification.notificationType == "commentOnComment"){
                     itemView.notifierName.text = notification.notifierName
                     itemView.notificationDescription.text = "replied to your comment"
                     itemView.notificationVisualDescription.setImageResource(R.drawable.ic_notification_comment)
+                    itemView.confirmFriendRequestButton.visibility = View.GONE
+                    itemView.cancelFriendRequestButton.visibility = View.GONE
+                    itemView.acceptGroupInvitationButton.visibility = View.GONE
+                    itemView.cancelGroupInvitationButton.visibility = View.GONE
                 }
 
                 if (notification.notificationType == "share"){
                     itemView.notifierName.text = notification.notifierName
                     itemView.notificationDescription.text = "shared your post"
                     itemView.notificationVisualDescription.setImageResource(R.drawable.ic_share_noification)
+                    itemView.confirmFriendRequestButton.visibility = View.GONE
+                    itemView.cancelFriendRequestButton.visibility = View.GONE
+                    itemView.acceptGroupInvitationButton.visibility = View.GONE
+                    itemView.cancelGroupInvitationButton.visibility = View.GONE
                 }
-                itemView.confirmFriendRequestButton.visibility = View.GONE
-                itemView.cancelFriendRequestButton.visibility = View.GONE
+
+
+                if (notification.notificationType == "groupInvitation"){
+                    itemView.acceptGroupInvitationButton.visibility = View.VISIBLE
+                    itemView.cancelGroupInvitationButton.visibility = View.VISIBLE
+                    itemView.confirmFriendRequestButton.visibility = View.GONE
+                    itemView.cancelFriendRequestButton.visibility = View.GONE
+                    itemView.notifierName.text = notification.notifierName
+                    itemView.notificationDescription.text = "invited you to join\n${notification.groupName}"
+                    itemView.notificationVisualDescription.setImageResource(R.drawable.ic_user_group)
+                }
             }
         }
 
@@ -130,6 +172,7 @@ class NotificationsAdapter(private var notifications: List<Notification>,
             val commentPosition = currentNotification.commentPosition
             //val commentId = currentNotification.commentId.toString()
             val id = currentNotification.id.toString()
+            val groupId = currentNotification.groupId.toString()
 
             when (notificationType){
                 "friendRequest" ->  notListener.onClickFriendRequestNotification(notifierId)
@@ -156,6 +199,11 @@ class NotificationsAdapter(private var notifications: List<Notification>,
                     postId = postId,
                     commentPosition = commentPosition!!
                 )
+
+                "groupInvitation" -> {
+                    notListener.onClickOnGroupInvitationNotification(notifierId, groupId)
+
+                }
             }
 
         }

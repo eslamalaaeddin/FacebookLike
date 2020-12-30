@@ -147,6 +147,7 @@ class CommentsBottomSheet(
             }
 
             else {
+                //Media comment
                 if (commentData != null) {
                     if (commentDataType == "image") {
                         var bitmap: Bitmap? = null
@@ -354,6 +355,12 @@ class CommentsBottomSheet(
                     val reactsResult = snapshot?.toObject(ReactDocument::class.java)?.reacts
 
                     commentsList = commentsResult.orEmpty().reversed()
+                    if (commentsList.isNullOrEmpty()){
+                        emptyCommentsLayout.visibility = View.VISIBLE
+                    }
+                    else{
+                        emptyCommentsLayout.visibility = View.GONE
+                    }
                     reactsList = reactsResult.orEmpty().reversed()
 
 

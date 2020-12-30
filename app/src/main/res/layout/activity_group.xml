@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.activity.GroupActivity">
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".ui.activity.GroupActivity">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/groupPostRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view8" />
+
+    <ImageView
+        android:id="@+id/groupCoverImageView"
+        android:layout_width="0dp"
+        android:layout_height="224dp"
+        android:scaleType="fitXY"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/mansour" />
+
+    <ImageView
+        android:id="@+id/upButtonImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_up_button"
+        app:tint="@color/white" />
+
+    <ImageView
+        android:id="@+id/moreImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_more"
+        app:tint="@color/white" />
+
+    <ImageView
+        android:id="@+id/adminBadgeImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_shield"
+        app:tint="@color/white" />
+
+    <TextView
+        android:id="@+id/groupNameTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:padding="8dp"
+        android:text="Zag Computers 2021, Students >"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/groupCoverImageView" />
+
+    <TextView
+        android:id="@+id/groupMembersCountTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="100 members"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/groupNameTextView" />
+
+    <LinearLayout
+        android:id="@+id/showGroupMembersLayout"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:gravity="start|center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/groupMembersCountTextView">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/secondMemberPlaceHolder"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:scaleType="centerCrop"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/sarhan"
+            app:civ_border_overlay="true"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:layout_editor_absoluteY="372dp" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/thirdMemberPlaceHolder"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/sarhan"
+            app:civ_border_overlay="true"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:layout_editor_absoluteY="372dp" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/fourthMemberPlaceHolder"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/sengab"
+            app:civ_border_overlay="true"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:layout_editor_absoluteY="372dp" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/firstMemberPlaceHolder"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/mansour"
+            app:civ_border_overlay="true"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:layout_editor_absoluteY="372dp" />
+
+        <Button
+            android:id="@+id/inviteFriendButton"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:focusable="true"
+            android:layout_marginStart="32dp"
+            android:background="@drawable/round_background"
+            android:backgroundTint="@color/light_blue"
+            android:text="invite"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+           />
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/view8"
+        android:layout_width="0dp"
+        android:layout_height="12dp"
+        android:layout_marginTop="8dp"
+        android:background="#DFDFDF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/smallUserImageView" />
+
+    <View
+        android:id="@+id/view9"
+        android:layout_width="0dp"
+        android:layout_height="12dp"
+        android:layout_marginTop="16dp"
+        android:background="#DFDFDF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/showGroupMembersLayout" />
+
+    <TextView
+        android:id="@+id/whatIsInYourMindTextView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:gravity="center|start"
+        android:text="What is in your mind?"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/smallUserImageView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/smallUserImageView"
+        app:layout_constraintTop_toTopOf="@+id/smallUserImageView"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/smallUserImageView"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/sarhan"
+        app:civ_border_overlay="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view9" />
+
+    <ImageView
+        android:id="@+id/searchImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/moreImageView"
+        app:layout_constraintEnd_toStartOf="@+id/moreImageView"
+        app:layout_constraintTop_toTopOf="@+id/moreImageView"
+        app:srcCompat="@drawable/ic_search"
+        app:tint="@color/white" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

@@ -11,6 +11,7 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.profile_post_item.view.*
 import android.text.format.DateFormat.format
 import android.util.Log
+import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.facebook_clone.helper.listener.PostListener
@@ -385,6 +386,119 @@ class ProfilePostsAdapter(
             itemView.setOnClickListener(this)
             listener = postListener
 
+            /////////////////////////////////////////////////////////////
+
+
+            itemView.addCommentTextView.setOnClickListener {
+                val interactorId = auth.currentUser?.uid.toString()
+                val post = posts[adapterPosition]
+                val postId = post.id.toString()
+                val postPublisherId = post.publisherId.toString()
+                listener.onCommentButtonClicked(
+                    postPublisherId,
+                    postId,
+                    interactorId,
+                    interactorName,
+                    interactorImageUrl,
+                    adapterPosition
+                )
+            }
+
+            itemView.addReactTextView.setOnClickListener {
+                val interactorId = auth.currentUser?.uid.toString()
+                val post = posts[adapterPosition]
+                val postId = post.id.toString()
+                val postPublisherId = post.publisherId.toString()
+                val currentPostReacts = post.reacts.orEmpty()
+                var currentReact: React? = null
+                var reacted: Boolean = false
+
+                post.reacts?.let { reacts ->
+                    for (react in reacts) {
+                        if (react.reactorId == interactorId) {
+                            currentReact = react
+                            reacted = true
+                            break
+                        }
+                    }
+                }
+
+                listener.onReactButtonClicked(
+                    postPublisherId,
+                    postId,
+                    interactorId,
+                    interactorName,
+                    interactorImageUrl,
+                    reacted,
+                    currentReact,//null
+                    adapterPosition
+                )
+
+            }
+
+            itemView.addReactTextView.setOnLongClickListener {
+                val interactorId = auth.currentUser?.uid.toString()
+                val post = posts[adapterPosition]
+                val postId = post.id.toString()
+                val postPublisherId = post.publisherId.toString()
+                val currentPostReacts = post.reacts.orEmpty()
+                var currentReact: React? = null
+                var reacted: Boolean = false
+
+                post.reacts?.let { reacts ->
+                    for (react in reacts) {
+                        if (react.reactorId == interactorId) {
+                            currentReact = react
+                            reacted = true
+                            break
+                        }
+                    }
+                }
+
+                listener.onReactButtonLongClicked(
+                    postPublisherId,
+                    postId,
+                    interactorId,
+                    interactorName,
+                    interactorImageUrl,
+                    reacted,
+                    currentReact,//null
+                    adapterPosition
+                )
+                true
+            }
+
+            itemView.addShareTextView.setOnClickListener {
+//                val interactorId = auth.currentUser?.uid.toString()
+//                val post = posts[adapterPosition]
+//                val postId = post.id.toString()
+//                val postPublisherId = post.publisherId.toString()
+//                listener.onShareButtonClicked(
+//                    post,
+//                    interactorId,
+//                    interactorName,
+//                    interactorImageUrl,
+//                    adapterPosition
+//                )
+                Toast.makeText(itemView.context, "Cyclic share is not available till now", Toast.LENGTH_SHORT).show()
+            }
+
+            itemView.reactsLayout.setOnClickListener {
+                val interactorId = auth.currentUser?.uid.toString()
+                val post = posts[adapterPosition]
+                val postId = post.id.toString()
+                val postPublisherId = post.publisherId.toString()
+                listener.onReactLayoutClicked(
+                    postPublisherId,
+                    postId,
+                    interactorId,
+                    interactorName,
+                    interactorImageUrl,
+                    adapterPosition
+                )
+            }
+
+            //////////////////////////////////////////////////////////////////////
             itemView.moreOnPost.setOnClickListener {
                 val post = posts[adapterPosition]
                 listener.onPostMoreDotsClicked(post, true)

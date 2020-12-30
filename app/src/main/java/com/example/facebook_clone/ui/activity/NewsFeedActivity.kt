@@ -2,25 +2,29 @@ package com.example.facebook_clone.ui.activity
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.util.Log
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.NewsFeedTabsAdapter
-import com.example.facebook_clone.model.post.Post
-import com.example.facebook_clone.model.post.comment.Comment
+import com.example.facebook_clone.helper.BaseApplication.Companion.context
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.model.user.recentloggedinuser.RecentLoggedInUser
 import com.example.facebook_clone.viewmodel.NewsFeedActivityViewModel
 import com.example.facebook_clone.viewmodel.PostViewModel
 import com.google.android.gms.tasks.Task
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayout.ViewPagerOnTabSelectedListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
 import kotlinx.android.synthetic.main.activity_news_feed.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+
 
 private const val TAG = "NewsFeedActivity"
 private const val TOKEN = "token"
@@ -46,7 +50,7 @@ class NewsFeedActivity : AppCompatActivity() {
             getUserToken().addOnSuccessListener {
                 val newToken = it.token
                 val tokenFromSharedPref = getTokenFromSharedPreference(this)
-                if (newToken != tokenFromSharedPref){
+                if (newToken != tokenFromSharedPref) {
                     saveTokenToSharedPreference(this, newToken)
                     updateTokenInCurrentUserPosts(user.id.toString(), newToken)
                     //updateTokenInCurrentUserComments(user.id.toString(), newToken)
@@ -67,7 +71,10 @@ class NewsFeedActivity : AppCompatActivity() {
 
                     addUserToRecentUsers(currentUser, token).addOnCompleteListener {
                         if (!it.isSuccessful) {
-                            newsFeedActivityViewModel.createRecentUsersCollection(token,currentUser).addOnCompleteListener {
+                            newsFeedActivityViewModel.createRecentUsersCollection(
+                                token,
+                                currentUser
+                            ).addOnCompleteListener {
                                 addUserToRecentUsers(currentUser, token)
                             }
                         }
@@ -91,13 +98,52 @@ class NewsFeedActivity : AppCompatActivity() {
 
     private fun setUpTabs() {
        val tabsAdapter = NewsFeedTabsAdapter(supportFragmentManager)
-        viewPager.adapter = tabsAdapter
-        newsFeedTabLayout.setupWithViewPager(viewPager)
+        if (viewPager != null){
+            viewPager.adapter = tabsAdapter
+            newsFeedTabLayout.setupWithViewPager(viewPager)
+        }
+
 
         newsFeedTabLayout.getTabAt(0)?.setIcon(R.drawable.ic_news_feed)
         newsFeedTabLayout.getTabAt(1)?.setIcon(R.drawable.ic_group)
         newsFeedTabLayout.getTabAt(2)?.setIcon(R.drawable.ic_alarm)
         newsFeedTabLayout.getTabAt(3)?.setIcon(R.drawable.ic_menu)
+
+
+//        newsFeedTabLayout.setOnTabSelectedListener(
+//            object : ViewPagerOnTabSelectedListener(viewPager) {
+//                override fun onTabSelected(tab: TabLayout.Tab) {
+//                    super.onTabSelected(tab)
+//                    val tabIconColor = ContextCompat.getColor(this@NewsFeedActivity, R.color.medium_blue)
+//                    when(tab.position){
+//                        0 -> {
+//                            tab.icon = R.drawable.ic_news_feed_filled
+//                        }
+//                        1 -> {
+//
+//                        }
+//                        2 -> {
+//
+//                        }
+//                        3 -> {
+//
+//                        }
+//                    }
+//
+//                }
+//
+//                override fun onTabUnselected(tab: TabLayout.Tab) {
+//                    super.onTabUnselected(tab)
+//                    val tabIconColor =
+//                        ContextCompat.getColor(this@NewsFeedActivity, R.color.black)
+//                    tab.icon!!.setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN)
+//                }
+//
+//                override fun onTabReselected(tab: TabLayout.Tab) {
+//                    super.onTabReselected(tab)
+//                }
+//            }
+//        )
 
     }
 

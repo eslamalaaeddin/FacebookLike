@@ -3,6 +3,7 @@ package com.example.facebook_clone.ui.bottomsheet
 import android.app.Dialog
 import android.opengl.Visibility
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +22,7 @@ import kotlinx.android.synthetic.main.user_relations_bottom_sheet.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
+private const val TAG = "UserRelationsBottomShee"
 class UserRelationsBottomSheet(private val friendId: String): BottomSheetDialogFragment() {
     private val othersViewModel by viewModel<OthersProfileActivityViewModel>()
     private val profileActivityViewModel by viewModel<ProfileActivityViewModel>()
@@ -132,11 +134,11 @@ class UserRelationsBottomSheet(private val friendId: String): BottomSheetDialogF
         deleteButton.setOnClickListener {
             currentFriend?.let { currentFriend ->
                 othersViewModel.also {
+                    //delete me from his friends list
+                    val meFriend = Friend(auth.currentUser?.uid.toString(), currentUser.name, currentUser.profileImageUrl)
+                    it.deleteFriendFromFriends(meFriend, currentFriend.id.toString())
+                    //delete him from my friends list
                     it.deleteFriendFromFriends(currentFriend, auth.currentUser?.uid.toString())
-                    meAsFriend?.let {meAsFriend ->
-                        it.deleteFriendFromFriends(meAsFriend, currentFriend.id.toString())
-                    }
-
                 }
             }
             dialog.dismiss()

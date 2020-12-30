@@ -33,5 +33,10 @@ interface NotificationListener {
 
     fun onNotificationLongClicked(notification: Notification)
 
+    fun onClickOnGroupInvitationNotification(notifierId: String, groupId: String)
+
+    fun onAcceptGroupInvitationButtonClicked(groupId: String, notificationId: String)
+    fun onCancelGroupInvitationButtonClicked(notifiedId: String, notificationId: String)
+
 
 }

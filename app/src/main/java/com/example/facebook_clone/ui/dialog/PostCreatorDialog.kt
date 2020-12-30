@@ -11,27 +11,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.facebook_clone.R
-import com.example.facebook_clone.adapter.AddToPostAdapter
 import com.example.facebook_clone.adapter.PostVisibilityAdapter
 import com.example.facebook_clone.helper.provider.NameImageProvider
 import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.helper.listener.PostAttachmentListener
-import com.example.facebook_clone.model.Option
 import com.example.facebook_clone.model.Visibility
 import com.example.facebook_clone.model.post.Post
+import com.example.facebook_clone.ui.activity.NewsFeedActivity
 import com.example.facebook_clone.ui.bottomsheet.AddToPostBottomSheet
 import com.example.facebook_clone.viewmodel.PostViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.add_to_post_bottom_sheet.view.*
 import kotlinx.android.synthetic.main.post_creator_dialog.*
-import kotlinx.android.synthetic.main.profile_post_item.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -67,7 +62,7 @@ class PostCreatorDialog : DialogFragment(), AdapterView.OnItemSelectedListener, 
 
         postVisibilitySpinner.onItemSelectedListener = this
 
-        Picasso.get().load(userProfileImageUrl).into(smallProfileImageView)
+        Picasso.get().load(userProfileImageUrl).into(smallUserImageView)
         userNameTextView.text = userName
 
         val publicOption = Visibility(R.drawable.ic_public_visibility, "Public")
@@ -191,7 +186,8 @@ class PostCreatorDialog : DialogFragment(), AdapterView.OnItemSelectedListener, 
             publisherName = userName,
             publisherImageUrl = userProfileImageUrl,
             attachmentUrl = postAttachmentUrl,
-            attachmentType = postAttachmentType
+            attachmentType = postAttachmentType,
+            publisherToken = NewsFeedActivity.getTokenFromSharedPreference(requireContext())
         )
     }
 

@@ -10,7 +10,7 @@
 
     <com.github.chrisbanes.photoview.PhotoView
         android:id="@+id/photoView"
-        android:scaleType="centerCrop"
+        android:scaleType="centerInside"
         android:layout_gravity="center"
         android:layout_width="match_parent"
         android:layout_height="396dp" />

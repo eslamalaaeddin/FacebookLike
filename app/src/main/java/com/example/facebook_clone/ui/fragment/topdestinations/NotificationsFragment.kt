@@ -12,12 +12,18 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.NotificationsAdapter
 import com.example.facebook_clone.helper.listener.NotificationListener
+import com.example.facebook_clone.model.group.Member
+import com.example.facebook_clone.model.group.SemiGroup
 import com.example.facebook_clone.model.notification.Notification
 import com.example.facebook_clone.model.user.User
+import com.example.facebook_clone.model.user.followed.Followed
+import com.example.facebook_clone.model.user.follower.Follower
 import com.example.facebook_clone.model.user.friend.Friend
 import com.example.facebook_clone.model.user.friendrequest.FriendRequest
+import com.example.facebook_clone.ui.activity.GroupActivity
 import com.example.facebook_clone.ui.activity.OthersProfileActivity
 import com.example.facebook_clone.ui.activity.PostViewerActivity
+import com.example.facebook_clone.viewmodel.GroupsViewModel
 import com.example.facebook_clone.viewmodel.NotificationsFragmentViewModel
 import com.example.facebook_clone.viewmodel.OthersProfileActivityViewModel
 import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
@@ -36,6 +42,8 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), Notific
             by viewModel<OthersProfileActivityViewModel>()
     private val profileActivityViewModel
             by viewModel<ProfileActivityViewModel>()
+    private val groupViewModel
+            by viewModel<GroupsViewModel>()
 
     private val auth: FirebaseAuth by inject()
     private val notifiedUserId = auth.currentUser?.uid.toString()//Current user id
@@ -89,6 +97,20 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), Notific
         val meAsFriend = Friend(userId, userName, userImageUrl)
         val himAsFriend = Friend(currentUser.id, currentUser.name, currentUser.profileImageUrl)
         createFriendshipBetweenMeAndHim(notificationId, meAsFriend, himAsFriend)
+
+//        val meAsAFollower = Follower(userId, userName, userImageUrl)
+//        val meAsAFollowing = Followed(userId, userName, userImageUrl)
+//        //following == followed
+//        val himAsAFollowing = Followed(currentUser.id, currentUser.name, currentUser.profileImageUrl)
+//        val himAsAFollower = Follower(currentUser.id, currentUser.name, currentUser.profileImageUrl)
+//
+//        othersProfileActivityViewModel.addMeAsAFollowerToHisDocument(currentUser.id.toString(), meAsAFollower)
+//            .addOnCompleteListener { task ->
+//                if (task.isSuccessful){
+//                    othersProfileActivityViewModel.addHimAsAFollowingToMyDocument(userId, himAsAFollowing)
+//                }
+//            }
+
         othersProfileActivityViewModel.deleteNotificationIdFromNotifiedDocument(
             notificationId,
             auth.currentUser?.uid.toString()
@@ -124,6 +146,32 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), Notific
 
     override fun onNotificationLongClicked(notification: Notification) {
         showDeleteNotificationConfirmationDialog(notification)
+    }
+
+    override fun onClickOnGroupInvitationNotification(notifierId: String, groupId: String) {
+        Toast.makeText(requireContext(), "$notifierId || $groupId", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onAcceptGroupInvitationButtonClicked( groupId: String, notificationId: String) {
+
+        val member = Member(id = currentUser.id, name = currentUser.name, imageUrl = currentUser.profileImageUrl, blocked = false)
+        groupViewModel.addMemberToGroup(member, groupId).addOnSuccessListener {
+            val groupLiveData = groupViewModel.getGroupLiveData(groupId)
+            groupLiveData.observe(viewLifecycleOwner){
+                val semiGroup = SemiGroup(it.id, it.name, it.coverImageUrl)
+                addGroupToUserGroups(userId = currentUser.id.toString(), semiGroup)
+            }
+
+            deleteNotification(currentUser.id.toString(), notificationId)
+        }
+    }
+
+    override fun onCancelGroupInvitationButtonClicked(notifiedId: String, notificationId: String) {
+        deleteNotification(notifiedId, notificationId)
+    }
+
+    private fun addGroupToUserGroups(userId: String, semiGroup: SemiGroup){
+        groupViewModel.addGroupToUserGroups(userId, semiGroup)
     }
 
     private fun deleteFriendRequestFromMeAndHim(notificationId: String) {
@@ -170,6 +218,10 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), Notific
                     deleteFriendRequestFromMeAndHim(notificationId)
                 }
             }
+    }
+
+    private fun createFollowingRelationBetweenMeAndHim(){
+
     }
 
     private fun deleteNotification(notifiedId: String, notificationId: String) {

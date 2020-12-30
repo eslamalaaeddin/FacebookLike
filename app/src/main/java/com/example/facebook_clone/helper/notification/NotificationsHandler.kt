@@ -20,8 +20,10 @@ class NotificationsHandler(
     var notificationType: String? = null,
     var postPublisherId: String? = null,
     var postId: String? = null,
+    var groupName: String? = null,
     var reactType: Int? = null,
     var commentPosition: Int? = null,
+    var groupId: String? = null,
 
     private val othersProfileActivityViewModel: OthersProfileActivityViewModel,
     private val notificationsFragmentViewModel: NotificationsFragmentViewModel
@@ -36,6 +38,8 @@ class NotificationsHandler(
             notifierName = notifierName,
             notifierImageUrl = notifierImageUrl,
             postId = postId,
+            groupName = groupName,
+            groupId = groupId,
             reactType = reactType,
             commentPosition = commentPosition,
             postPublisherId = postPublisherId

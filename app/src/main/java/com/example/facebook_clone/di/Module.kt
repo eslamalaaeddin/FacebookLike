@@ -1,5 +1,6 @@
 package com.example.facebook_clone.di
 
+import com.example.facebook_clone.repository.GroupsRepository
 import com.example.facebook_clone.repository.PostsRepository
 import com.example.facebook_clone.repository.UsersRepository
 import com.example.facebook_clone.viewmodel.*
@@ -56,7 +57,12 @@ val recentUsersActivityViewModelModule = module { viewModel { RecentUsersActivit
 
 val postViewerActivityViewModelModule = module { viewModel { PostViewerViewModel(get(), get()) } }
 
+val groupsFragmentViewModel = module { viewModel { GroupsFragmentViewModel(get()) }}
+
+val groupsViewModelModule = module { viewModel { GroupsViewModel(get()) }}
+
 /////////////////////////////////////////////////REPOSITORIES///////////////////////////////////////
 
 val usersRepositoryModule = module { single { UsersRepository(get(),get(), get()) } }
 val postsRepositoryModule = module { single { PostsRepository(get(),get(), get()) } }
+val groupsRepositoryModule = module { single { GroupsRepository(get(),get(), get()) } }

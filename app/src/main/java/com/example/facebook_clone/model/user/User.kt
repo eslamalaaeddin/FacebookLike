@@ -1,5 +1,6 @@
 package com.example.facebook_clone.model.user
 
+import com.example.facebook_clone.model.group.SemiGroup
 import com.example.facebook_clone.model.user.followed.Followed
 import com.example.facebook_clone.model.user.follower.Follower
 import com.example.facebook_clone.model.user.friend.Friend
@@ -20,7 +21,7 @@ data class User(
     var friends: List<Friend>? = null,
     var followers: List<Follower>? = null,
     var followings: List<Followed>? = null,
-    var groupsIds: List<String>? = null,
+    var groups: List<SemiGroup>? = null,
     var favPagesIds: List<String>? = null,
     var friendRequests: List<FriendRequest>? = null,
     var biography: String? = null,
