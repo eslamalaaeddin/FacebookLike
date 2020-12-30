@@ -44,7 +44,7 @@ class ProfilePostsAdapter(
     private val postListener: PostListener,
     private val interactorName: String,
     private val interactorImageUrl: String,
-    private val iAmFriend: Boolean,
+    private val iAmFriend: Boolean?,
     private val userId: String
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -80,8 +80,7 @@ class ProfilePostsAdapter(
 
     }
 
-    inner class ProfilePostsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
-        View.OnClickListener {
+    inner class ProfilePostsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
 
         init {
             itemView.setOnClickListener(this)
@@ -346,7 +345,7 @@ class ProfilePostsAdapter(
                             ViewGroup.LayoutParams.WRAP_CONTENT
                         )
                 } else if (postVisibility == 1) {
-                    if (iAmFriend) {
+                    if (iAmFriend == true) {
                         itemView.visibility = View.VISIBLE
                         itemView.layoutParams = RecyclerView.LayoutParams(
                                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -677,7 +676,7 @@ class ProfilePostsAdapter(
                             ViewGroup.LayoutParams.WRAP_CONTENT
                         )
                 } else if (postVisibility == 1) {
-                    if (iAmFriend) {
+                    if (iAmFriend == true) {
                         itemView.visibility = View.VISIBLE
                         itemView.layoutParams =
                             RecyclerView.LayoutParams(

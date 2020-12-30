@@ -13,8 +13,9 @@
     tools:context=".ui.activity.GroupActivity">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/groupPostRecyclerView"
+        android:id="@+id/groupPostsRecyclerView"
         android:layout_width="0dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
