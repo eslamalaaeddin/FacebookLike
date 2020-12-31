@@ -228,7 +228,7 @@ class PostCreatorDialog(private val fromWhere: String, private val groupId: Stri
 
             POST_FROM_GROUP -> {
                 post.firstCollectionType = GROUP_POSTS_COLLECTION
-                post.creatorReferenceId = groupId
+                post.creatorReferenceId = groupId.orEmpty()
                 post.secondCollectionType = SPECIFIC_GROUP_POSTS_COLLECTION
             }
 

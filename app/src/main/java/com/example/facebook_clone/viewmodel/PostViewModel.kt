@@ -19,15 +19,7 @@ import com.google.firebase.storage.UploadTask
 class PostViewModel(private val repository: PostsRepository) : ViewModel() {
 
     fun createPost(post: Post): Task<Void> {
-        val firstCollectionType = post.firstCollectionType.orEmpty()
-        val creatorReferenceId = post.creatorReferenceId.orEmpty()
-        val secondCollectionType = post.secondCollectionType.orEmpty()
-        return repository.createPost(
-            post,
-            firstCollectionType,
-            creatorReferenceId,
-            secondCollectionType
-        )
+        return repository.createPost(post)
     }
 
     fun addSharedPostToMyPosts(post: Post, myId: String): Task<Void> {

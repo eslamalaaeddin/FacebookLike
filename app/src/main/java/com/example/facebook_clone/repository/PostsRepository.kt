@@ -26,6 +26,7 @@ import java.util.*
 
 private const val TAG = "PostsRepository"
 
+
 class PostsRepository(
     private val database: FirebaseFirestore,
     private val auth: FirebaseAuth,
@@ -41,15 +42,13 @@ class PostsRepository(
 //            .collection(PROFILE_POSTS_COLLECTION).document(post.id.toString()).set(post)
 //    }
 
-    fun createPost(
-        post: Post,
-        firstCollectionType: String,
-        creatorReferenceId: String,
-        secondCollectionType: String
-    ): Task<Void> {
-        //Strings only
-        return database.collection(firstCollectionType).document(creatorReferenceId)
-            .collection(secondCollectionType).document(post.id.toString()).set(post)
+    fun createPost(post: Post): Task<Void> {
+        return database
+            .collection(post.firstCollectionType)
+            .document(post.creatorReferenceId)
+            .collection(post.secondCollectionType)
+            .document(post.id.toString())
+            .set(post)
     }
 
     fun addSharedPostToMyPosts(post: Post, myId: String): Task<Void> {

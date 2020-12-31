@@ -22,7 +22,7 @@ data class Post(
     var visibility: Int? = 0, // 0 --> public, 1 --> private ......
     val creationTime: Timestamp = Timestamp(Date()),
     var publisherToken: String? = null,
-    @get:Exclude var firstCollectionType: String? = null,
-    @get:Exclude var creatorReferenceId: String? = null,
-    @get:Exclude var secondCollectionType: String? = null
+    @get:Exclude var firstCollectionType: String = "",
+    @get:Exclude var creatorReferenceId: String = "",
+    @get:Exclude var secondCollectionType: String = ""
 )
