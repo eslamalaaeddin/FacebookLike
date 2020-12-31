@@ -197,9 +197,9 @@ class PostsRepository(
     //better to be named getPostSnapshotByItsId
     fun getPostById(post: Post): Task<DocumentSnapshot> {
         return database
-            .collection(POSTS_COLLECTION)
+            .collection(post.firstCollectionType)
             .document(post.creatorReferenceId)
-            .collection(PROFILE_POSTS_COLLECTION)
+            .collection(post.secondCollectionType)
             .document(post.id.orEmpty()).get()
     }
 

@@ -297,8 +297,9 @@ class CommentsBottomSheet(
                         )
 
                     commentEditText.text.clear()
-
+                    Log.i(TAG, "TOTO onViewCreated: $post")
                     postViewModel.addCommentToPostComments(post, comment)
+
                         .addOnCompleteListener { task ->
                             //   progressDialog?.dismiss()
                             postViewModel
@@ -344,8 +345,8 @@ class CommentsBottomSheet(
 
     @SuppressLint("SetTextI18n")
     private fun updateCommentsUI() {
-        post.firstCollectionType = POSTS_COLLECTION
-        post.secondCollectionType = PROFILE_POSTS_COLLECTION
+//        post.firstCollectionType = POSTS_COLLECTION
+//        post.secondCollectionType = PROFILE_POSTS_COLLECTION
         postViewModel.getPostById(post).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 task.result?.reference?.addSnapshotListener { snapshot, error ->

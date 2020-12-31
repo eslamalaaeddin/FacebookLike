@@ -35,9 +35,8 @@ class ProfileActivityPostsHandler(
     private val context: Context,
     private val postViewModel: PostViewModel,
     private val profileActivityViewModel: ProfileActivityViewModel
-    ): BasePostHandler(), PostListener, FriendClickListener {
-    private var currentEditedPostPosition: Int = -1
-    private var progressDialog: ProgressDialog? = null
+    ): BasePostHandler(context), PostListener, FriendClickListener {
+
     override fun onReactButtonClicked(
         post: Post,
         interactorId: String,
@@ -48,7 +47,7 @@ class ProfileActivityPostsHandler(
         postPosition: Int
     ) {
         currentEditedPostPosition = postPosition
-        val modifiedPost = locatePostDestination(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
+        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
         if (!reacted) {
             val myReact = createReact(interactorId, interactorName, interactorImageUrl)
             addReactOnPostToDb(myReact, modifiedPost).addOnCompleteListener { task ->
@@ -79,7 +78,7 @@ class ProfileActivityPostsHandler(
         currentReact: React?,
         postPosition: Int
     ) {
-        val modifiedPost = locatePostDestination(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
+        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
         currentEditedPostPosition = postPosition
         showReactsChooserDialog(
             interactorId,
@@ -97,17 +96,7 @@ class ProfileActivityPostsHandler(
         interactorImageUrl: String,
         postPosition: Int
     ) {
-        val modifiedPost = locatePostDestination(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
-        currentEditedPostPosition = postPosition
-        val commentsBottomSheet = CommentsBottomSheet(
-            modifiedPost,
-            interactorId,
-            interactorName,
-            interactorImageUrl,
-            null,//used to handle notification so, no need for it in my profile.
-            ""//me
-        )
-        commentsBottomSheet.show((context as AppCompatActivity).supportFragmentManager, commentsBottomSheet.tag)
+        openCommentsBottomSheet(post, interactorId, interactorName, interactorImageUrl, postPosition)
     }
 
     override fun onShareButtonClicked(
@@ -117,7 +106,7 @@ class ProfileActivityPostsHandler(
         interactorImageUrl: String,
         postPosition: Int
     ) {
-        val modifiedPost = locatePostDestination(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
+        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
         currentEditedPostPosition = postPosition
         val share = Share(
             sharerId = interactorId,
@@ -136,37 +125,13 @@ class ProfileActivityPostsHandler(
         interactorImageUrl: String,
         postPosition: Int
     ) {
-        val modifiedPost = locatePostDestination(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
-        currentEditedPostPosition = postPosition
-        CommentsBottomSheet(
-            modifiedPost,
-            interactorId,
-            interactorName,
-            interactorImageUrl,
-            null,
-            "",
-        ).apply {
-            show((context as AppCompatActivity ).supportFragmentManager, tag)
-        }
+        openCommentsBottomSheet(post, interactorId, interactorName, interactorImageUrl, postPosition)
     }
 
-    override fun onMediaPostClicked(mediaUrl: String) {
-        //Image
-        if (mediaUrl.contains("jpeg")) {
-            val imageViewerDialog = ImageViewerDialog()
-            imageViewerDialog.show((context as AppCompatActivity ).supportFragmentManager, "signature")
-            imageViewerDialog.setMediaUrl(mediaUrl)
-        }
-        //video
-        else {
-            val videoIntent = Intent(context, VideoPlayerActivity::class.java)
-            videoIntent.putExtra("videoUrl", mediaUrl)
-            context.startActivity(videoIntent)
-        }
-    }
+    override fun onMediaPostClicked(mediaUrl: String) { handleMediaClicks(mediaUrl) }
 
     override fun onPostMoreDotsClicked(post: Post, shared: Boolean?) {
-        val modifiedPost = locatePostDestination(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
+        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
         val postConfigurationsBottomSheet = PostConfigurationsBottomSheet(modifiedPost, shared)
         postConfigurationsBottomSheet.show(
             (context as AppCompatActivity ).supportFragmentManager,
@@ -187,37 +152,55 @@ class ProfileActivityPostsHandler(
         context.startActivity(intent)
     }
 
+    private fun openCommentsBottomSheet(post: Post,
+                                        interactorId: String,
+                                        interactorName: String,
+                                        interactorImageUrl: String,
+                                        postPosition: Int){
+        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
+        currentEditedPostPosition = postPosition
+        CommentsBottomSheet(
+            modifiedPost,
+            interactorId,
+            interactorName,
+            interactorImageUrl,
+            null,
+            "",
+        ).apply {
+            show((context as AppCompatActivity ).supportFragmentManager, tag)
+        }
+    }
 
     private fun addReactOnPostToDb(
         react: React,
         post: Post
     ): Task<Void> {
-        val modifiedPost = locatePostDestination(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
+        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
         return postViewModel.addReactToDB(react, modifiedPost)
     }
 
-    private fun createReact(
-        interactorId: String,
-        interactorName: String,
-        interactorImageUrl: String
-    ): React {
-        return React(
-            reactorId = interactorId,
-            reactorName = interactorName,
-            reactorImageUrl = interactorImageUrl
-        )
-    }
+//    private fun createReact(
+//        interactorId: String,
+//        interactorName: String,
+//        interactorImageUrl: String
+//    ): React {
+//        return React(
+//            reactorId = interactorId,
+//            reactorName = interactorName,
+//            reactorImageUrl = interactorImageUrl
+//        )
+//    }
 
     private fun deleteReactFromPost(
         react: React,
         post: Post
     ): Task<Void> {
-        val modifiedPost = locatePostDestination(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
+        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
         return postViewModel.deleteReactFromPost(react, modifiedPost)
     }
 
     private fun addShareToPost(share: Share, post: Post): Task<Void> {
-        val modifiedPost = locatePostDestination(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
+        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
         return postViewModel.addShareToPost(share, modifiedPost)
     }
 

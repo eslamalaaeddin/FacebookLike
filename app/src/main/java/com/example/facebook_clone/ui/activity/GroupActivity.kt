@@ -9,10 +9,12 @@ import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.ProfilePostsAdapter
 import com.example.facebook_clone.helper.Utils.POST_FROM_GROUP
 import com.example.facebook_clone.helper.listener.AdminToolsListener
+import com.example.facebook_clone.helper.posthandler.GroupsActivityPostsHandler
 import com.example.facebook_clone.ui.bottomsheet.AdminToolsBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.InviteMembersBottomSheet
 import com.example.facebook_clone.ui.dialog.PostCreatorDialog
 import com.example.facebook_clone.viewmodel.GroupsViewModel
+import com.example.facebook_clone.viewmodel.PostViewModel
 import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
@@ -24,32 +26,40 @@ private const val TAG = "GroupActivity"
 class GroupActivity : AppCompatActivity(), AdminToolsListener {
     private val groupsViewModel by viewModel<GroupsViewModel>()
     private val profileActivityViewModel by viewModel<ProfileActivityViewModel>()
+    private val postViewModel by viewModel<PostViewModel>()
     private val auth: FirebaseAuth by inject()
     private val currentUserId = auth.currentUser?.uid.toString()
     private var currentUserName = ""
     private var currentUserImageUrl = ""
-    private val picasso = Picasso.get()
     private var groupId = ""
     private var groupName = ""
-//    private val postHandler = PostHandler(this)
+    private val picasso = Picasso.get()
+
+    private lateinit var groupsActivityPostsHandler : GroupsActivityPostsHandler
     private lateinit var profilePostsAdapter: ProfilePostsAdapter
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group)
 
+
+
+
         upButtonImageView.setOnClickListener { finish() }
 
         groupId = intent.getStringExtra("groupId").orEmpty()
-        
-        val groupPostsLiveData = groupsViewModel.getGroupPostsLiveData(groupId)
-        groupPostsLiveData.observe(this){posts ->
-            posts?.let {
+
+        groupsActivityPostsHandler = GroupsActivityPostsHandler(this, groupId, postViewModel)
+
+//        val groupPostsLiveData = groupsViewModel.getGroupPostsLiveData(groupId)
+//        groupPostsLiveData.observe(this){posts ->
+//            posts?.let {
+//
 //                profilePostsAdapter =
-//                    ProfilePostsAdapter(auth, posts, postHandler, currentUserName, currentUserImageUrl, null,currentUserId )
+//                    ProfilePostsAdapter(auth, posts, groupsActivityPostsHandler, currentUserName, currentUserImageUrl, null,currentUserId )
 //                groupPostsRecyclerView.adapter = profilePostsAdapter
-            }
-        }
+//            }
+//        }
 
         val groupLiveData = groupsViewModel.getGroupLiveData(groupId)
         groupLiveData.observe(this) { group ->
@@ -73,7 +83,19 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener {
                 picasso.load(user.profileImageUrl).into(smallUserImageView)
                 currentUserName = user.name.orEmpty()
                 currentUserImageUrl = user.profileImageUrl.orEmpty()
+
+                val groupPostsLiveData = groupsViewModel.getGroupPostsLiveData(groupId)
+                groupPostsLiveData.observe(this){posts ->
+                    posts?.let {
+
+                        profilePostsAdapter =
+                            ProfilePostsAdapter(auth, posts, groupsActivityPostsHandler, currentUserName, currentUserImageUrl, null,currentUserId )
+                        groupPostsRecyclerView.adapter = profilePostsAdapter
+                    }
+                }
             }
+
+
         }
 
         adminBadgeImageView.setOnClickListener {showAdminToolsBottomSheet(groupId)}
@@ -87,7 +109,7 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener {
             Toast.makeText(this, "Islam love Alaa", Toast.LENGTH_SHORT).show()
         }
 
-        smallUserImageView.setOnClickListener { navigateToUserProfile()}
+        smallUserImageView.setOnClickListener {navigateToUserProfile()}
 
         whatIsInYourMindButton.setOnClickListener {showPostCreatorDialog()}
     }
