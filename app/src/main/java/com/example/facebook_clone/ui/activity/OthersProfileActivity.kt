@@ -12,6 +12,8 @@ import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.FriendsAdapter
 import com.example.facebook_clone.adapter.ProfilePostsAdapter
 import com.example.facebook_clone.helper.Utils
+import com.example.facebook_clone.helper.Utils.POSTS_COLLECTION
+import com.example.facebook_clone.helper.Utils.PROFILE_POSTS_COLLECTION
 import com.example.facebook_clone.helper.listener.CommentsBottomSheetListener
 import com.example.facebook_clone.helper.listener.FriendClickListener
 import com.example.facebook_clone.helper.listener.PostListener
@@ -434,7 +436,9 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
                 shares = mutableListOf(share),
                 reacts = null,
                 comments = null,
-                publisherToken = NewsFeedActivity.getTokenFromSharedPreference(this)
+                publisherToken = NewsFeedActivity.getTokenFromSharedPreference(this),
+                firstCollectionType = POSTS_COLLECTION,
+                secondCollectionType = PROFILE_POSTS_COLLECTION
             )
             if (task.isSuccessful) {
                 //post.shares?.add(share)

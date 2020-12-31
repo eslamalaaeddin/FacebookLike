@@ -52,8 +52,12 @@ class PostsRepository(
     }
 
     fun addSharedPostToMyPosts(post: Post, myId: String): Task<Void> {
-        return database.collection(POSTS_COLLECTION).document(myId)
-            .collection(PROFILE_POSTS_COLLECTION).document(post.id.toString()).set(post)
+        return database
+            .collection(post.firstCollectionType)
+            .document(myId)
+            .collection(post.secondCollectionType)
+            .document(post.id.toString())
+            .set(post)
     }
 
 
