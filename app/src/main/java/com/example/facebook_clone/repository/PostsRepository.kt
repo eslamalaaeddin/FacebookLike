@@ -84,12 +84,14 @@ class PostsRepository(
     }
 
     fun addCommentToPostComments(
-        postId: String,
-        postPublisherId: String,
+        post: Post,
         comment: Comment
     ): Task<Void> {
-        return database.collection(POSTS_COLLECTION).document(postPublisherId)
-            .collection(PROFILE_POSTS_COLLECTION).document(postId)
+        return database
+            .collection(post.firstCollectionType)
+            .document(post.creatorReferenceId)
+            .collection(post.secondCollectionType)
+            .document(post.id.orEmpty())
             .update("comments", FieldValue.arrayUnion(comment))
     }
 
@@ -193,25 +195,32 @@ class PostsRepository(
 
 
     //better to be named getPostSnapshotByItsId
-    fun getPostById(publisherId: String, postId: String): Task<DocumentSnapshot> {
-        return database.collection(POSTS_COLLECTION).document(publisherId)
+    fun getPostById(post: Post): Task<DocumentSnapshot> {
+        return database
+            .collection(POSTS_COLLECTION)
+            .document(post.creatorReferenceId)
             .collection(PROFILE_POSTS_COLLECTION)
-            .document(postId).get()
+            .document(post.id.orEmpty()).get()
     }
 
-    fun getPostLiveDataById(publisherId: String, postId: String): PostLiveData {
+    fun getPostLiveDataById(post: Post): PostLiveData {
 
-        val postDocRef = database.collection(POSTS_COLLECTION).document(publisherId)
-            .collection(PROFILE_POSTS_COLLECTION)
-            .document(postId)
+        val postDocRef = database
+            .collection(post.firstCollectionType)
+            .document(post.creatorReferenceId)
+            .collection(post.secondCollectionType)
+            .document(post.id.orEmpty())
 
         return PostLiveData(postDocRef)
     }
 
-    fun updatePostWithNewEdits(publisherId: String, postId: String, post: Post): Task<Void> {
-        return database.collection(POSTS_COLLECTION).document(publisherId)
-            .collection(PROFILE_POSTS_COLLECTION)
-            .document(postId).set(post)
+    fun updatePostWithNewEdits(post: Post): Task<Void> {
+        return database
+            .collection(post.firstCollectionType)
+            .document(post.creatorReferenceId)
+            .collection(post.secondCollectionType)
+            .document(post.id.orEmpty())
+            .set(post)
     }
 
     fun updateSharedPostVisibilityWithNewEdits(
@@ -220,25 +229,33 @@ class PostsRepository(
         post: Post,
         visibility: Int
     ): Task<Void> {
-        return database.collection(POSTS_COLLECTION).document(sharerId)
-            .collection(PROFILE_POSTS_COLLECTION)
-            .document(sharedPostId).update("visibility", visibility)
+        return database
+            .collection(post.firstCollectionType)
+            .document(sharerId)
+            .collection(post.secondCollectionType)
+            .document(sharedPostId)
+            .update("visibility", visibility)
     }
 
-    fun deletePost(publisherId: String, postId: String): Task<Void> {
-        return database.collection(POSTS_COLLECTION).document(publisherId).collection(
-            PROFILE_POSTS_COLLECTION
-        ).document(postId).delete()
+    fun deletePost(post: Post): Task<Void> {
+        return database
+            .collection(post.firstCollectionType)
+            .document(post.creatorReferenceId)
+            .collection(post.secondCollectionType)
+            .document(post.id.orEmpty())
+            .delete()
     }
 
     fun deleteCommentFromPost(
         comment: Comment,
-        postId: String,
-        postPublisherId: String
+        post: Post
     ): Task<Void> {
-        return database.collection(POSTS_COLLECTION).document(postPublisherId).collection(
-            PROFILE_POSTS_COLLECTION
-        ).document(postId).update("comments", FieldValue.arrayRemove(comment))
+        return database
+            .collection(post.firstCollectionType)
+            .document(post.creatorReferenceId)
+            .collection(post.secondCollectionType)
+            .document(post.id.orEmpty())
+            .update("comments", FieldValue.arrayRemove(comment))
     }
 
     fun deleteCommentDocumentFromCommentsCollection(
@@ -250,22 +267,31 @@ class PostsRepository(
         ).document(commentId).delete()
     }
 
-    fun updatePostComment(comment: Comment, postId: String, postPublisherId: String): Task<Void> {
-        return database.collection(POSTS_COLLECTION).document(postPublisherId).collection(
-            PROFILE_POSTS_COLLECTION
-        ).document(postId).update("comments", FieldValue.arrayUnion(comment))
+    fun updatePostComment(comment: Comment, post: Post): Task<Void> {
+        return database
+            .collection(post.firstCollectionType)
+            .document(post.creatorReferenceId)
+            .collection(post.secondCollectionType)
+            .document(post.id.orEmpty())
+            .update("comments", FieldValue.arrayUnion(comment))
     }
 
-    fun addReactToDB(react: React, postId: String, postPublisherId: String): Task<Void> {
-        return database.collection(POSTS_COLLECTION).document(postPublisherId).collection(
-            PROFILE_POSTS_COLLECTION
-        ).document(postId).update("reacts", FieldValue.arrayUnion(react))
+    fun addReactToDB(react: React, post: Post): Task<Void> {
+        return database
+            .collection(post.firstCollectionType)
+            .document(post.creatorReferenceId)
+            .collection(post.secondCollectionType)
+            .document(post.id.orEmpty())
+            .update("reacts", FieldValue.arrayUnion(react))
     }
 
-    fun deleteReactFromPost(react: React, postId: String, postPublisherId: String): Task<Void> {
-        return database.collection(POSTS_COLLECTION).document(postPublisherId).collection(
-            PROFILE_POSTS_COLLECTION
-        ).document(postId).update("reacts", FieldValue.arrayRemove(react))
+    fun deleteReactFromPost(react: React, post: Post): Task<Void> {
+        return database
+            .collection(post.firstCollectionType)
+            .document(post.creatorReferenceId)
+            .collection(post.secondCollectionType)
+            .document(post.id.orEmpty())
+            .update("reacts", FieldValue.arrayRemove(react))
     }
 
     fun addReactOnCommentToDB(react: React, postId: String, postPublisherId: String): Task<Void> {
@@ -290,11 +316,16 @@ class PostsRepository(
         ).document(postId).update("reacts", FieldValue.arrayRemove(react))
     }
 
-    fun addShareToPost(share: Share, postId: String, postPublisherId: String): Task<Void> {
-        return database.collection(POSTS_COLLECTION).document(postPublisherId).collection(
-            PROFILE_POSTS_COLLECTION
-        ).document(postId).update("shares", FieldValue.arrayUnion(share))
+    fun addShareToPost(share: Share, post: Post): Task<Void> {
+        return database
+            .collection(post.firstCollectionType)
+            .document(post.creatorReferenceId)
+            .collection(post.secondCollectionType)
+            .document(post.id.orEmpty())
+            .update("shares", FieldValue.arrayUnion(share))
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     fun uploadPostImageToCloudStorage(bitmap: Bitmap): UploadTask {
         val userId = auth.currentUser?.uid.toString()

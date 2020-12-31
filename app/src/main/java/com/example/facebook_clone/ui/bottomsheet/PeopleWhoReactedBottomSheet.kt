@@ -31,8 +31,7 @@ private const val TAG = "PeopleWhoReactedBottomS"
 class PeopleWhoReactedBottomSheet(
     private val commenterId: String?,
     private val commentId: String?,
-    private val postId: String,
-    private val postPublisherId: String,
+    private val post: Post,
     private val reactedOn: String
 ) : BottomSheetDialogFragment(), PeopleWhoReactedClickListener {
     private val postViewModel by viewModel<PostViewModel>()
@@ -64,7 +63,7 @@ class PeopleWhoReactedBottomSheet(
         upButtonImageView.setOnClickListener { dismiss() }
 
         if (reactedOn == "post"){
-            postViewModel.getPostById(postPublisherId, postId).addOnCompleteListener { task ->
+            postViewModel.getPostById(post).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val reactsOnPost =
                         task.result?.toObject(ReactDocument::class.java)?.reacts.orEmpty()

@@ -12,10 +12,10 @@ class PostViewerViewModel(
 ) : ViewModel() {
     private var postLiveData: LiveData<Post>? = null
 
-    fun getPostLiveData(postPublisherId: String, postId: String): LiveData<Post>? {
+    fun getPostLiveData(post: Post): LiveData<Post>? {
         var liveData = postLiveData
         if (liveData == null) {
-            liveData = postsRepository.getPostLiveDataById(postPublisherId, postId)
+            liveData = postsRepository.getPostLiveDataById(post)
             postLiveData = liveData
         }
         return liveData

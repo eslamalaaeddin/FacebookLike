@@ -15,6 +15,8 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.CommentsAdapter
 import com.example.facebook_clone.helper.Utils
+import com.example.facebook_clone.helper.Utils.POSTS_COLLECTION
+import com.example.facebook_clone.helper.Utils.PROFILE_POSTS_COLLECTION
 import com.example.facebook_clone.helper.listener.CommentClickListener
 import com.example.facebook_clone.helper.listener.CommentsBottomSheetListener
 import com.example.facebook_clone.helper.listener.ReactClickListener
@@ -62,7 +64,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
     private lateinit var notificationsHandler: NotificationsHandler
     private val picasso = Picasso.get()
     private var commentsAdapter: CommentsAdapter? = null
-    private var post: Post? = null
+    private var post: Post = Post()
     private val auth: FirebaseAuth by inject()
     private lateinit var currentUser: User
     private lateinit var postPublisherToken: String
@@ -93,7 +95,10 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
         //Each coment and post should wrap user token
 //        notificationsHandler.notifiedToken = user.token
 
-        val postLiveData = postViewerActivityViewModel.getPostLiveData(postPublisherId, postId)
+        post.firstCollectionType = POSTS_COLLECTION
+        post.secondCollectionType = PROFILE_POSTS_COLLECTION
+
+        val postLiveData = postViewerActivityViewModel.getPostLiveData(post)
         postLiveData?.observe(this, { post ->
             if (post != null) {
                 this.post = post
@@ -313,8 +318,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                     val myReact = createReact(interactorId, interactorName, interactorImageUrl)
                     addReactOnPostToDb(
                         myReact,
-                        postId,
-                        postPublisherId
+                        post
                     ).addOnCompleteListener { task ->
 
 //                        if (interactorId != postPublisherId) {
@@ -337,8 +341,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                             Log.i(TAG, "YOYO onCreate: Remove React")
                             deleteReactFromPost(
                                 react,
-                                postId,
-                                postPublisherId
+                                post
                             ).addOnCompleteListener { task ->
                                 if (!task.isSuccessful) {
                                     Utils.toastMessage(this, task.exception?.message.toString())
@@ -353,8 +356,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                                 createReact(interactorId, interactorName, interactorImageUrl)
                             addReactOnPostToDb(
                                 myReact,
-                                postId,
-                                postPublisherId
+                                post
                             ).addOnCompleteListener { task ->
                                 if (!task.isSuccessful) {
                                     Toast.makeText(
@@ -371,8 +373,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                                 createReact(interactorId, interactorName, interactorImageUrl)
                             addReactOnPostToDb(
                                 myReact,
-                                postId,
-                                postPublisherId
+                                post
                             ).addOnCompleteListener { task ->
                                 if (!task.isSuccessful) {
                                     Toast.makeText(
@@ -392,8 +393,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                     val myReact = createReact(interactorId, interactorName, interactorImageUrl)
                     addReactOnPostToDb(
                         myReact,
-                        postId,
-                        postPublisherId
+                        post
                     ).addOnCompleteListener { task ->
 
                         if (interactorId != postPublisherId) {
@@ -416,8 +416,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                             Log.i(TAG, "YOYO onCreate: Remove React")
                             deleteReactFromPost(
                                 react,
-                                postId,
-                                postPublisherId
+                                post
                             ).addOnCompleteListener { task ->
                                 if (!task.isSuccessful) {
                                     Utils.toastMessage(this, task.exception?.message.toString())
@@ -432,8 +431,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                                 createReact(interactorId, interactorName, interactorImageUrl)
                             addReactOnPostToDb(
                                 myReact,
-                                postId,
-                                postPublisherId
+                                post
                             ).addOnCompleteListener { task ->
                                 if (interactorId != postPublisherId) {
                                     notificationsHandler.also {
@@ -460,8 +458,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                                 createReact(interactorId, interactorName, interactorImageUrl)
                             addReactOnPostToDb(
                                 myReact,
-                                postId,
-                                postPublisherId
+                                post
                             ).addOnCompleteListener { task ->
                                 if (interactorId != postPublisherId) {
                                     notificationsHandler.also {
@@ -578,8 +575,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
         addCommentOnPostTextView.setOnClickListener {
 //            commentEditText.requestFocus()
             CommentsBottomSheet(
-                postPublisherId,
-                postId,
+                post,
                 interactorId,
                 interactorName,
                 interactorImageUrl,
@@ -592,8 +588,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
 
         showCommentsTextView.setOnClickListener {
             CommentsBottomSheet(
-                postPublisherId,
-                postId,
+                post,
                 interactorId,
                 interactorName,
                 interactorImageUrl,
@@ -606,8 +601,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
 
         postViewerReactsLayout.setOnClickListener {
             CommentsBottomSheet(
-                postPublisherId,
-                postId,
+                post,
                 interactorId,
                 interactorName,
                 interactorImageUrl,
@@ -619,13 +613,13 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
         }
 
         addShareOnPostTextView.setOnClickListener {
-            if (post?.publisherId == currentUserId) {
+            if (post.publisherId == currentUserId) {
                 val share = Share(
                     sharerId = interactorId,
                     sharerName = interactorName,
                     sharerImageUrl = interactorImageUrl,
                 )
-                addShareToPost(share, postId, postPublisherId).addOnCompleteListener { task ->
+                addShareToPost(share, post).addOnCompleteListener { task ->
                     Utils.doAfterFinishing(this, task, "You shared this post")
                 }
             } else {
@@ -634,7 +628,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                     sharerName = interactorName,
                     sharerImageUrl = interactorImageUrl,
                 )
-                addShareToPost(share, postId, postPublisherId).addOnCompleteListener { task ->
+                addShareToPost(share, post).addOnCompleteListener { task ->
                     Utils.doAfterFinishing(this, task, "You shared this post")
                     if (interactorId != postPublisherId) {
                         notificationsHandler.also {
@@ -736,7 +730,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
     private fun handlePostReactsAdditionAndDeletion(reacted: Boolean, currentReact: React?) {
         if (!reacted) {
             val myReact = createReact(interactorId, interactorName, interactorImageUrl)
-            addReactOnPostToDb(myReact, postId, postPublisherId).addOnCompleteListener { task ->
+            addReactOnPostToDb(myReact, post).addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
                 }
@@ -744,8 +738,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
         } else {
             deleteReactFromPost(
                 currentReact!!,
-                postId,
-                postPublisherId
+                post
             ).addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     Utils.toastMessage(this, task.exception?.message.toString())
@@ -756,10 +749,9 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
 
     private fun addReactOnPostToDb(
         react: React,
-        postId: String,
-        postPublisherId: String
+        post: Post
     ): Task<Void> {
-        return postViewModel.addReactToDB(react, postId, postPublisherId)
+        return postViewModel.addReactToDB(react, post)
     }
 
     private fun createReact(
@@ -776,14 +768,13 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
 
     private fun deleteReactFromPost(
         react: React,
-        postId: String,
-        postPublisherId: String
+        post: Post
     ): Task<Void> {
-        return postViewModel.deleteReactFromPost(react, postId, postPublisherId)
+        return postViewModel.deleteReactFromPost(react, post)
     }
 
-    private fun addShareToPost(share: Share, postId: String, postPublisherId: String): Task<Void> {
-        return postViewModel.addShareToPost(share, postId, postPublisherId)
+    private fun addShareToPost(share: Share, post: Post): Task<Void> {
+        return postViewModel.addShareToPost(share, post)
     }
 
     private fun showReactsChooserDialog(
@@ -807,32 +798,32 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
 
         dialog.loveReactButton.setOnClickListener {
             react.react = 2
-            handleLongReactCreationAndDeletion(currentReact, react, postId, postPublisherId)
+            handleLongReactCreationAndDeletion(currentReact, react, post)
             dialog.dismiss()
         }
         dialog.careReactButton.setOnClickListener {
             react.react = 3
-            handleLongReactCreationAndDeletion(currentReact, react, postId, postPublisherId)
+            handleLongReactCreationAndDeletion(currentReact, react, post)
             dialog.dismiss()
         }
         dialog.hahaReactButton.setOnClickListener {
             react.react = 4
-            handleLongReactCreationAndDeletion(currentReact, react, postId, postPublisherId)
+            handleLongReactCreationAndDeletion(currentReact, react, post)
             dialog.dismiss()
         }
         dialog.wowReactButton.setOnClickListener {
             react.react = 5
-            handleLongReactCreationAndDeletion(currentReact, react, postId, postPublisherId)
+            handleLongReactCreationAndDeletion(currentReact, react, post)
             dialog.dismiss()
         }
         dialog.sadReactButton.setOnClickListener {
             react.react = 6
-            handleLongReactCreationAndDeletion(currentReact, react, postId, postPublisherId)
+            handleLongReactCreationAndDeletion(currentReact, react, post)
             dialog.dismiss()
         }
         dialog.angryReactButton.setOnClickListener {
             react.react = 7
-            handleLongReactCreationAndDeletion(currentReact, react, postId, postPublisherId)
+            handleLongReactCreationAndDeletion(currentReact, react, post)
             dialog.dismiss()
         }
         dialog.show()
@@ -841,13 +832,12 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
     private fun handleLongReactCreationAndDeletion(
         currentReact: React?,
         react: React,
-        postId: String,
-        postPublisherId: String
+        post: Post
     ) {
         if (currentReact != null) {
-            deleteReactFromPost(currentReact, postId, postPublisherId)
+            deleteReactFromPost(currentReact, post)
         }
-        addReactOnPostToDb(react, postId, postPublisherId).addOnCompleteListener {task ->
+        addReactOnPostToDb(react, post).addOnCompleteListener {task ->
             if (task.isSuccessful){
                 if (interactorId != postPublisherId) {
                     notificationsHandler.also {
@@ -875,7 +865,7 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
 
     private fun openPeopleWhoReactedLayout(commenterId: String?, commentId: String?, reactedOn: String) {
         val peopleWhoReactedDialog =
-            PeopleWhoReactedBottomSheet(commenterId.toString(), commentId.toString(), postId, postPublisherId, reactedOn)
+            PeopleWhoReactedBottomSheet(commenterId.toString(), commentId.toString(), post, reactedOn)
         peopleWhoReactedDialog.show(
             supportFragmentManager,
             peopleWhoReactedDialog.tag

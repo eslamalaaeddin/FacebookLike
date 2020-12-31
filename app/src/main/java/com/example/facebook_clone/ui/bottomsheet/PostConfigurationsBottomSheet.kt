@@ -74,7 +74,7 @@ class PostConfigurationsBottomSheet(private val post: Post, private val shared: 
 
         publicLayout.setOnClickListener {
             post.visibility = 0
-            postViewModel.updatePostWithNewEdits(postPublisherId, postId, post).addOnCompleteListener {
+            postViewModel.updatePostWithNewEdits(post).addOnCompleteListener {
                 if (!post.shares.isNullOrEmpty()){
                     post.shares?.let {shares ->
                         shares.forEach { share ->
@@ -94,7 +94,7 @@ class PostConfigurationsBottomSheet(private val post: Post, private val shared: 
 
         friendsLayout.setOnClickListener {
             post.visibility = 1
-            postViewModel.updatePostWithNewEdits(postPublisherId, postId, post).addOnCompleteListener {
+            postViewModel.updatePostWithNewEdits(post).addOnCompleteListener {
                 if (!post.shares.isNullOrEmpty()){
                     post.shares?.let {shares ->
                         shares.forEach { share ->
@@ -114,7 +114,7 @@ class PostConfigurationsBottomSheet(private val post: Post, private val shared: 
 
         privateLayout.setOnClickListener {
             post.visibility = 2
-            postViewModel.updatePostWithNewEdits(postPublisherId, postId, post).addOnCompleteListener {
+            postViewModel.updatePostWithNewEdits(post).addOnCompleteListener {
                 if (!post.shares.isNullOrEmpty()){
                     post.shares?.let {shares ->
                         shares.forEach { share ->
@@ -149,7 +149,7 @@ class PostConfigurationsBottomSheet(private val post: Post, private val shared: 
         deleteButton.setOnClickListener {
             //[1]get post to loop through its comments and delete them one by one
             if (post.comments == null || post.comments!!.isEmpty()) {
-                postViewModel.deletePost(postPublisherId, postId)
+                postViewModel.deletePost(post)
                     .addOnCompleteListener {
                         if (it.isSuccessful) {
 //                            dialog.dismiss()
@@ -171,11 +171,9 @@ class PostConfigurationsBottomSheet(private val post: Post, private val shared: 
                 post.comments!!.forEach { comment ->
                     deleteComment(comment)
                 }
-                postViewModel.deletePost(postPublisherId, postId).addOnCompleteListener {
+                postViewModel.deletePost(post).addOnCompleteListener {
                         if (it.isSuccessful) {
                             dialog.dismiss()
-                            Toast.makeText(requireContext(), "Post deleted", Toast.LENGTH_SHORT)
-                                .show()
                             dismiss()
                         } else {
                             Toast.makeText(
@@ -189,7 +187,7 @@ class PostConfigurationsBottomSheet(private val post: Post, private val shared: 
             }
 
             if (post.shares.isNullOrEmpty()){
-                postViewModel.deletePost(postPublisherId, postId).addOnCompleteListener {
+                postViewModel.deletePost(post).addOnCompleteListener {
                     if (it.isSuccessful) {
                      //   Toast.makeText(requireContext(), "Post deleted", Toast.LENGTH_SHORT).show()
                     }
@@ -207,7 +205,7 @@ class PostConfigurationsBottomSheet(private val post: Post, private val shared: 
                 post.shares?.let {shares ->
                     shares.forEach { share ->
                         val sharerId = share.sharerId.toString()
-                        postViewModel.deletePost(sharerId, postId).addOnCompleteListener {
+                        postViewModel.deletePost(post).addOnCompleteListener {
                             if (it.isSuccessful) {
 //                                dialog.dismiss()
 //                                Toast.makeText(requireContext(), "Post deleted", Toast.LENGTH_SHORT)

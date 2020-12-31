@@ -30,8 +30,8 @@ class PostViewModel(private val repository: PostsRepository) : ViewModel() {
         return repository.getUserProfilePostsLiveData(userId)
     }
 
-    fun updatePostWithNewEdits(publisherId: String, postId: String, post: Post): Task<Void> {
-        return repository.updatePostWithNewEdits(publisherId, postId, post)
+    fun updatePostWithNewEdits(post: Post): Task<Void> {
+        return repository.updatePostWithNewEdits(post)
     }
 
     fun updateSharedPostVisibilityWithNewEdits(
@@ -58,11 +58,10 @@ class PostViewModel(private val repository: PostsRepository) : ViewModel() {
 
 
     fun addCommentToPostComments(
-        postId: String,
-        postPublisherId: String,
+        post: Post,
         comment: Comment
     ): Task<Void> {
-        return repository.addCommentToPostComments(postId, postPublisherId, comment)
+        return repository.addCommentToPostComments(post, comment)
     }
 
     fun getCommentById(commenterId: String, commentId: String): Task<DocumentSnapshot> {
@@ -148,37 +147,41 @@ class PostViewModel(private val repository: PostsRepository) : ViewModel() {
         )
     }
 
-    fun getPostById(publisherId: String, postId: String): Task<DocumentSnapshot> {
-        return repository.getPostById(publisherId, postId)
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    fun getPostById(post: Post): Task<DocumentSnapshot> {
+        return repository.getPostById(post)
     }
 
-    fun deletePost(publisherId: String, postId: String): Task<Void> {
-        return repository.deletePost(publisherId, postId)
+    fun deletePost(post: Post): Task<Void> {
+        return repository.deletePost(post)
     }
 
     fun deleteCommentFromPost(
         comment: Comment,
-        postId: String,
-        postPublisherId: String
+        post: Post
     ): Task<Void> {
-        return repository.deleteCommentFromPost(comment, postId, postPublisherId)
+        return repository.deleteCommentFromPost(comment, post)
     }
 
-    fun updateComment(comment: Comment, postId: String, postPublisherId: String): Task<Void> {
-        return repository.updatePostComment(comment, postId, postPublisherId)
+    fun updateComment(comment: Comment, post: Post): Task<Void> {
+        return repository.updatePostComment(comment, post)
     }
 
-    fun addReactToDB(react: React, postId: String, postPublisherId: String): Task<Void> {
-        return repository.addReactToDB(react, postId, postPublisherId)
+    fun addReactToDB(react: React, post: Post): Task<Void> {
+        return repository.addReactToDB(react, post)
     }
 
-    fun deleteReactFromPost(react: React, postId: String, postPublisherId: String): Task<Void> {
-        return repository.deleteReactFromPost(react, postId, postPublisherId)
+    fun deleteReactFromPost(react: React, post: Post): Task<Void> {
+        return repository.deleteReactFromPost(react, post)
     }
 
-    fun addShareToPost(share: Share, postId: String, postPublisherId: String): Task<Void> {
-        return repository.addShareToPost(share, postId, postPublisherId)
+    fun addShareToPost(share: Share, post: Post): Task<Void> {
+        return repository.addShareToPost(share, post)
     }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     fun uploadPostImageToCloudStorage(bitmap: Bitmap): UploadTask {
         return repository.uploadPostImageToCloudStorage(bitmap)

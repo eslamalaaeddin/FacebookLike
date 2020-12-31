@@ -4,16 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.ProfilePostsAdapter
-import com.example.facebook_clone.helper.PostHandler
 import com.example.facebook_clone.helper.Utils.POST_FROM_GROUP
 import com.example.facebook_clone.helper.listener.AdminToolsListener
-import com.example.facebook_clone.helper.listener.PostListener
-import com.example.facebook_clone.model.post.Post
-import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.ui.bottomsheet.AdminToolsBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.InviteMembersBottomSheet
 import com.example.facebook_clone.ui.dialog.PostCreatorDialog
@@ -36,7 +31,7 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener {
     private val picasso = Picasso.get()
     private var groupId = ""
     private var groupName = ""
-    private val postHandler = PostHandler(this)
+//    private val postHandler = PostHandler(this)
     private lateinit var profilePostsAdapter: ProfilePostsAdapter
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,9 +45,9 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener {
         val groupPostsLiveData = groupsViewModel.getGroupPostsLiveData(groupId)
         groupPostsLiveData.observe(this){posts ->
             posts?.let {
-                profilePostsAdapter =
-                    ProfilePostsAdapter(auth, posts, postHandler, currentUserName, currentUserImageUrl, null,currentUserId )
-                groupPostsRecyclerView.adapter = profilePostsAdapter
+//                profilePostsAdapter =
+//                    ProfilePostsAdapter(auth, posts, postHandler, currentUserName, currentUserImageUrl, null,currentUserId )
+//                groupPostsRecyclerView.adapter = profilePostsAdapter
             }
         }
 

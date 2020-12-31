@@ -1,10 +1,12 @@
 package com.example.facebook_clone.model.post
 
+import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.model.post.share.Share
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.Exclude
+import okhttp3.internal.Util
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -25,4 +27,8 @@ data class Post(
     @get:Exclude var firstCollectionType: String = "",
     @get:Exclude var creatorReferenceId: String = "",
     @get:Exclude var secondCollectionType: String = ""
+
+//    @get:Exclude var firstCollectionType: String = Utils.POSTS_COLLECTION,
+//    @get:Exclude var creatorReferenceId: String = "",
+//    @get:Exclude var secondCollectionType: String = Utils.PROFILE_POSTS_COLLECTION
 )

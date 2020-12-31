@@ -312,8 +312,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
     }
 
     override fun onReactButtonClicked(
-        postPublisherId: String,
-        postId: String,
+        post: Post,
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
@@ -324,12 +323,12 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         currentEditedPostPosition = postPosition
         if (!reacted) {
             val myReact = createReact(interactorId, interactorName, interactorImageUrl, 1)
-            addReactToDb(myReact, postId, postPublisherId).addOnCompleteListener { task ->
+            addReactToDb(myReact, post).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     notificationsHandler.also {
                         it.notificationType = "reactOnPost"
                         it.reactType = 1
-                        it.postId = postId
+                        it.postId = post.id.orEmpty()
                         it.handleNotificationCreationAndFiring()
                     }
 
@@ -341,8 +340,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         } else {
             deleteReactFromPost(
                 currentReact!!,
-                postId,
-                postPublisherId
+                post
             ).addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     Utils.toastMessage(this, task.exception?.message.toString())
@@ -352,8 +350,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
     }
 
     override fun onReactButtonLongClicked(
-        postPublisherId: String,
-        postId: String,
+        post: Post,
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
@@ -366,15 +363,13 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             interactorId,
             interactorName,
             interactorImageUrl,
-            postId,
-            postPublisherId,
+            post,
             currentReact
         )
     }
 
     override fun onCommentButtonClicked(
-        postPublisherId: String,
-        postId: String,
+        post: Post,
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
@@ -382,8 +377,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
     ) {
         //Open comment bottom sheet
         CommentsBottomSheet(
-            postPublisherId,
-            postId,
+            post,
             interactorId,
             interactorName,
             interactorImageUrl,
@@ -425,7 +419,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         post.comments = null
 
 
-        addShareToPost(share, postId, postPublisherId).addOnCompleteListener { task ->
+        addShareToPost(share, post).addOnCompleteListener { task ->
             val myPost = Post(
                 id = share.id,
                 publisherId = auth.currentUser?.uid.toString(),
@@ -458,8 +452,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
     }
 
     override fun onReactLayoutClicked(
-        postPublisherId: String,
-        postId: String,
+        post: Post,
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
@@ -491,8 +484,8 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
 
     }
 
-    private fun addReactToDb(react: React, postId: String, postPublisherId: String): Task<Void> {
-        return postViewModel.addReactToDB(react, postId, postPublisherId)
+    private fun addReactToDb(react: React, post: Post): Task<Void> {
+        return postViewModel.addReactToDB(react, post)
 
     }
 
@@ -512,14 +505,13 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
 
     private fun deleteReactFromPost(
         react: React,
-        postId: String,
-        postPublisherId: String
+        post: Post
     ): Task<Void> {
-        return postViewModel.deleteReactFromPost(react, postId, postPublisherId)
+        return postViewModel.deleteReactFromPost(react, post)
     }
 
-    private fun addShareToPost(share: Share, postId: String, postPublisherId: String): Task<Void> {
-        return postViewModel.addShareToPost(share, postId, postPublisherId)
+    private fun addShareToPost(share: Share, post: Post): Task<Void> {
+        return postViewModel.addShareToPost(share, post)
     }
 
     override fun onAnotherUserCommented(commentPosition: Int, commentId: String, postId: String) {
@@ -553,8 +545,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
-        postId: String,
-        postPublisherId: String,
+        post: Post,
         currentReact: React?
     ) {
         val dialog = Dialog(this)
@@ -571,8 +562,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             handleLongReactCreationAndDeletionAndUserNotification(
                 currentReact,
                 react,
-                postId,
-                postPublisherId
+                post
             )
             dialog.dismiss()
         }
@@ -581,8 +571,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             handleLongReactCreationAndDeletionAndUserNotification(
                 currentReact,
                 react,
-                postId,
-                postPublisherId
+                post
             )
             dialog.dismiss()
         }
@@ -591,8 +580,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             handleLongReactCreationAndDeletionAndUserNotification(
                 currentReact,
                 react,
-                postId,
-                postPublisherId
+                post
             )
             dialog.dismiss()
         }
@@ -601,8 +589,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             handleLongReactCreationAndDeletionAndUserNotification(
                 currentReact,
                 react,
-                postId,
-                postPublisherId
+                post
             )
             dialog.dismiss()
         }
@@ -611,8 +598,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             handleLongReactCreationAndDeletionAndUserNotification(
                 currentReact,
                 react,
-                postId,
-                postPublisherId
+                post
             )
             dialog.dismiss()
         }
@@ -621,8 +607,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             handleLongReactCreationAndDeletionAndUserNotification(
                 currentReact,
                 react,
-                postId,
-                postPublisherId
+                post
             )
             dialog.dismiss()
         }
@@ -645,17 +630,16 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
     private fun handleLongReactCreationAndDeletionAndUserNotification(
         currentReact: React?,
         react: React,
-        postId: String,
-        postPublisherId: String
+        post: Post
     ) {
         if (currentReact != null) {
-            deleteReactFromPost(currentReact, postId, postPublisherId)
+            deleteReactFromPost(currentReact, post)
         }
-        addReactToDb(react, postId, postPublisherId).addOnCompleteListener { task ->
+        addReactToDb(react, post).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 notificationsHandler.also {
                     it.notificationType = "reactOnPost"
-                    it.postId = postId
+                    it.postId = post.id.orEmpty()
                     it.reactType = react.react
                     it.handleNotificationCreationAndFiring()
                 }

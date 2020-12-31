@@ -93,8 +93,7 @@ class ProfilePostsAdapter(
                 val postId = post.id.toString()
                 val postPublisherId = post.publisherId.toString()
                 listener.onCommentButtonClicked(
-                    postPublisherId,
-                    postId,
+                    post,
                     interactorId,
                     interactorName,
                     interactorImageUrl,
@@ -122,8 +121,7 @@ class ProfilePostsAdapter(
                 }
 
                 listener.onReactButtonClicked(
-                    postPublisherId,
-                    postId,
+                    post,
                     interactorId,
                     interactorName,
                     interactorImageUrl,
@@ -154,8 +152,7 @@ class ProfilePostsAdapter(
                 }
 
                 listener.onReactButtonLongClicked(
-                    postPublisherId,
-                    postId,
+                    post,
                     interactorId,
                     interactorName,
                     interactorImageUrl,
@@ -186,8 +183,7 @@ class ProfilePostsAdapter(
                 val postId = post.id.toString()
                 val postPublisherId = post.publisherId.toString()
                 listener.onReactLayoutClicked(
-                    postPublisherId,
-                    postId,
+                    post,
                     interactorId,
                     interactorName,
                     interactorImageUrl,
@@ -394,8 +390,7 @@ class ProfilePostsAdapter(
                 val postId = post.id.toString()
                 val postPublisherId = post.publisherId.toString()
                 listener.onCommentButtonClicked(
-                    postPublisherId,
-                    postId,
+                    post,
                     interactorId,
                     interactorName,
                     interactorImageUrl,
@@ -423,8 +418,7 @@ class ProfilePostsAdapter(
                 }
 
                 listener.onReactButtonClicked(
-                    postPublisherId,
-                    postId,
+                    post,
                     interactorId,
                     interactorName,
                     interactorImageUrl,
@@ -455,8 +449,7 @@ class ProfilePostsAdapter(
                 }
 
                 listener.onReactButtonLongClicked(
-                    postPublisherId,
-                    postId,
+                    post,
                     interactorId,
                     interactorName,
                     interactorImageUrl,
@@ -488,8 +481,7 @@ class ProfilePostsAdapter(
                 val postId = post.id.toString()
                 val postPublisherId = post.publisherId.toString()
                 listener.onReactLayoutClicked(
-                    postPublisherId,
-                    postId,
+                    post,
                     interactorId,
                     interactorName,
                     interactorImageUrl,

@@ -15,6 +15,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.CommentsAdapter
 import com.example.facebook_clone.helper.Utils
+import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.comment.ReactionsAndSubComments
 import com.example.facebook_clone.viewmodel.PostViewModel
@@ -28,8 +29,7 @@ private const val TAG = "LongClickedCommentBotto"
 class LongClickedCommentBottomSheet(
     private val superComment: Comment?,
     private val comment: Comment,
-    private val postId: String,
-    private val postPublisherId: String,
+    private val post: Post,
     private val type: String
 ) : BottomSheetDialogFragment() {
     private val postViewModel by viewModel<PostViewModel>()
@@ -57,7 +57,7 @@ class LongClickedCommentBottomSheet(
         }
 
         editCommentLayout.setOnClickListener {
-            val editCommentBottomSheet = EditCommentBottomSheet(comment, postId, postPublisherId)
+            val editCommentBottomSheet = EditCommentBottomSheet(comment, post)
             editCommentBottomSheet.show(activity?.supportFragmentManager!!, "signature")
         }
 
@@ -76,7 +76,7 @@ class LongClickedCommentBottomSheet(
         }
         deleteButton.setOnClickListener {
             if (type == "comment") {
-                deleteComment(comment, postId, postPublisherId)
+                deleteComment(comment, post)
             } else if (type == "subComment") {
                 deleteSubCommentAndItsDocument(comment)
 
@@ -87,7 +87,7 @@ class LongClickedCommentBottomSheet(
 
     }
 
-    private fun deleteComment(comment: Comment, postId: String, postPublisherId: String) {
+    private fun deleteComment(comment: Comment, post: Post) {
         //[1]Get super comment
         postViewModel.getCommentById(comment.commenterId.toString(), comment.id.toString())
             .addOnCompleteListener {
@@ -105,8 +105,7 @@ class LongClickedCommentBottomSheet(
                                 //[4]delete super comment from post
                                 postViewModel.deleteCommentFromPost(
                                     comment,
-                                    postId,
-                                    postPublisherId
+                                    post
                                 )
                                     .addOnCompleteListener { task1 ->
                                         if (task1.isSuccessful) {
@@ -127,7 +126,7 @@ class LongClickedCommentBottomSheet(
                     }
                 }
                 else {
-                    postViewModel.deleteCommentFromPost(comment, postId, postPublisherId)
+                    postViewModel.deleteCommentFromPost(comment, post)
                         .addOnCompleteListener { task1 ->
                             if (task1.isSuccessful) {
                                 postViewModel.deleteCommentDocumentFromCommentsCollection(

@@ -25,6 +25,7 @@ import com.example.facebook_clone.helper.listener.PostAttachmentListener
 import com.example.facebook_clone.helper.listener.ReactClickListener
 import com.example.facebook_clone.helper.notification.NotificationsHandler
 import com.example.facebook_clone.helper.provider.ReplyOnCommentDataProvider
+import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.comment.ReactionsAndSubComments
 import com.example.facebook_clone.model.post.react.React
@@ -52,6 +53,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 private const val TAG = "ReplyOnCommentBottomShe"
 
 class ReplyOnCommentBottomSheet(
+    private val post: Post,
     private val clicksConsumer: ReplyOnCommentDataProvider,
     private val postPublisherId: String,
     private val superComment: Comment,
@@ -401,7 +403,7 @@ class ReplyOnCommentBottomSheet(
 
         constraintLayout.setOnLongClickListener {
             val longClickedCommentBottomSheet =
-                LongClickedCommentBottomSheet(null ,superComment, postId, postPublisherId, "comment")
+                LongClickedCommentBottomSheet(null ,superComment, post, "comment")
             longClickedCommentBottomSheet.show(activity?.supportFragmentManager!!, "signature")
             true
         }
@@ -726,7 +728,7 @@ class ReplyOnCommentBottomSheet(
 
     override fun onCommentLongClicked(comment: Comment) {
         val longClickedCommentBottomSheet =
-            LongClickedCommentBottomSheet(superComment,comment, postId, postPublisherId, "subComment")
+            LongClickedCommentBottomSheet(superComment,comment, post, "subComment")
         longClickedCommentBottomSheet.show(activity?.supportFragmentManager!!, "signature")
 
     }
@@ -1023,7 +1025,7 @@ class ReplyOnCommentBottomSheet(
 
     private fun openPeopleWhoReactedLayout(commenterId: String?, commentId: String?, reactedOn: String) {
         val peopleWhoReactedDialog =
-            PeopleWhoReactedBottomSheet(commenterId.toString(), commentId.toString(), postId, postPublisherId, reactedOn)
+            PeopleWhoReactedBottomSheet(commenterId.toString(), commentId.toString(), post, reactedOn)
         peopleWhoReactedDialog.show(
             activity?.supportFragmentManager!!,
             peopleWhoReactedDialog.tag

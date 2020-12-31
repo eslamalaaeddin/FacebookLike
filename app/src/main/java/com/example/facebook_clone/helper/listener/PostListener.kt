@@ -7,8 +7,7 @@ import com.example.facebook_clone.model.post.react.React
 interface PostListener{
 
     fun onReactButtonClicked(
-        postPublisherId:String,
-        postId:String,
+        post: Post,
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
@@ -18,8 +17,7 @@ interface PostListener{
     )
 
     fun onReactButtonLongClicked(
-        postPublisherId:String,
-        postId:String,
+        post: Post,
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
@@ -29,8 +27,7 @@ interface PostListener{
     )
 
     fun onCommentButtonClicked(
-        postPublisherId:String,
-        postId:String,
+        post: Post,
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
@@ -46,8 +43,7 @@ interface PostListener{
     )
 
     fun onReactLayoutClicked(
-        postPublisherId:String,
-        postId:String,
+        post: Post,
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,

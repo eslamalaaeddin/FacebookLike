@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.facebook_clone.R
+import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.viewmodel.PostViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -15,8 +16,7 @@ import kotlinx.android.synthetic.main.edit_comment_bottom_sheet_layout.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class EditCommentBottomSheet(private val comment: Comment,
-                             private val postId: String,
-                             private val postPublisherId: String) : BottomSheetDialogFragment() {
+                             private val post: Post) : BottomSheetDialogFragment() {
 
     private val postViewModel by viewModel<PostViewModel>()
 
@@ -51,9 +51,9 @@ class EditCommentBottomSheet(private val comment: Comment,
         updateCommentButton.setOnClickListener {
             //New comment
             //i can't update field in array so i deleted the old comment and added a new one
-            postViewModel.deleteCommentFromPost(comment, postId, postPublisherId)
+            postViewModel.deleteCommentFromPost(comment, post)
             comment.textComment = editCommentEditText.text.toString()
-            postViewModel.updateComment(comment, postId, postPublisherId)
+            postViewModel.updateComment(comment, post)
         }
 
         cancelEditCommentButton.setOnClickListener {

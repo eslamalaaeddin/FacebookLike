@@ -19,6 +19,8 @@ import com.example.facebook_clone.adapter.CommentsAdapter
 import com.example.facebook_clone.helper.listener.CommentClickListener
 import com.example.facebook_clone.helper.listener.ReactClickListener
 import com.example.facebook_clone.helper.Utils
+import com.example.facebook_clone.helper.Utils.POSTS_COLLECTION
+import com.example.facebook_clone.helper.Utils.PROFILE_POSTS_COLLECTION
 import com.example.facebook_clone.helper.listener.CommentsBottomSheetListener
 import com.example.facebook_clone.helper.listener.PostAttachmentListener
 import com.example.facebook_clone.helper.notification.NotificationsHandler
@@ -55,8 +57,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 private const val TAG = "CommentsBottomSheet"
 
 class CommentsBottomSheet(
-    private val postPublisherId: String,
-    private val postId: String,
+    private val post: Post,
     private val interactorId: String,
     private val interactorName: String,
     private val interactorImageUrl: String,
@@ -82,6 +83,8 @@ class CommentsBottomSheet(
     private var commentAttachmentUrl: String? = null
     private lateinit var notificationsHandler: NotificationsHandler
     private var progressDialog: ProgressDialog? = null
+    private var postPublisherId = post.publisherId.orEmpty()
+    private var postId = post.id.orEmpty()
     private lateinit var commentFromReplyBottomSheet: Comment
     private var commentPositionFromReplyBottomSheet = 0
     private var reactedFromReplyBottomSheet: Boolean = false
@@ -182,8 +185,7 @@ class CommentsBottomSheet(
 //                                        change 1
 
                                         postViewModel.addCommentToPostComments(
-                                            postId,
-                                            postPublisherId,
+                                            post,
                                             comment
                                         ).addOnCompleteListener { task ->
                                             commentEditText.text.clear()
@@ -244,8 +246,7 @@ class CommentsBottomSheet(
                                         }
                                         //change 2
                                         postViewModel.addCommentToPostComments(
-                                            postId,
-                                            postPublisherId,
+                                            post,
                                             comment
                                         ).addOnCompleteListener { task ->
                                             commentEditText.text.clear()
@@ -297,7 +298,7 @@ class CommentsBottomSheet(
 
                     commentEditText.text.clear()
 
-                    postViewModel.addCommentToPostComments(postId, postPublisherId, comment)
+                    postViewModel.addCommentToPostComments(post, comment)
                         .addOnCompleteListener { task ->
                             //   progressDialog?.dismiss()
                             postViewModel
@@ -343,7 +344,9 @@ class CommentsBottomSheet(
 
     @SuppressLint("SetTextI18n")
     private fun updateCommentsUI() {
-        postViewModel.getPostById(postPublisherId, postId).addOnCompleteListener { task ->
+        post.firstCollectionType = POSTS_COLLECTION
+        post.secondCollectionType = PROFILE_POSTS_COLLECTION
+        postViewModel.getPostById(post).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 task.result?.reference?.addSnapshotListener { snapshot, error ->
                     if (error != null) {
@@ -356,10 +359,14 @@ class CommentsBottomSheet(
 
                     commentsList = commentsResult.orEmpty().reversed()
                     if (commentsList.isNullOrEmpty()){
-                        emptyCommentsLayout.visibility = View.VISIBLE
+                        emptyCommentsLayout?.let {
+                            it.visibility = View.VISIBLE
+                        }
                     }
                     else{
-                        emptyCommentsLayout.visibility = View.GONE
+                        emptyCommentsLayout?.let {
+                            it.visibility = View.GONE
+                        }
                     }
                     reactsList = reactsResult.orEmpty().reversed()
 
@@ -420,7 +427,7 @@ class CommentsBottomSheet(
 
     override fun onCommentLongClicked(comment: Comment) {
         val longClickedCommentBottomSheet =
-            LongClickedCommentBottomSheet(null, comment, postId, postPublisherId, "comment")
+            LongClickedCommentBottomSheet(null, comment, post, "comment")
         longClickedCommentBottomSheet.show(activity?.supportFragmentManager!!, "signature")
     }
 
@@ -559,6 +566,7 @@ class CommentsBottomSheet(
         commenterLiveData?.observe(this, {commenter ->
             val commenterToken = commenter.token
             val replyOnCommentBottomSheet = ReplyOnCommentBottomSheet(
+                post,
                 this,
                 postPublisherId,
                 comment,
@@ -706,9 +714,9 @@ class CommentsBottomSheet(
         )
     }
 
-    private fun createShare(share: Share, postId: String, postPublisherId: String): Task<Void> {
-        return postViewModel.addShareToPost(share, postId, postPublisherId)
-    }
+//    private fun createShare(share: Share, postId: String, postPublisherId: String): Task<Void> {
+//        return postViewModel.addShareToPost(share, postId, postPublisherId)
+//    }
 
     private fun handleLongReactOnCommentCreationAndDeletion(
         currentReact: React?,
@@ -800,7 +808,7 @@ class CommentsBottomSheet(
 
     private fun openPeopleWhoReactedLayout(commenterId: String?, commentId: String?, reactedOn: String) {
         val peopleWhoReactedDialog =
-            PeopleWhoReactedBottomSheet(commenterId.toString(), commentId.toString(), postId, postPublisherId, reactedOn)
+            PeopleWhoReactedBottomSheet(commenterId.toString(), commentId.toString(), post, reactedOn)
         peopleWhoReactedDialog.show(
             activity?.supportFragmentManager!!,
             peopleWhoReactedDialog.tag
