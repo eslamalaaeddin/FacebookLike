@@ -35,7 +35,7 @@ class ProfileActivityPostsHandler(
     private val context: Context,
     private val postViewModel: PostViewModel,
     private val profileActivityViewModel: ProfileActivityViewModel
-    ): BasePostHandler(context), PostListener, FriendClickListener {
+    ): BasePostHandler(context, postViewModel), PostListener, FriendClickListener {
 
     override fun onReactButtonClicked(
         post: Post,
@@ -50,17 +50,10 @@ class ProfileActivityPostsHandler(
         val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
         if (!reacted) {
             val myReact = createReact(interactorId, interactorName, interactorImageUrl)
-            addReactOnPostToDb(myReact, modifiedPost).addOnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Toast.makeText(context, task.exception?.message, Toast.LENGTH_SHORT).show()
-                }
-            }
+            addReactOnPostToDb(interactorId, myReact, modifiedPost)
         }
         else {
-            deleteReactFromPost(
-                currentReact!!,
-                modifiedPost
-            ).addOnCompleteListener { task ->
+            deleteReactFromPost(currentReact!!, modifiedPost).addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     Utils.toastMessage(context, task.exception?.message.toString())
                 }
@@ -96,7 +89,8 @@ class ProfileActivityPostsHandler(
         interactorImageUrl: String,
         postPosition: Int
     ) {
-        openCommentsBottomSheet(post, interactorId, interactorName, interactorImageUrl, postPosition)
+        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
+        openCommentsBottomSheet(modifiedPost, interactorId, interactorName, interactorImageUrl, postPosition)
     }
 
     override fun onShareButtonClicked(
@@ -125,18 +119,15 @@ class ProfileActivityPostsHandler(
         interactorImageUrl: String,
         postPosition: Int
     ) {
-        openCommentsBottomSheet(post, interactorId, interactorName, interactorImageUrl, postPosition)
+        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
+        openCommentsBottomSheet(modifiedPost, interactorId, interactorName, interactorImageUrl, postPosition)
     }
 
     override fun onMediaPostClicked(mediaUrl: String) { handleMediaClicks(mediaUrl) }
 
     override fun onPostMoreDotsClicked(post: Post, shared: Boolean?) {
         val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
-        val postConfigurationsBottomSheet = PostConfigurationsBottomSheet(modifiedPost, shared)
-        postConfigurationsBottomSheet.show(
-            (context as AppCompatActivity ).supportFragmentManager,
-            postConfigurationsBottomSheet.tag
-        )
+        openPostConfigurationsBottomSheet(modifiedPost, shared)
     }
 
     override fun onSharedPostClicked(originalPostPublisherId: String, postId: String) {
@@ -151,122 +142,6 @@ class ProfileActivityPostsHandler(
         intent.putExtra("userId", friendId)
         context.startActivity(intent)
     }
-
-    private fun openCommentsBottomSheet(post: Post,
-                                        interactorId: String,
-                                        interactorName: String,
-                                        interactorImageUrl: String,
-                                        postPosition: Int){
-        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
-        currentEditedPostPosition = postPosition
-        CommentsBottomSheet(
-            modifiedPost,
-            interactorId,
-            interactorName,
-            interactorImageUrl,
-            null,
-            "",
-        ).apply {
-            show((context as AppCompatActivity ).supportFragmentManager, tag)
-        }
-    }
-
-    private fun addReactOnPostToDb(
-        react: React,
-        post: Post
-    ): Task<Void> {
-        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
-        return postViewModel.addReactToDB(react, modifiedPost)
-    }
-
-//    private fun createReact(
-//        interactorId: String,
-//        interactorName: String,
-//        interactorImageUrl: String
-//    ): React {
-//        return React(
-//            reactorId = interactorId,
-//            reactorName = interactorName,
-//            reactorImageUrl = interactorImageUrl
-//        )
-//    }
-
-    private fun deleteReactFromPost(
-        react: React,
-        post: Post
-    ): Task<Void> {
-        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
-        return postViewModel.deleteReactFromPost(react, modifiedPost)
-    }
-
-    private fun addShareToPost(share: Share, post: Post): Task<Void> {
-        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
-        return postViewModel.addShareToPost(share, modifiedPost)
-    }
-
-    private fun showReactsChooserDialog(
-        interactorId: String,
-        interactorName: String,
-        interactorImageUrl: String,
-        modifiedPost: Post,
-        currentReact: React?
-    ) {
-        val dialog = Dialog(context)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCancelable(true)
-        dialog.setContentView(R.layout.long_clicked_reacts_button)
-
-        val react = React(
-            reactorId = interactorId,
-            reactorName = interactorName,
-            reactorImageUrl = interactorImageUrl
-        )
-
-        dialog.loveReactButton.setOnClickListener {
-            react.react = 2
-            handleLongReactCreationAndDeletion(currentReact, react, modifiedPost)
-            dialog.dismiss()
-        }
-        dialog.careReactButton.setOnClickListener {
-            react.react = 3
-            handleLongReactCreationAndDeletion(currentReact, react, modifiedPost)
-            dialog.dismiss()
-        }
-        dialog.hahaReactButton.setOnClickListener {
-            react.react = 4
-            handleLongReactCreationAndDeletion(currentReact, react, modifiedPost)
-            dialog.dismiss()
-        }
-        dialog.wowReactButton.setOnClickListener {
-            react.react = 5
-            handleLongReactCreationAndDeletion(currentReact, react, modifiedPost)
-            dialog.dismiss()
-        }
-        dialog.sadReactButton.setOnClickListener {
-            react.react = 6
-            handleLongReactCreationAndDeletion(currentReact, react, modifiedPost)
-            dialog.dismiss()
-        }
-        dialog.angryReactButton.setOnClickListener {
-            react.react = 7
-            handleLongReactCreationAndDeletion(currentReact, react, modifiedPost)
-            dialog.dismiss()
-        }
-        dialog.show()
-    }
-
-    private fun handleLongReactCreationAndDeletion(
-        currentReact: React?,
-        react: React,
-        modifiedPost: Post
-    ) {
-        if (currentReact != null) {
-            deleteReactFromPost(currentReact, modifiedPost)
-        }
-        addReactOnPostToDb(react, modifiedPost)
-    }
-
-
 
     fun uploadCoverImageToCloudStorage(bitmap: Bitmap){
         progressDialog = Utils.showProgressDialog(context, "Please wait...")
