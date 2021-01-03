@@ -96,7 +96,9 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
 //        notificationsHandler.notifiedToken = user.token
 
         post.firstCollectionType = POSTS_COLLECTION
+        post.creatorReferenceId = postPublisherId
         post.secondCollectionType = PROFILE_POSTS_COLLECTION
+        post.id = postId
 
         val postLiveData = postViewerActivityViewModel.getPostLiveData(post)
         postLiveData?.observe(this, { post ->
@@ -261,7 +263,8 @@ class PostViewerActivity : AppCompatActivity(), CommentClickListener, ReactClick
                         }
                     }
                 }
-            } else {
+            }
+            else {
                 //finish()
                 Toast.makeText(this, postPublisherId, Toast.LENGTH_SHORT).show()
                 Toast.makeText(this, postId, Toast.LENGTH_SHORT).show()

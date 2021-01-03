@@ -2,13 +2,11 @@ package com.example.facebook_clone.helper.notification
 
 import android.graphics.Bitmap
 import android.util.Log
-import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.example.facebook_clone.helper.BaseApplication
 import com.example.facebook_clone.model.notification.Notifier
-import com.example.facebook_clone.ui.activity.MainActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.CoroutineScope
@@ -43,7 +41,7 @@ class FirebaseService : FirebaseMessagingService() {
         Log.i(TAG, "FAWZY onMessageReceived: $notifierImageUrl")
 
 
-        createNotification(notificationType,
+        createClientSideNotification(notificationType,
             notifierName,
             notifierId,
             notifierImageUrl,
@@ -54,7 +52,7 @@ class FirebaseService : FirebaseMessagingService() {
         )
     }
 
-    private fun createNotification(
+    private fun createClientSideNotification(
         notificationType: String?,
         notifierName: String?,
         notifierId: String?,
@@ -83,7 +81,7 @@ class FirebaseService : FirebaseMessagingService() {
                             imageUrl = notifierImageUrl,
                             imageBitmap = bitmap
                         )
-                        BaseApplication.fireNotification(notificationType!!, notifier, postId,postPublisherId , commentPosition, notifiedId)
+                        BaseApplication.fireClientSideNotification(notificationType!!, notifier, postId,postPublisherId , commentPosition, notifiedId)
                     }
                 })
         }

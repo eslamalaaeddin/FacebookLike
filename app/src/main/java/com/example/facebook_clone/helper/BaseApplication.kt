@@ -106,7 +106,7 @@ class BaseApplication : Application() {
         var context: Context? = null
         var destination: Class<*>? = null
         //val usersRepository = UsersRepository(FirebaseFirestore.getInstance(), FirebaseAuth.getInstance(), FirebaseStorage.getInstance())
-        fun fireNotification(
+        fun fireClientSideNotification(
             notificationType: String,
             notifier: Notifier,
             postId: String?,

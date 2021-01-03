@@ -11,7 +11,7 @@ import java.util.*
 import kotlin.collections.HashMap
 
 data class Post(
-    val id: String? = UUID.randomUUID().toString(),
+    var id: String? = UUID.randomUUID().toString(),
     var content: String? = null,
     var attachmentUrl: String? = null,//it will hold urls for media as images, videos, and docs
     var attachmentType: String? = null,//video, or image.....
@@ -23,10 +23,12 @@ data class Post(
     var publisherName: String? = null,
     var visibility: Int? = 0, // 0 --> public, 1 --> private ......
     val creationTime: Timestamp = Timestamp(Date()),
-    var publisherToken: String? = null,
+   // var publisherToken: String? = null,
     @get:Exclude var firstCollectionType: String = "",
     @get:Exclude var creatorReferenceId: String = "",
-    @get:Exclude var secondCollectionType: String = ""
+    @get:Exclude var secondCollectionType: String = "",
+    var groupName: String? = null,
+    var groupId: String? = null
 
 //    @get:Exclude var firstCollectionType: String = Utils.POSTS_COLLECTION,
 //    @get:Exclude var creatorReferenceId: String = "",

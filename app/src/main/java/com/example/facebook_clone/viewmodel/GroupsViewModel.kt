@@ -31,4 +31,6 @@ class GroupsViewModel(private val groupsRepository: GroupsRepository): ViewModel
     fun getGroupPostsLiveData(groupId: String): LiveData<List<Post>> {
         return groupsRepository.getGroupPostsLiveData(groupId)
     }
+
+
 }

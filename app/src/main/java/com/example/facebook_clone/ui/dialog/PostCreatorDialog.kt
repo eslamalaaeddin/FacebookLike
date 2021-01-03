@@ -25,6 +25,7 @@ import com.example.facebook_clone.helper.Utils.POST_FROM_PAGE
 import com.example.facebook_clone.helper.Utils.POST_FROM_PROFILE
 import com.example.facebook_clone.helper.Utils.PROFILE_POSTS_COLLECTION
 import com.example.facebook_clone.helper.Utils.SPECIFIC_GROUP_POSTS_COLLECTION
+import com.example.facebook_clone.helper.Utils.toastMessage
 import com.example.facebook_clone.helper.listener.PostAttachmentListener
 import com.example.facebook_clone.model.Visibility
 import com.example.facebook_clone.model.post.Post
@@ -39,7 +40,10 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 private const val TAG = "PostCreatorDialog"
 
-class PostCreatorDialog(private val fromWhere: String, private val groupId: String? = null) : DialogFragment(), AdapterView.OnItemSelectedListener, NameImageProvider,
+class PostCreatorDialog(private val fromWhere: String,
+                        private val groupId: String? = null,
+                        private val groupName: String? = null
+) : DialogFragment(), AdapterView.OnItemSelectedListener, NameImageProvider,
     PostAttachmentListener {
     private val auth: FirebaseAuth by inject()
     private val postViewModel by viewModel<PostViewModel>()
@@ -59,7 +63,6 @@ class PostCreatorDialog(private val fromWhere: String, private val groupId: Stri
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.post_creator_dialog, container, false)
-
     }
 
     override fun getTheme(): Int {
@@ -121,11 +124,13 @@ class PostCreatorDialog(private val fromWhere: String, private val groupId: Stri
                                     val post = createPost(postAttachmentUrl!!, postDataType!!)
                                     postViewModel.createPost(post).addOnCompleteListener { task ->
                                         progressDialog?.dismiss()
-                                        if (!task.isSuccessful) {
-                                            Utils.toastMessage(
-                                                requireContext(),
-                                                task.exception?.message.toString()
-                                            )
+                                        if (task.isSuccessful){
+                                            if (fromWhere == POST_FROM_GROUP){
+                                                postViewModel.addGroupPostToPosterCollection(post)
+                                            }
+                                        }
+                                        else{
+                                            toastMessage(requireContext(), task.exception?.message.toString())
                                         }
                                     }
                                     dismiss()
@@ -144,11 +149,13 @@ class PostCreatorDialog(private val fromWhere: String, private val groupId: Stri
                                     val post = createPost(postAttachmentUrl!!, postDataType!!)
                                     postViewModel.createPost(post).addOnCompleteListener { task ->
                                         progressDialog?.dismiss()
-                                        if (!task.isSuccessful) {
-                                            Utils.toastMessage(
-                                                requireContext(),
-                                                task.exception?.message.toString()
-                                            )
+                                        if (task.isSuccessful){
+                                            if (fromWhere == POST_FROM_GROUP){
+                                                postViewModel.addGroupPostToPosterCollection(post)
+                                            }
+                                        }
+                                        else{
+                                            toastMessage(requireContext(), task.exception?.message.toString())
                                         }
                                         dismiss()
                                     }
@@ -165,8 +172,13 @@ class PostCreatorDialog(private val fromWhere: String, private val groupId: Stri
 
                 postViewModel.createPost(post).addOnCompleteListener { task ->
                     progressDialog?.dismiss()
-                    if (!task.isSuccessful) {
-                        Utils.toastMessage(requireContext(), task.exception?.message.toString())
+                    if (task.isSuccessful){
+                        if (fromWhere == POST_FROM_GROUP){
+                            postViewModel.addGroupPostToPosterCollection(post)
+                        }
+                    }
+                    else{
+                        toastMessage(requireContext(), task.exception?.message.toString())
                     }
                     dismiss()
                 }
@@ -217,7 +229,8 @@ class PostCreatorDialog(private val fromWhere: String, private val groupId: Stri
             publisherImageUrl = userProfileImageUrl,
             attachmentUrl = postAttachmentUrl,
             attachmentType = postAttachmentType,
-            publisherToken = NewsFeedActivity.getTokenFromSharedPreference(requireContext()))
+            //publisherToken = NewsFeedActivity.getTokenFromSharedPreference(requireContext())
+             )
 
         when(fromWhere){
             POST_FROM_PROFILE -> {
@@ -227,6 +240,8 @@ class PostCreatorDialog(private val fromWhere: String, private val groupId: Stri
             }
 
             POST_FROM_GROUP -> {
+                post.groupId = groupId
+                post.groupName = groupName
                 post.firstCollectionType = GROUP_POSTS_COLLECTION
                 post.creatorReferenceId = groupId.orEmpty()
                 post.secondCollectionType = SPECIFIC_GROUP_POSTS_COLLECTION

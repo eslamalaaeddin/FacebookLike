@@ -127,7 +127,7 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener {
     }
 
     private fun showPostCreatorDialog(){
-        val postCreatorDialog = PostCreatorDialog(POST_FROM_GROUP, groupId)
+        val postCreatorDialog = PostCreatorDialog(POST_FROM_GROUP, groupId, groupName)
         postCreatorDialog.show(supportFragmentManager, "signature")
         postCreatorDialog
             .setUserNameAndProfileImageUrl(

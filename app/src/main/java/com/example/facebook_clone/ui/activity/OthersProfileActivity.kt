@@ -18,6 +18,7 @@ import com.example.facebook_clone.helper.listener.CommentsBottomSheetListener
 import com.example.facebook_clone.helper.listener.FriendClickListener
 import com.example.facebook_clone.helper.listener.PostListener
 import com.example.facebook_clone.helper.notification.NotificationsHandler
+import com.example.facebook_clone.helper.posthandler.OthersProfileActivityPostsHandler
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.SharedPost
 import com.example.facebook_clone.model.user.User
@@ -69,6 +70,8 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
     private var profilePostsAdapter: ProfilePostsAdapter? = null
     private lateinit var friendsAdapter: FriendsAdapter
     private lateinit var notificationsHandler: NotificationsHandler
+    private lateinit var othersProfileActivityPostsHandler: OthersProfileActivityPostsHandler
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_others_profile)
@@ -79,6 +82,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             notificationsFragmentViewModel = notificationsFragmentViewModel
         )
 
+        othersProfileActivityPostsHandler = OthersProfileActivityPostsHandler(this, postViewModel)
         val myLiveData = profileActivityViewModel.getMe(auth.currentUser?.uid.toString())
         myLiveData?.observe(this, { user ->
             user?.let {
@@ -247,7 +251,6 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         imageViewerDialog.setMediaUrl(imageUrl)
     }
 
-
     private fun updateUserPosts(posts: List<Post>) {
         profilePostsAdapter = ProfilePostsAdapter(
             auth,
@@ -282,7 +285,6 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
 
     }
 
-    //
     private fun sendUserFriendRequest() {
         val friendRequest = FriendRequest(fromId = currentUser.id, toId = userIdIAmViewing)
         othersProfileActivityViewModel.addFriendRequestToHisDocument(friendRequest)
@@ -307,10 +309,6 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             }
     }
 
-    private fun addNotificationIdToHisDocument(notificationId: String, hisId: String) {
-        othersProfileActivityViewModel.addNotificationIdToNotifiedDocument(notificationId, hisId)
-    }
-
     override fun onReactButtonClicked(
         post: Post,
         interactorId: String,
@@ -320,33 +318,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         currentReact: React?,
         postPosition: Int
     ) {
-        currentEditedPostPosition = postPosition
-        if (!reacted) {
-            val myReact = createReact(interactorId, interactorName, interactorImageUrl, 1)
-            addReactToDb(myReact, post).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    notificationsHandler.also {
-                        it.notificationType = "reactOnPost"
-                        it.reactType = 1
-                        it.postId = post.id.orEmpty()
-                        it.handleNotificationCreationAndFiring()
-                    }
-
-                    Log.i(TAG, "ISLAM onReactButtonClicked: ${notificationsHandler.notifiedToken}")
-                } else {
-                    Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
-                }
-            }
-        } else {
-            deleteReactFromPost(
-                currentReact!!,
-                post
-            ).addOnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Utils.toastMessage(this, task.exception?.message.toString())
-                }
-            }
-        }
+        othersProfileActivityPostsHandler.onReactButtonClicked(post, interactorId, interactorName, interactorImageUrl, reacted, currentReact, postPosition)
     }
 
     override fun onReactButtonLongClicked(
@@ -358,14 +330,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         currentReact: React?,
         postPosition: Int
     ) {
-        currentEditedPostPosition = postPosition
-        showReactsChooserDialog(
-            interactorId,
-            interactorName,
-            interactorImageUrl,
-            post,
-            currentReact
-        )
+        othersProfileActivityPostsHandler.onReactButtonLongClicked(post, interactorId, interactorName, interactorImageUrl, reacted, currentReact, postPosition)
     }
 
     override fun onCommentButtonClicked(
@@ -375,17 +340,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         interactorImageUrl: String,
         postPosition: Int
     ) {
-        //Open comment bottom sheet
-        CommentsBottomSheet(
-            post,
-            interactorId,
-            interactorName,
-            interactorImageUrl,
-            this,
-            userIAmViewing.token.toString()
-        ).apply {
-            show(supportFragmentManager, tag)
-        }
+        othersProfileActivityPostsHandler.onCommentButtonClicked(post, interactorId, interactorName, interactorImageUrl, postPosition)
     }
 
     override fun onShareButtonClicked(
@@ -395,60 +350,8 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         interactorImageUrl: String,
         postPosition: Int
     ) {
-        currentEditedPostPosition = postPosition
-        val share = Share(
-            sharerId = interactorId,
-            sharerName = interactorName,
-            sharerImageUrl = interactorImageUrl,
-            sharedPost = SharedPost(
-                id = post.id,
-                content = post.content,
-                attachmentUrl = post.attachmentUrl,
-                attachmentType = post.attachmentType,
-                publisherId = post.publisherId,
-                publisherImageUrl = post.publisherImageUrl,
-                publisherName = post.publisherName,
-                visibility = post.visibility,
-                creationTime =post.creationTime
-            )
-        )
-        val postId = post.id.toString()
-        val postPublisherId = post.publisherId.toString()
-        post.shares?.add(share)
-        post.reacts = null
-        post.comments = null
+        othersProfileActivityPostsHandler.onShareButtonClicked(post, interactorId, interactorName, interactorImageUrl, postPosition)
 
-
-        addShareToPost(share, post).addOnCompleteListener { task ->
-            val myPost = Post(
-                id = share.id,
-                publisherId = auth.currentUser?.uid.toString(),
-                content = null,
-                visibility = 0,
-                publisherName = currentUser.name,
-                publisherImageUrl = currentUser.profileImageUrl,
-                shares = mutableListOf(share),
-                reacts = null,
-                comments = null,
-                publisherToken = NewsFeedActivity.getTokenFromSharedPreference(this),
-                firstCollectionType = POSTS_COLLECTION,
-                secondCollectionType = PROFILE_POSTS_COLLECTION
-            )
-            if (task.isSuccessful) {
-                //post.shares?.add(share)
-                Log.i(TAG, "YOYO onShareButtonClicked: $myPost")
-
-                //this trick is to add recent share data to my post collections also
-                addSharedPostToMyPosts(myPost, auth.currentUser?.uid.toString())
-                notificationsHandler.also {
-                    it.notificationType = "share"
-                    it.postId = postId
-                    it.handleNotificationCreationAndFiring()
-                }
-            } else {
-                Utils.toastMessage(this, task.exception?.message.toString())
-            }
-        }
     }
 
     override fun onReactLayoutClicked(
@@ -458,22 +361,11 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         interactorImageUrl: String,
         postPosition: Int
     ) {
-
+        othersProfileActivityPostsHandler.onCommentButtonClicked(post, interactorId, interactorName, interactorImageUrl, postPosition)
     }
 
     override fun onMediaPostClicked(mediaUrl: String) {
-        //Image
-        if (mediaUrl.contains("jpeg")) {
-            val imageViewerDialog = ImageViewerDialog()
-            imageViewerDialog.show(supportFragmentManager, "signature")
-            imageViewerDialog.setMediaUrl(mediaUrl)
-        }
-        //video(I chosed an activity to show media controllers)
-        else {
-            val videoIntent = Intent(this, VideoPlayerActivity::class.java)
-            videoIntent.putExtra("videoUrl", mediaUrl)
-            startActivity(videoIntent)
-        }
+        othersProfileActivityPostsHandler.onMediaPostClicked(mediaUrl)
     }
 
     override fun onPostMoreDotsClicked(post: Post, shared: Boolean?) {
@@ -484,43 +376,14 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
 
     }
 
-    private fun addReactToDb(react: React, post: Post): Task<Void> {
-        return postViewModel.addReactToDB(react, post)
-
-    }
-
-    private fun createReact(
-        interactorId: String,
-        interactorName: String,
-        interactorImageUrl: String,
-        reactType: Int?
-    ): React {
-        return React(
-            reactorId = interactorId,
-            reactorName = interactorName,
-            reactorImageUrl = interactorImageUrl,
-            react = reactType
-        )
-    }
-
-    private fun deleteReactFromPost(
-        react: React,
-        post: Post
-    ): Task<Void> {
-        return postViewModel.deleteReactFromPost(react, post)
-    }
-
-    private fun addShareToPost(share: Share, post: Post): Task<Void> {
-        return postViewModel.addShareToPost(share, post)
-    }
-
     override fun onAnotherUserCommented(commentPosition: Int, commentId: String, postId: String) {
-        notificationsHandler.also {
-            it.notificationType = "commentOnPost"
-            it.postId = postId
-            it.commentPosition = commentPosition
-            it.handleNotificationCreationAndFiring()
-        }
+//        notificationsHandler.also {
+//            it.notificationType = "commentOnPost"
+//            it.postId = postId
+//            it.commentPosition = commentPosition
+//            it.handleNotificationCreationAndFiring()
+//        }
+       // othersProfileActivityPostsHandler.onAnotherUserCommented(commentPosition, commentId, postId)
     }
 
     override fun onFriendClicked(friendId: String) {
@@ -541,80 +404,6 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         }
     }
 
-    private fun showReactsChooserDialog(
-        interactorId: String,
-        interactorName: String,
-        interactorImageUrl: String,
-        post: Post,
-        currentReact: React?
-    ) {
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCancelable(true)
-        dialog.setContentView(R.layout.long_clicked_reacts_button)
-        val react = React(
-            reactorId = interactorId,
-            reactorName = interactorName,
-            reactorImageUrl = interactorImageUrl
-        )
-        dialog.loveReactButton.setOnClickListener {
-            react.react = 2
-            handleLongReactCreationAndDeletionAndUserNotification(
-                currentReact,
-                react,
-                post
-            )
-            dialog.dismiss()
-        }
-        dialog.careReactButton.setOnClickListener {
-            react.react = 3
-            handleLongReactCreationAndDeletionAndUserNotification(
-                currentReact,
-                react,
-                post
-            )
-            dialog.dismiss()
-        }
-        dialog.hahaReactButton.setOnClickListener {
-            react.react = 4
-            handleLongReactCreationAndDeletionAndUserNotification(
-                currentReact,
-                react,
-                post
-            )
-            dialog.dismiss()
-        }
-        dialog.wowReactButton.setOnClickListener {
-            react.react = 5
-            handleLongReactCreationAndDeletionAndUserNotification(
-                currentReact,
-                react,
-                post
-            )
-            dialog.dismiss()
-        }
-        dialog.sadReactButton.setOnClickListener {
-            react.react = 6
-            handleLongReactCreationAndDeletionAndUserNotification(
-                currentReact,
-                react,
-                post
-            )
-            dialog.dismiss()
-        }
-        dialog.angryReactButton.setOnClickListener {
-            react.react = 7
-            handleLongReactCreationAndDeletionAndUserNotification(
-                currentReact,
-                react,
-                post
-            )
-            dialog.dismiss()
-        }
-        dialog.show()
-
-    }
-
     private fun updateUserFriends(friends: List<Friend>) {
         friendsCountTextView.text = if (friends.isNotEmpty()) "${friends.size}" else ""
         if (friends.size >= 6) {
@@ -626,32 +415,5 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         }
 
     }
-
-    private fun handleLongReactCreationAndDeletionAndUserNotification(
-        currentReact: React?,
-        react: React,
-        post: Post
-    ) {
-        if (currentReact != null) {
-            deleteReactFromPost(currentReact, post)
-        }
-        addReactToDb(react, post).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                notificationsHandler.also {
-                    it.notificationType = "reactOnPost"
-                    it.postId = post.id.orEmpty()
-                    it.reactType = react.react
-                    it.handleNotificationCreationAndFiring()
-                }
-            } else {
-                Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun addSharedPostToMyPosts(post: Post, myId: String){
-        postViewModel.addSharedPostToMyPosts(post, myId)
-    }
-
 
 }

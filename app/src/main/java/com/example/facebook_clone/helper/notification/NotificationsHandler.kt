@@ -51,7 +51,7 @@ class NotificationsHandler(
         val notification = createNotification()
         addNotificationToNotificationCollection(notification).addOnCompleteListener { task ->
             if (task.isSuccessful){
-                fireAnyNotification(notification)
+                fireServerSideNotification(notification)
                 othersProfileActivityViewModel
                     .addNotificationIdToNotifiedDocument(notification.id.toString(), notifiedId!!)
                     .addOnCompleteListener {task2 ->
@@ -84,7 +84,7 @@ class NotificationsHandler(
         othersProfileActivityViewModel.deleteNotificationIdFromNotifiedDocument(notificationId!!, notifiedId!!)
     }
 
-    private fun fireAnyNotification(notification: Notification) = CoroutineScope(
+    private fun fireServerSideNotification(notification: Notification) = CoroutineScope(
         Dispatchers.IO).launch {
         try {
             //userIAmViewing.token.toString()

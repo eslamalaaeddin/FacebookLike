@@ -8,7 +8,7 @@ import android.view.Window
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.facebook_clone.R
-import com.example.facebook_clone.helper.BaseApplication.Companion.context
+import com.example.facebook_clone.helper.listener.CommentsBottomSheetListener
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.model.post.share.Share
@@ -71,10 +71,10 @@ open class BasePostHandler(
         )
     }
 
-    fun addReactOnPostToDb(currentUserId: String, react: React, post: Post) {
+    fun addReactOnPostToDb(interactorId: String, react: React, post: Post) {
         postViewModel.addReactToDB(react, post).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                if (currentUserId != post.publisherId) {
+                if (interactorId != post.publisherId) {
                     Toast.makeText(context, "Notify Him", Toast.LENGTH_SHORT).show()
                 }
             } else {
@@ -159,7 +159,8 @@ open class BasePostHandler(
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
-        postPosition: Int
+        postPosition: Int,
+        commentsBottomSheetListener: CommentsBottomSheetListener?
     ) {
         currentEditedPostPosition = postPosition
         val commentsBottomSheet = CommentsBottomSheet(
@@ -167,7 +168,7 @@ open class BasePostHandler(
             interactorId,
             interactorName,
             interactorImageUrl,
-            null,
+            commentsBottomSheetListener,
             "",
         )
         commentsBottomSheet.show((context as AppCompatActivity).supportFragmentManager, commentsBottomSheet.tag)

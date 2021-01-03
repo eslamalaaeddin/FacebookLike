@@ -2,22 +2,16 @@ package com.example.facebook_clone.ui.activity
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.PorterDuff
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.NewsFeedTabsAdapter
-import com.example.facebook_clone.helper.BaseApplication.Companion.context
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.model.user.recentloggedinuser.RecentLoggedInUser
 import com.example.facebook_clone.viewmodel.NewsFeedActivityViewModel
 import com.example.facebook_clone.viewmodel.PostViewModel
 import com.google.android.gms.tasks.Task
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayout.ViewPagerOnTabSelectedListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
@@ -52,11 +46,13 @@ class NewsFeedActivity : AppCompatActivity() {
                 val tokenFromSharedPref = getTokenFromSharedPreference(this)
                 if (newToken != tokenFromSharedPref) {
                     saveTokenToSharedPreference(this, newToken)
-                    updateTokenInCurrentUserPosts(user.id.toString(), newToken)
-                    //updateTokenInCurrentUserComments(user.id.toString(), newToken)
-
-                    //CommentsOperations
-                    //PostsOperations
+//                    updateTokenInCurrentUserPosts(user.id.toString(), "newToken")
+//                    val userGroups = user.groups.orEmpty()
+//                    if (userGroups.isNotEmpty()){
+//                        for (group in userGroups){
+//                            updateTokenInUserGroupPosts(user.id.orEmpty(), group.id.orEmpty(), "newToken")
+//                        }
+//                    }
 
                 }
                 updateUserToken(newToken, currentUser.id.toString())
@@ -168,13 +164,17 @@ class NewsFeedActivity : AppCompatActivity() {
             return prefs.getString(TOKEN, "")
         }
     }
-    private fun updateTokenInCurrentUserPosts(userId: String, token: String){
-        postViewModel.updateTokenInPost(userId, token)
-    }
+//    private fun updateTokenInCurrentUserPosts(userId: String, token: String){
+//        postViewModel.updateTokenInProfilePost(userId, token)
+//    }
 
-    private fun updateTokenInCurrentUserComments(userId: String, token: String){
-        postViewModel.updateTokenInComment(userId, token)
-    }
+//    private fun updateTokenInUserGroupPosts(userId: String, groupId: String, token: String){
+//        postViewModel.updateTokenInGroupPost(userId, groupId, token)
+//    }
+
+//    private fun updateTokenInCurrentUserComments(userId: String, token: String){
+//        postViewModel.updateTokenInComment(userId, token)
+//    }
 
 
 }

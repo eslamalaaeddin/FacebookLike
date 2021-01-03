@@ -72,8 +72,8 @@ class GroupsActivityPostsHandler(
         interactorImageUrl: String,
         postPosition: Int
     ) {
-        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, groupId, SECOND_COLLECTION_TYPE)
-        openCommentsBottomSheet(modifiedPost, interactorId, interactorName, interactorImageUrl, postPosition)
+//        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, groupId, SECOND_COLLECTION_TYPE)
+//        openCommentsBottomSheet(modifiedPost, interactorId, interactorName, interactorImageUrl, postPosition)
     }
 
     override fun onShareButtonClicked(
@@ -93,8 +93,8 @@ class GroupsActivityPostsHandler(
         interactorImageUrl: String,
         postPosition: Int
     ) {
-        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, groupId, SECOND_COLLECTION_TYPE)
-        openCommentsBottomSheet(modifiedPost, interactorId, interactorName, interactorImageUrl, postPosition)
+//        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, groupId, SECOND_COLLECTION_TYPE)
+//        openCommentsBottomSheet(modifiedPost, interactorId, interactorName, interactorImageUrl, postPosition)
     }
 
     override fun onMediaPostClicked(mediaUrl: String) { handleMediaClicks(mediaUrl) }

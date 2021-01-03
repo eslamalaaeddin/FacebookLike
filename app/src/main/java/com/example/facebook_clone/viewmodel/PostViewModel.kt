@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.comment.ReactionsAndSubComments
@@ -20,6 +19,10 @@ class PostViewModel(private val repository: PostsRepository) : ViewModel() {
 
     fun createPost(post: Post): Task<Void> {
         return repository.createPost(post)
+    }
+
+    fun addGroupPostToPosterCollection(post: Post): Task<Void>{
+        return repository.addGroupPostToPosterCollection(post)
     }
 
     fun addSharedPostToMyPosts(post: Post, myId: String): Task<Void> {
@@ -48,8 +51,12 @@ class PostViewModel(private val repository: PostsRepository) : ViewModel() {
         )
     }
 
-    fun updateTokenInPost(userId: String, token: String) {
-        repository.updateTokenInPost(userId, token)
+    fun updateTokenInProfilePost(userId: String, token: String) {
+        repository.updateTokenInProfilePost(userId, token)
+    }
+
+    fun updateTokenInGroupPost(userId: String, groupId: String, token: String) {
+        repository.updateTokenInGroupPost(userId, groupId, token)
     }
 
     fun updateTokenInComment(userId: String, token: String) {

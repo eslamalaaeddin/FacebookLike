@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.facebook_clone.helper.Utils.COMMENTS_COLLECTION
 import com.example.facebook_clone.helper.Utils.MY_COMMENTS_COLLECTION
+import com.example.facebook_clone.helper.Utils.MY_GROUP_POSTS_COLLECTION
 import com.example.facebook_clone.helper.Utils.POSTS_COLLECTION
 import com.example.facebook_clone.helper.Utils.PROFILE_POSTS_COLLECTION
 import com.example.facebook_clone.helper.Utils.USERS_COLLECTION
@@ -48,6 +49,16 @@ class PostsRepository(
             .document(post.creatorReferenceId)
             .collection(post.secondCollectionType)
             .document(post.id.toString())
+            .set(post)
+    }
+
+    fun addGroupPostToPosterCollection(post: Post): Task<Void> {
+        return database.collection(POSTS_COLLECTION)
+            .document(post.publisherId.orEmpty())
+            .collection(MY_GROUP_POSTS_COLLECTION)
+            .document(post.groupId.toString())
+            .collection(MY_GROUP_POSTS_COLLECTION)//this annoys me
+            .document(post.id.orEmpty())
             .set(post)
     }
 
@@ -383,21 +394,52 @@ class PostsRepository(
         ).document(postId).update("reacted", reacted)
     }
 
-    fun updateTokenInPost(userId: String, token: String) {
-        database.collection(POSTS_COLLECTION).document(userId).collection(
-            PROFILE_POSTS_COLLECTION
-        ).get().addOnCompleteListener { task ->
+    fun updateTokenInProfilePost(userId: String, token: String) {
+        database
+            .collection(POSTS_COLLECTION)
+            .document(userId)
+            .collection(PROFILE_POSTS_COLLECTION)
+            .get().addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val querySnapshots = task.result
                 if (querySnapshots != null) {
                     for (doc in querySnapshots) {
-                        database.collection(POSTS_COLLECTION).document(userId)
+                        database
+                            .collection(POSTS_COLLECTION)
+                            .document(userId)
                             .collection(PROFILE_POSTS_COLLECTION)
-                            .document(doc.id).update("publisherToken", token)
+                            .document(doc.id)
+                            .update("publisherToken", token)
                     }
                 }
             }
         }
+    }
+
+    fun updateTokenInGroupPost(userId: String, groupId: String, token: String){
+        database
+            .collection(POSTS_COLLECTION)
+            .document(userId)
+            .collection(MY_GROUP_POSTS_COLLECTION)
+            .document(groupId)
+            .collection(MY_GROUP_POSTS_COLLECTION)
+            .get().addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val querySnapshots = task.result
+                    if (querySnapshots != null) {
+                        for (doc in querySnapshots) {
+                            database
+                                .collection(POSTS_COLLECTION)
+                                .document(userId)
+                                .collection(MY_GROUP_POSTS_COLLECTION)
+                                .document(groupId)
+                                .collection(MY_GROUP_POSTS_COLLECTION)
+                                .document(doc.id)
+                                .update("publisherToken", token)
+                        }
+                    }
+                }
+            }
     }
 
 

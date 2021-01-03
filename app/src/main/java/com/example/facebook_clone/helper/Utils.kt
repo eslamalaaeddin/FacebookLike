@@ -23,6 +23,7 @@ object Utils {
     const val NOTIFICATIONS_COLLECTION = "notifications"
     const val MY_NOTIFICATIONS_COLLECTION = "my_notifications"
     const val PROFILE_POSTS_COLLECTION = "my_posts"
+    const val MY_GROUP_POSTS_COLLECTION = "my_group_posts"
     const val GROUP_POSTS_COLLECTION = "group posts collection"
     const val SPECIFIC_GROUP_POSTS_COLLECTION = "specific_group_posts_collection"
 //    const val OTHERS_POSTS_COLLECTION = "others_posts"
