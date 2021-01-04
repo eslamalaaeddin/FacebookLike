@@ -78,7 +78,8 @@ class ProfileActivityPostsHandler(
             interactorName,
             interactorImageUrl,
             modifiedPost,
-            currentReact
+            currentReact,
+            null
         )
     }
 
@@ -90,7 +91,7 @@ class ProfileActivityPostsHandler(
         postPosition: Int
     ) {
         val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
-        openCommentsBottomSheet(modifiedPost, interactorId, interactorName, interactorImageUrl, postPosition, null)
+        openCommentsBottomSheet(modifiedPost, interactorId, interactorName, interactorImageUrl, postPosition, null,"")
     }
 
     override fun onShareButtonClicked(
@@ -120,12 +121,12 @@ class ProfileActivityPostsHandler(
         postPosition: Int
     ) {
         val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
-        openCommentsBottomSheet(modifiedPost, interactorId, interactorName, interactorImageUrl, postPosition, null)
+        openCommentsBottomSheet(modifiedPost, interactorId, interactorName, interactorImageUrl, postPosition, null, "")
     }
 
     override fun onMediaPostClicked(mediaUrl: String) { handleMediaClicks(mediaUrl) }
 
-    override fun onPostMoreDotsClicked(post: Post, shared: Boolean?) {
+    override fun onPostMoreDotsClicked(interactorId: String, post: Post, shared: Boolean?) {
         val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
         openPostConfigurationsBottomSheet(modifiedPost, shared)
     }

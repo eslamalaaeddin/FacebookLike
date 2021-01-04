@@ -52,7 +52,7 @@ interface PostListener{
 
     fun onMediaPostClicked(mediaUrl: String)
 
-    fun onPostMoreDotsClicked(post: Post, shared: Boolean?)
+    fun onPostMoreDotsClicked(interactorId: String, post: Post, shared: Boolean?)
 
     fun onSharedPostClicked(originalPostPublisherId: String, postId: String)
 }

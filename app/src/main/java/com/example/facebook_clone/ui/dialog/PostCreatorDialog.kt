@@ -125,9 +125,9 @@ class PostCreatorDialog(private val fromWhere: String,
                                     postViewModel.createPost(post).addOnCompleteListener { task ->
                                         progressDialog?.dismiss()
                                         if (task.isSuccessful){
-                                            if (fromWhere == POST_FROM_GROUP){
-                                                postViewModel.addGroupPostToPosterCollection(post)
-                                            }
+//                                            if (fromWhere == POST_FROM_GROUP){
+//                                                postViewModel.addGroupPostToPosterCollection(post)
+//                                            }
                                         }
                                         else{
                                             toastMessage(requireContext(), task.exception?.message.toString())
@@ -150,9 +150,9 @@ class PostCreatorDialog(private val fromWhere: String,
                                     postViewModel.createPost(post).addOnCompleteListener { task ->
                                         progressDialog?.dismiss()
                                         if (task.isSuccessful){
-                                            if (fromWhere == POST_FROM_GROUP){
-                                                postViewModel.addGroupPostToPosterCollection(post)
-                                            }
+//                                            if (fromWhere == POST_FROM_GROUP){
+//                                                postViewModel.addGroupPostToPosterCollection(post)
+//                                            }
                                         }
                                         else{
                                             toastMessage(requireContext(), task.exception?.message.toString())
@@ -173,9 +173,9 @@ class PostCreatorDialog(private val fromWhere: String,
                 postViewModel.createPost(post).addOnCompleteListener { task ->
                     progressDialog?.dismiss()
                     if (task.isSuccessful){
-                        if (fromWhere == POST_FROM_GROUP){
-                            postViewModel.addGroupPostToPosterCollection(post)
-                        }
+//                        if (fromWhere == POST_FROM_GROUP){
+//                            postViewModel.addGroupPostToPosterCollection(post)
+//                        }
                     }
                     else{
                         toastMessage(requireContext(), task.exception?.message.toString())

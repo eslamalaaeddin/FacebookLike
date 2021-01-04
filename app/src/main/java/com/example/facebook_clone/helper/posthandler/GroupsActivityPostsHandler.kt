@@ -5,23 +5,42 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.facebook_clone.helper.Utils
+import com.example.facebook_clone.helper.listener.CommentsBottomSheetListener
 import com.example.facebook_clone.helper.listener.PostListener
+import com.example.facebook_clone.helper.notification.NotificationsHandler
+import com.example.facebook_clone.model.group.Group
 import com.example.facebook_clone.model.post.Post
+import com.example.facebook_clone.model.post.SharedPost
 import com.example.facebook_clone.model.post.react.React
+import com.example.facebook_clone.model.post.share.Share
 import com.example.facebook_clone.ui.bottomsheet.CommentsBottomSheet
+import com.example.facebook_clone.viewmodel.NotificationsFragmentViewModel
+import com.example.facebook_clone.viewmodel.OthersProfileActivityViewModel
 import com.example.facebook_clone.viewmodel.PostViewModel
 import com.google.android.gms.tasks.Task
 
 private const val TAG = "GroupsActivityPostsHand"
 private const val FIRST_COLLECTION_TYPE = Utils.GROUP_POSTS_COLLECTION
+
 //private const val CREATOR_REFERENCE_ID =
 private const val SECOND_COLLECTION_TYPE = Utils.SPECIFIC_GROUP_POSTS_COLLECTION
+
 class GroupsActivityPostsHandler(
     private val context: Context,
-    private val groupId: String,
-    private val postViewModel: PostViewModel
-    ): BasePostHandler(context, postViewModel), PostListener {
+    private val group: Group,
+    private val postViewModel: PostViewModel,
+    private val notificationsFragmentViewModel: NotificationsFragmentViewModel?,
+    private val othersProfileActivityViewModel: OthersProfileActivityViewModel?
+) : BasePostHandler(
+    context,
+    postViewModel,
+    notificationsFragmentViewModel,
+    othersProfileActivityViewModel
+), PostListener, CommentsBottomSheetListener {
 
+    //    private val notificationsHandler = NotificationsHandler(
+//        notificationsFragmentViewModel = notificationsFragmentViewModel,
+//        othersProfileActivityViewModel = othersProfileActivityViewModel)
     override fun onReactButtonClicked(
         post: Post,
         interactorId: String,
@@ -31,26 +50,24 @@ class GroupsActivityPostsHandler(
         currentReact: React?,
         postPosition: Int
     ) {
-//        currentEditedPostPosition = postPosition
-//        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, groupId, SECOND_COLLECTION_TYPE)
-//        if (!reacted) {
-//            val myReact = createReact(interactorId, interactorName, interactorImageUrl)
-//            addReactOnPostToDb(myReact, modifiedPost).addOnCompleteListener { task ->
-//                if (!task.isSuccessful) {
-//                    Toast.makeText(context, task.exception?.message, Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//        }
-//        else {
-//            deleteReactFromPost(
-//                currentReact!!,
-//                modifiedPost
-//            ).addOnCompleteListener { task ->
-//                if (!task.isSuccessful) {
-//                    Utils.toastMessage(context, task.exception?.message.toString())
-//                }
-//            }
-//        }
+        currentEditedPostPosition = postPosition
+        val modifiedPost =
+            handlePostLocation(
+                post,
+                FIRST_COLLECTION_TYPE,
+                group.id.orEmpty(),
+                SECOND_COLLECTION_TYPE
+            )
+        if (!reacted) {
+            val myReact = createReact(interactorId, interactorName, interactorImageUrl)
+            addReactOnPostToDb(interactorId, myReact, modifiedPost)
+        } else {
+            deleteReactFromPost(currentReact!!, modifiedPost).addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Utils.toastMessage(context, task.exception?.message.toString())
+                }
+            }
+        }
     }
 
     override fun onReactButtonLongClicked(
@@ -62,7 +79,21 @@ class GroupsActivityPostsHandler(
         currentReact: React?,
         postPosition: Int
     ) {
-
+        val modifiedPost = handlePostLocation(
+            post,
+            FIRST_COLLECTION_TYPE,
+            post.groupId.orEmpty(),
+            SECOND_COLLECTION_TYPE
+        )
+        currentEditedPostPosition = postPosition
+        showReactsChooserDialog(
+            interactorId,
+            interactorName,
+            interactorImageUrl,
+            modifiedPost,
+            currentReact,
+            null
+        )
     }
 
     override fun onCommentButtonClicked(
@@ -72,8 +103,21 @@ class GroupsActivityPostsHandler(
         interactorImageUrl: String,
         postPosition: Int
     ) {
-//        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, groupId, SECOND_COLLECTION_TYPE)
-//        openCommentsBottomSheet(modifiedPost, interactorId, interactorName, interactorImageUrl, postPosition)
+        val modifiedPost = handlePostLocation(
+            post,
+            FIRST_COLLECTION_TYPE,
+            group.id.orEmpty(),
+            SECOND_COLLECTION_TYPE
+        )
+        openCommentsBottomSheet(
+            modifiedPost,
+            interactorId,
+            interactorName,
+            interactorImageUrl,
+            postPosition,
+            this,
+            "" //i have to modify it later
+        )
     }
 
     override fun onShareButtonClicked(
@@ -83,7 +127,11 @@ class GroupsActivityPostsHandler(
         interactorImageUrl: String,
         postPosition: Int
     ) {
-        Toast.makeText(context, "Post Shared", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "لا يا أخي؟!", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun addSharedPostToMyPosts(post: Post, myId: String) {
+        postViewModel.addSharedPostToMyPosts(post, myId)
     }
 
     override fun onReactLayoutClicked(
@@ -93,53 +141,49 @@ class GroupsActivityPostsHandler(
         interactorImageUrl: String,
         postPosition: Int
     ) {
-//        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, groupId, SECOND_COLLECTION_TYPE)
-//        openCommentsBottomSheet(modifiedPost, interactorId, interactorName, interactorImageUrl, postPosition)
+        val modifiedPost = handlePostLocation(
+            post,
+            FIRST_COLLECTION_TYPE,
+            group.id.orEmpty(),
+            SECOND_COLLECTION_TYPE
+        )
+        openCommentsBottomSheet(
+            modifiedPost,
+            interactorId,
+            interactorName,
+            interactorImageUrl,
+            postPosition,
+            this,
+            ""
+        )
     }
 
-    override fun onMediaPostClicked(mediaUrl: String) { handleMediaClicks(mediaUrl) }
+    override fun onMediaPostClicked(mediaUrl: String) {
+        handleMediaClicks(mediaUrl)
+    }
 
-    override fun onPostMoreDotsClicked(post: Post, shared: Boolean?) {
-        Toast.makeText(context, "Dots Clicked", Toast.LENGTH_SHORT).show()
+    override fun onPostMoreDotsClicked(interactorId: String, post: Post, shared: Boolean?) {
+        val admin = group.admins.orEmpty().first()
+        if (admin.id == interactorId) {
+            Toast.makeText(context, "Show admin tools", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(context, "Show member tools", Toast.LENGTH_SHORT).show()
+        }
+
     }
 
     override fun onSharedPostClicked(originalPostPublisherId: String, postId: String) {
         Toast.makeText(context, "Shared Post", Toast.LENGTH_SHORT).show()
     }
 
-//    private fun addReactOnPostToDb(
-//        react: React,
-//        post: Post
-//    ): Task<Void> {
-//        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, groupId, SECOND_COLLECTION_TYPE)
-//        return postViewModel.addReactToDB(react, modifiedPost)
-//    }
-//
-//    private fun deleteReactFromPost(
-//        react: React,
-//        post: Post
-//    ): Task<Void> {
-//        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, groupId, SECOND_COLLECTION_TYPE)
-//        return postViewModel.deleteReactFromPost(react, modifiedPost)
-//    }
-
-//    private fun openCommentsBottomSheet(post: Post,
-//                                        interactorId: String,
-//                                        interactorName: String,
-//                                        interactorImageUrl: String,
-//                                        postPosition: Int){
-//
-//        currentEditedPostPosition = postPosition
-//        val commentsBottomSheet = CommentsBottomSheet(
-//            post,
-//            interactorId,
-//            interactorName,
-//            interactorImageUrl,
-//            null,//used to handle notification so, no need for it in my profile.
-//            ""//me
-//        )
-//        commentsBottomSheet.show((context as AppCompatActivity).supportFragmentManager, commentsBottomSheet.tag)
-//    }
-
+    override fun onAnotherUserCommented(commentPosition: Int, commentId: String, postId: String) {
+//        notificationsHandler.also {
+//            it.notificationType = "commentOnPost"
+//            it.postId = postId
+//            it.commentPosition = commentPosition
+//            it.handleNotificationCreationAndFiring()
+//        }
+        Toast.makeText(context, "Notify Her", Toast.LENGTH_SHORT).show()
+    }
 
 }

@@ -14,6 +14,7 @@ import android.util.Log
 import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.example.facebook_clone.helper.Utils.POST_FROM_GROUP
 import com.example.facebook_clone.helper.listener.PostListener
 import com.example.facebook_clone.model.post.react.React
 import com.google.firebase.auth.FirebaseAuth
@@ -45,7 +46,8 @@ class ProfilePostsAdapter(
     private val interactorName: String,
     private val interactorImageUrl: String,
     private val iAmFriend: Boolean?,
-    private val userId: String
+    private val userId: String,
+    private var fromWhere: String = ""
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val picasso = Picasso.get()
@@ -193,7 +195,8 @@ class ProfilePostsAdapter(
 
             itemView.moreOnPost.setOnClickListener {
                 val post = posts[adapterPosition]
-                listener.onPostMoreDotsClicked(post, null)
+                val interactorId = auth.currentUser?.uid.toString()
+                listener.onPostMoreDotsClicked(interactorId, post, null)
             }
 
         }
@@ -356,7 +359,7 @@ class ProfilePostsAdapter(
                 }
             }
 
-            if (auth.currentUser?.uid.toString() == post.publisherId) {
+            if (auth.currentUser?.uid.toString() == post.publisherId || fromWhere == POST_FROM_GROUP) {
                 itemView.moreOnPost.visibility = View.VISIBLE
             } else {
                 itemView.moreOnPost.visibility = View.GONE
@@ -492,7 +495,8 @@ class ProfilePostsAdapter(
             //////////////////////////////////////////////////////////////////////
             itemView.moreOnPost.setOnClickListener {
                 val post = posts[adapterPosition]
-                listener.onPostMoreDotsClicked(post, true)
+                val interactorId = auth.currentUser?.uid.toString()
+                listener.onPostMoreDotsClicked(interactorId, post, true)
             }
         }
 

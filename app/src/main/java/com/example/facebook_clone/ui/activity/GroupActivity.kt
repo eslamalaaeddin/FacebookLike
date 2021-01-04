@@ -23,6 +23,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 private const val TAG = "GroupActivity"
+
 class GroupActivity : AppCompatActivity(), AdminToolsListener {
     private val groupsViewModel by viewModel<GroupsViewModel>()
     private val profileActivityViewModel by viewModel<ProfileActivityViewModel>()
@@ -35,8 +36,9 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener {
     private var groupName = ""
     private val picasso = Picasso.get()
 
-    private lateinit var groupsActivityPostsHandler : GroupsActivityPostsHandler
+    private lateinit var groupsActivityPostsHandler: GroupsActivityPostsHandler
     private lateinit var profilePostsAdapter: ProfilePostsAdapter
+
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +51,7 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener {
 
         groupId = intent.getStringExtra("groupId").orEmpty()
 
-        groupsActivityPostsHandler = GroupsActivityPostsHandler(this, groupId, postViewModel)
+
 
 //        val groupPostsLiveData = groupsViewModel.getGroupPostsLiveData(groupId)
 //        groupPostsLiveData.observe(this){posts ->
@@ -64,11 +66,12 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener {
         val groupLiveData = groupsViewModel.getGroupLiveData(groupId)
         groupLiveData.observe(this) { group ->
             groupName = group.name.toString()
+            groupsActivityPostsHandler = GroupsActivityPostsHandler(this, group, postViewModel, null, null)
             val groupMembers = group.members.orEmpty()
             picasso.load(group.coverImageUrl).into(groupCoverImageView)
             groupNameTextView.text = group.name
             groupMembersCountTextView.text = "${groupMembers.size + 2} Members"
-            if (groupMembers.size >= 2){
+            if (groupMembers.size >= 2) {
                 val firstMember = groupMembers[0]
                 val secondMember = groupMembers[1]
 
@@ -79,17 +82,26 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener {
 
         val currentUserLiveData = profileActivityViewModel.getMe(currentUserId)
         currentUserLiveData?.let {
-            it.observe(this) {user ->
+            it.observe(this) { user ->
                 picasso.load(user.profileImageUrl).into(smallUserImageView)
                 currentUserName = user.name.orEmpty()
                 currentUserImageUrl = user.profileImageUrl.orEmpty()
 
                 val groupPostsLiveData = groupsViewModel.getGroupPostsLiveData(groupId)
-                groupPostsLiveData.observe(this){posts ->
+                groupPostsLiveData.observe(this) { posts ->
                     posts?.let {
 
                         profilePostsAdapter =
-                            ProfilePostsAdapter(auth, posts, groupsActivityPostsHandler, currentUserName, currentUserImageUrl, null,currentUserId )
+                            ProfilePostsAdapter(
+                                auth,
+                                posts,
+                                groupsActivityPostsHandler,
+                                currentUserName,
+                                currentUserImageUrl,
+                                null,
+                                currentUserId,
+                                POST_FROM_GROUP
+                            )
                         groupPostsRecyclerView.adapter = profilePostsAdapter
                     }
                 }
@@ -98,7 +110,7 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener {
 
         }
 
-        adminBadgeImageView.setOnClickListener {showAdminToolsBottomSheet(groupId)}
+        adminBadgeImageView.setOnClickListener { showAdminToolsBottomSheet(groupId) }
 
         inviteFriendButton.setOnClickListener {
             val inviteMembersBottomSheet = InviteMembersBottomSheet(groupId, groupName)
@@ -109,9 +121,9 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener {
             Toast.makeText(this, "Islam love Alaa", Toast.LENGTH_SHORT).show()
         }
 
-        smallUserImageView.setOnClickListener {navigateToUserProfile()}
+        smallUserImageView.setOnClickListener { navigateToUserProfile() }
 
-        whatIsInYourMindButton.setOnClickListener {showPostCreatorDialog()}
+        whatIsInYourMindButton.setOnClickListener { showPostCreatorDialog() }
     }
 
     private fun showAdminToolsBottomSheet(groupId: String?) {
@@ -120,13 +132,13 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener {
         adminToolsBottomSheet.show(supportFragmentManager, adminToolsBottomSheet.tag)
     }
 
-    private fun navigateToUserProfile(){
+    private fun navigateToUserProfile() {
         val intent = Intent(this, ProfileActivity::class.java)
         intent.putExtra("userId", currentUserId)
         startActivity(intent)
     }
 
-    private fun showPostCreatorDialog(){
+    private fun showPostCreatorDialog() {
         val postCreatorDialog = PostCreatorDialog(POST_FROM_GROUP, groupId, groupName)
         postCreatorDialog.show(supportFragmentManager, "signature")
         postCreatorDialog

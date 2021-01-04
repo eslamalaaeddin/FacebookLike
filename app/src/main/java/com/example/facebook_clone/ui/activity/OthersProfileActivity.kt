@@ -82,7 +82,8 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             notificationsFragmentViewModel = notificationsFragmentViewModel
         )
 
-        othersProfileActivityPostsHandler = OthersProfileActivityPostsHandler(this, postViewModel)
+
+
         val myLiveData = profileActivityViewModel.getMe(auth.currentUser?.uid.toString())
         myLiveData?.observe(this, { user ->
             user?.let {
@@ -168,6 +169,13 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
                 userIAmViewing = user
                 // notificationsHandler.notifiedToken = userIAmViewing.token
                 notificationsHandler.notifiedToken = user.token
+                othersProfileActivityPostsHandler = OthersProfileActivityPostsHandler(
+                    this,
+                    postViewModel,
+                    notificationsFragmentViewModel,
+                    othersProfileActivityViewModel,
+                    user.token.orEmpty()
+                )
                 updateUserInfo(user)
                 updateUserFriends(user.friends.orEmpty())
                 iAmFriend()
@@ -368,7 +376,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         othersProfileActivityPostsHandler.onMediaPostClicked(mediaUrl)
     }
 
-    override fun onPostMoreDotsClicked(post: Post, shared: Boolean?) {
+    override fun onPostMoreDotsClicked(interactorId: String, post: Post, shared: Boolean?) {
 
     }
 

@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.facebook_clone.R
 import com.example.facebook_clone.helper.listener.CommentsBottomSheetListener
+import com.example.facebook_clone.helper.notification.NotificationsHandler
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.model.post.share.Share
@@ -16,16 +17,30 @@ import com.example.facebook_clone.ui.activity.VideoPlayerActivity
 import com.example.facebook_clone.ui.bottomsheet.CommentsBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.PostConfigurationsBottomSheet
 import com.example.facebook_clone.ui.dialog.ImageViewerDialog
+import com.example.facebook_clone.viewmodel.NotificationsFragmentViewModel
+import com.example.facebook_clone.viewmodel.OthersProfileActivityViewModel
 import com.example.facebook_clone.viewmodel.PostViewModel
 import com.google.android.gms.tasks.Task
 import kotlinx.android.synthetic.main.long_clicked_reacts_button.*
 
 open class BasePostHandler(
     private val context: Context,
-    private val postViewModel: PostViewModel
+    private val postViewModel: PostViewModel,
+    private val notificationsFragmentViewModel: NotificationsFragmentViewModel? = null,
+    private val othersProfileActivityViewModel: OthersProfileActivityViewModel? = null,
 ) {
     var progressDialog: ProgressDialog? = null
     var currentEditedPostPosition: Int = -1
+
+    private lateinit var notificationsHandler: NotificationsHandler
+    init {
+        if (notificationsFragmentViewModel != null && othersProfileActivityViewModel != null){
+            notificationsHandler =
+                NotificationsHandler(notificationsFragmentViewModel = notificationsFragmentViewModel,
+                    othersProfileActivityViewModel = othersProfileActivityViewModel)
+        }
+    }
+
 
     fun handlePostLocation(
         post: Post,
@@ -57,8 +72,7 @@ open class BasePostHandler(
             context.startActivity(videoIntent)
         }
     }
-
-
+    
     fun createReact(
         interactorId: String,
         interactorName: String,
@@ -71,15 +85,58 @@ open class BasePostHandler(
         )
     }
 
-    fun addReactOnPostToDb(interactorId: String, react: React, post: Post) {
+    fun addReactOnPostToDb(interactorId: String, react: React, post: Post, notificationsHandler: NotificationsHandler? = null) {
         postViewModel.addReactToDB(react, post).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 if (interactorId != post.publisherId) {
+                    notificationsHandler?.let { it.handleNotificationCreationAndFiring() }
                     Toast.makeText(context, "Notify Him", Toast.LENGTH_SHORT).show()
                 }
             } else {
                 Toast.makeText(context, task.exception?.message, Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    fun buildNotificationHandlerForPostReacts(
+         notifierId: String,
+         notifierName: String,
+         notifierImageUrl: String,
+         notifiedId: String,
+         notifiedToken: String,
+         notificationType: String,
+         postPublisherId: String,
+         postId: String? = null,
+    ): NotificationsHandler{
+        return notificationsHandler.apply{
+            this.notifierId = notifierId
+            this.notifierName = notifierName
+            this.notifierImageUrl = notifierImageUrl
+            this.notifiedId = notifiedId
+            this.notifiedToken = notifiedToken
+            this.postPublisherId = postPublisherId
+            this.postId = postId
+            this.notificationType = notificationType
+        }
+    }
+
+    fun buildNotificationHandlerForPostShares(
+        post: Post,
+        interactorId: String,
+        interactorName: String,
+        interactorImageUrl: String,
+        postPosition: Int,
+        notifiedToken: String
+    ): NotificationsHandler{
+        return notificationsHandler.apply {
+            this.notifierId = interactorId
+            this.notifierName = interactorName
+            this.notifierImageUrl = interactorImageUrl
+            this.notifiedId = post.publisherId
+            this.notifiedToken = notifiedToken
+            this.postPublisherId = post.publisherId
+            this.postId = post.id
+            this.notificationType = "share"
         }
     }
 
@@ -96,7 +153,8 @@ open class BasePostHandler(
         interactorName: String,
         interactorImageUrl: String,
         modifiedPost: Post,
-        currentReact: React?
+        currentReact: React?,
+        notificationsHandler: NotificationsHandler?
     ) {
         val dialog = Dialog(context)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -111,32 +169,38 @@ open class BasePostHandler(
 
         dialog.loveReactButton.setOnClickListener {
             react.react = 2
-            handleLongReactCreationAndDeletion(interactorId, currentReact, react, modifiedPost)
+            notificationsHandler?.reactType = 2
+            handleLongReactCreationAndDeletion(interactorId, currentReact, react, modifiedPost, notificationsHandler)
             dialog.dismiss()
         }
         dialog.careReactButton.setOnClickListener {
             react.react = 3
-            handleLongReactCreationAndDeletion(interactorId, currentReact, react, modifiedPost)
+            notificationsHandler?.reactType = 3
+            handleLongReactCreationAndDeletion(interactorId, currentReact, react, modifiedPost, notificationsHandler)
             dialog.dismiss()
         }
         dialog.hahaReactButton.setOnClickListener {
             react.react = 4
-            handleLongReactCreationAndDeletion(interactorId, currentReact, react, modifiedPost)
+            notificationsHandler?.reactType = 4
+            handleLongReactCreationAndDeletion(interactorId, currentReact, react, modifiedPost, notificationsHandler)
             dialog.dismiss()
         }
         dialog.wowReactButton.setOnClickListener {
             react.react = 5
-            handleLongReactCreationAndDeletion(interactorId, currentReact, react, modifiedPost)
+            notificationsHandler?.reactType = 5
+            handleLongReactCreationAndDeletion(interactorId, currentReact, react, modifiedPost, notificationsHandler)
             dialog.dismiss()
         }
         dialog.sadReactButton.setOnClickListener {
             react.react = 6
-            handleLongReactCreationAndDeletion(interactorId, currentReact, react, modifiedPost)
+            notificationsHandler?.reactType = 6
+            handleLongReactCreationAndDeletion(interactorId, currentReact, react, modifiedPost, notificationsHandler)
             dialog.dismiss()
         }
         dialog.angryReactButton.setOnClickListener {
             react.react = 7
-            handleLongReactCreationAndDeletion(interactorId, currentReact, react, modifiedPost)
+            notificationsHandler?.reactType = 7
+            handleLongReactCreationAndDeletion(interactorId, currentReact, react, modifiedPost, notificationsHandler)
             dialog.dismiss()
         }
         dialog.show()
@@ -146,12 +210,14 @@ open class BasePostHandler(
         currentUserId: String,
         currentReact: React?,
         react: React,
-        modifiedPost: Post
+        modifiedPost: Post,
+        notificationsHandler: NotificationsHandler?
     ) {
         if (currentReact != null) {
             deleteReactFromPost(currentReact, modifiedPost)
         }
-        addReactOnPostToDb(currentUserId, react, modifiedPost)
+
+        addReactOnPostToDb(currentUserId, react, modifiedPost, notificationsHandler)
     }
 
     fun openCommentsBottomSheet(
@@ -160,7 +226,8 @@ open class BasePostHandler(
         interactorName: String,
         interactorImageUrl: String,
         postPosition: Int,
-        commentsBottomSheetListener: CommentsBottomSheetListener?
+        commentsBottomSheetListener: CommentsBottomSheetListener?,
+        notifiedToken: String
     ) {
         currentEditedPostPosition = postPosition
         val commentsBottomSheet = CommentsBottomSheet(
@@ -169,7 +236,7 @@ open class BasePostHandler(
             interactorName,
             interactorImageUrl,
             commentsBottomSheetListener,
-            "",
+            notifiedToken,
         )
         commentsBottomSheet.show((context as AppCompatActivity).supportFragmentManager, commentsBottomSheet.tag)
     }
