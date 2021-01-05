@@ -37,6 +37,8 @@ class ProfileActivityPostsHandler(
     private val profileActivityViewModel: ProfileActivityViewModel
     ): BasePostHandler(context, postViewModel), PostListener, FriendClickListener {
 
+
+
     override fun onReactButtonClicked(
         post: Post,
         interactorId: String,

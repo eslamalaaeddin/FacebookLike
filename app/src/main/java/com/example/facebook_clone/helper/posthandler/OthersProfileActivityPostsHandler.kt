@@ -40,6 +40,10 @@ class OthersProfileActivityPostsHandler(
         othersProfileActivityViewModel = othersProfileActivityViewModel
     )
 
+    fun dummy(name: String){
+        Toast.makeText(context, name, Toast.LENGTH_SHORT).show()
+    }
+
     override fun onReactButtonClicked(
         post: Post,
         interactorId: String,

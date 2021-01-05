@@ -106,9 +106,6 @@ class ProfilePostsAdapter(
             itemView.addReactTextView.setOnClickListener {
                 val interactorId = auth.currentUser?.uid.toString()
                 val post = posts[adapterPosition]
-                val postId = post.id.toString()
-                val postPublisherId = post.publisherId.toString()
-                val currentPostReacts = post.reacts.orEmpty()
                 var currentReact: React? = null
                 var reacted: Boolean = false
 
@@ -137,9 +134,6 @@ class ProfilePostsAdapter(
             itemView.addReactTextView.setOnLongClickListener {
                 val interactorId = auth.currentUser?.uid.toString()
                 val post = posts[adapterPosition]
-                val postId = post.id.toString()
-                val postPublisherId = post.publisherId.toString()
-                val currentPostReacts = post.reacts.orEmpty()
                 var currentReact: React? = null
                 var reacted: Boolean = false
 
@@ -168,8 +162,6 @@ class ProfilePostsAdapter(
             itemView.addShareTextView.setOnClickListener {
                 val interactorId = auth.currentUser?.uid.toString()
                 val post = posts[adapterPosition]
-                val postId = post.id.toString()
-                val postPublisherId = post.publisherId.toString()
                 listener.onShareButtonClicked(
                     post,
                     interactorId,
@@ -182,8 +174,6 @@ class ProfilePostsAdapter(
             itemView.reactsLayout.setOnClickListener {
                 val interactorId = auth.currentUser?.uid.toString()
                 val post = posts[adapterPosition]
-                val postId = post.id.toString()
-                val postPublisherId = post.publisherId.toString()
                 listener.onReactLayoutClicked(
                     post,
                     interactorId,

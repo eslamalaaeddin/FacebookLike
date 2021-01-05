@@ -24,13 +24,13 @@ data class Post(
     var visibility: Int? = 0, // 0 --> public, 1 --> private ......
     val creationTime: Timestamp = Timestamp(Date()),
    // var publisherToken: String? = null,
-    @get:Exclude var firstCollectionType: String = "",
-    @get:Exclude var creatorReferenceId: String = "",
-    @get:Exclude var secondCollectionType: String = "",
+//    @get:Exclude var firstCollectionType: String = "",
+//    @get:Exclude var creatorReferenceId: String = "",
+//    @get:Exclude var secondCollectionType: String = "",
+    var firstCollectionType: String = "",
+    var creatorReferenceId: String = "",
+    var secondCollectionType: String = "",
     var groupName: String? = null,
     var groupId: String? = null
 
-//    @get:Exclude var firstCollectionType: String = Utils.POSTS_COLLECTION,
-//    @get:Exclude var creatorReferenceId: String = "",
-//    @get:Exclude var secondCollectionType: String = Utils.PROFILE_POSTS_COLLECTION
 )
