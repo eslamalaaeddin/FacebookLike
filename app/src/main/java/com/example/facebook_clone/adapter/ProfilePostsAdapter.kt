@@ -246,69 +246,13 @@ class ProfilePostsAdapter(
                         itemView.reactImageViewGrey.visibility = View.INVISIBLE
                         itemView.reactImageViewBlue.visibility = View.VISIBLE
                         when (react.react) {
-                            1 -> {
-                                itemView.addReactTextView.text = "Like"
-                                itemView.addReactTextView.setTextColor(
-                                    itemView.context.resources.getColor(
-                                        R.color.dark_blue
-                                    )
-                                )
-                                itemView.reactImageViewBlue.setImageResource(R.drawable.ic_thumb_up)
-                            }
-                            2 -> {
-                                itemView.addReactTextView.text = "Love"
-                                itemView.addReactTextView.setTextColor(
-                                    itemView.context.resources.getColor(
-                                        R.color.red
-                                    )
-                                )
-                                itemView.reactImageViewBlue.setImageResource(R.drawable.ic_love_react)
-                            }
-                            3 -> {
-                                itemView.addReactTextView.text = "Care"
-                                itemView.addReactTextView.setTextColor(
-                                    itemView.context.resources.getColor(
-                                        R.color.orange
-                                    )
-                                )
-                                itemView.reactImageViewBlue.setImageResource(R.drawable.ic_care_react)
-                            }
-                            4 -> {
-                                itemView.addReactTextView.text = "Haha"
-                                itemView.addReactTextView.setTextColor(
-                                    itemView.context.resources.getColor(
-                                        R.color.orange
-                                    )
-                                )
-                                itemView.reactImageViewBlue.setImageResource(R.drawable.ic_haha_react)
-                            }
-                            5 -> {
-                                itemView.addReactTextView.text = "Wow"
-                                itemView.addReactTextView.setTextColor(
-                                    itemView.context.resources.getColor(
-                                        R.color.orange
-                                    )
-                                )
-                                itemView.reactImageViewBlue.setImageResource(R.drawable.ic_wow_react)
-                            }
-                            6 -> {
-                                itemView.addReactTextView.text = "Sad"
-                                itemView.addReactTextView.setTextColor(
-                                    itemView.context.resources.getColor(
-                                        R.color.yellow
-                                    )
-                                )
-                                itemView.reactImageViewBlue.setImageResource(R.drawable.ic_sad_react)
-                            }
-                            7 -> {
-                                itemView.addReactTextView.text = "Angry"
-                                itemView.addReactTextView.setTextColor(
-                                    itemView.context.resources.getColor(
-                                        R.color.orange
-                                    )
-                                )
-                                itemView.reactImageViewBlue.setImageResource(R.drawable.ic_angry_angry)
-                            }
+                            1 -> {handleReactsPositioning(itemView,"Like", R.color.dark_blue, R.drawable.ic_thumb_up)}
+                            2 -> {handleReactsPositioning(itemView,"Love", R.color.red, R.drawable.ic_love_react)}
+                            3 -> {handleReactsPositioning(itemView,"Care", R.color.orange, R.drawable.ic_care_react)}
+                            4 -> {handleReactsPositioning(itemView,"Haha", R.color.orange, R.drawable.ic_haha_react)}
+                            5 -> {handleReactsPositioning(itemView,"Wow", R.color.orange, R.drawable.ic_wow_react)}
+                            6 -> {handleReactsPositioning(itemView,"Sad", R.color.yellow, R.drawable.ic_sad_react)}
+                            7 -> {handleReactsPositioning(itemView,"Angry", R.color.orange, R.drawable.ic_angry_angry)}
                         }
                         break
                     }
@@ -380,8 +324,6 @@ class ProfilePostsAdapter(
             itemView.addCommentTextView.setOnClickListener {
                 val interactorId = auth.currentUser?.uid.toString()
                 val post = posts[adapterPosition]
-                val postId = post.id.toString()
-                val postPublisherId = post.publisherId.toString()
                 listener.onCommentButtonClicked(
                     post,
                     interactorId,
@@ -394,9 +336,6 @@ class ProfilePostsAdapter(
             itemView.addReactTextView.setOnClickListener {
                 val interactorId = auth.currentUser?.uid.toString()
                 val post = posts[adapterPosition]
-                val postId = post.id.toString()
-                val postPublisherId = post.publisherId.toString()
-                val currentPostReacts = post.reacts.orEmpty()
                 var currentReact: React? = null
                 var reacted: Boolean = false
 
@@ -425,9 +364,6 @@ class ProfilePostsAdapter(
             itemView.addReactTextView.setOnLongClickListener {
                 val interactorId = auth.currentUser?.uid.toString()
                 val post = posts[adapterPosition]
-                val postId = post.id.toString()
-                val postPublisherId = post.publisherId.toString()
-                val currentPostReacts = post.reacts.orEmpty()
                 var currentReact: React? = null
                 var reacted: Boolean = false
 
@@ -454,25 +390,12 @@ class ProfilePostsAdapter(
             }
 
             itemView.addShareTextView.setOnClickListener {
-//                val interactorId = auth.currentUser?.uid.toString()
-//                val post = posts[adapterPosition]
-//                val postId = post.id.toString()
-//                val postPublisherId = post.publisherId.toString()
-//                listener.onShareButtonClicked(
-//                    post,
-//                    interactorId,
-//                    interactorName,
-//                    interactorImageUrl,
-//                    adapterPosition
-//                )
                 Toast.makeText(itemView.context, "Cyclic share is not available till now", Toast.LENGTH_SHORT).show()
             }
 
             itemView.reactsLayout.setOnClickListener {
                 val interactorId = auth.currentUser?.uid.toString()
                 val post = posts[adapterPosition]
-                val postId = post.id.toString()
-                val postPublisherId = post.publisherId.toString()
                 listener.onReactLayoutClicked(
                     post,
                     interactorId,
@@ -575,69 +498,13 @@ class ProfilePostsAdapter(
                         itemView.reactImageViewGrey.visibility = View.INVISIBLE
                         itemView.reactImageViewBlue.visibility = View.VISIBLE
                         when (react.react) {
-                            1 -> {
-                                itemView.addReactTextView.text = "Like"
-                                itemView.addReactTextView.setTextColor(
-                                    itemView.context.resources.getColor(
-                                        R.color.dark_blue
-                                    )
-                                )
-                                itemView.reactImageViewBlue.setImageResource(R.drawable.ic_thumb_up)
-                            }
-                            2 -> {
-                                itemView.addReactTextView.text = "Love"
-                                itemView.addReactTextView.setTextColor(
-                                    itemView.context.resources.getColor(
-                                        R.color.red
-                                    )
-                                )
-                                itemView.reactImageViewBlue.setImageResource(R.drawable.ic_love_react)
-                            }
-                            3 -> {
-                                itemView.addReactTextView.text = "Care"
-                                itemView.addReactTextView.setTextColor(
-                                    itemView.context.resources.getColor(
-                                        R.color.orange
-                                    )
-                                )
-                                itemView.reactImageViewBlue.setImageResource(R.drawable.ic_care_react)
-                            }
-                            4 -> {
-                                itemView.addReactTextView.text = "Haha"
-                                itemView.addReactTextView.setTextColor(
-                                    itemView.context.resources.getColor(
-                                        R.color.orange
-                                    )
-                                )
-                                itemView.reactImageViewBlue.setImageResource(R.drawable.ic_haha_react)
-                            }
-                            5 -> {
-                                itemView.addReactTextView.text = "Wow"
-                                itemView.addReactTextView.setTextColor(
-                                    itemView.context.resources.getColor(
-                                        R.color.orange
-                                    )
-                                )
-                                itemView.reactImageViewBlue.setImageResource(R.drawable.ic_wow_react)
-                            }
-                            6 -> {
-                                itemView.addReactTextView.text = "Sad"
-                                itemView.addReactTextView.setTextColor(
-                                    itemView.context.resources.getColor(
-                                        R.color.yellow
-                                    )
-                                )
-                                itemView.reactImageViewBlue.setImageResource(R.drawable.ic_sad_react)
-                            }
-                            7 -> {
-                                itemView.addReactTextView.text = "Angry"
-                                itemView.addReactTextView.setTextColor(
-                                    itemView.context.resources.getColor(
-                                        R.color.orange
-                                    )
-                                )
-                                itemView.reactImageViewBlue.setImageResource(R.drawable.ic_angry_angry)
-                            }
+                            1 -> {handleReactsPositioning(itemView,"Like", R.color.dark_blue, R.drawable.ic_thumb_up)}
+                            2 -> {handleReactsPositioning(itemView,"Love", R.color.red, R.drawable.ic_love_react)}
+                            3 -> {handleReactsPositioning(itemView,"Care", R.color.orange, R.drawable.ic_care_react)}
+                            4 -> {handleReactsPositioning(itemView,"Haha", R.color.orange, R.drawable.ic_haha_react)}
+                            5 -> {handleReactsPositioning(itemView,"Wow", R.color.orange, R.drawable.ic_wow_react)}
+                            6 -> {handleReactsPositioning(itemView,"Sad", R.color.yellow, R.drawable.ic_sad_react)}
+                            7 -> {handleReactsPositioning(itemView,"Angry", R.color.orange, R.drawable.ic_angry_angry)}
                         }
                         break
                     }
@@ -713,6 +580,12 @@ class ProfilePostsAdapter(
 
     fun setPosts(newPosts: List<Post>) {
         posts = newPosts
+    }
+
+    private fun handleReactsPositioning(itemView: View, reactText: String, colorId: Int, imageId: Int) {
+        itemView.addReactTextView.text = reactText
+        itemView.addReactTextView.setTextColor(itemView.resources.getColor(colorId))
+        itemView.reactImageViewBlue.setImageResource(imageId)
     }
 
 

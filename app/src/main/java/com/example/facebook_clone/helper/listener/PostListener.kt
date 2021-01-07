@@ -13,7 +13,8 @@ interface PostListener{
         interactorImageUrl: String,
         reacted: Boolean,
         currentReact: React?,
-        postPosition: Int
+        postPosition: Int,
+        notifiedToken: String? = null
     )
 
     fun onReactButtonLongClicked(
@@ -23,7 +24,8 @@ interface PostListener{
         interactorImageUrl: String,
         reacted: Boolean,
         currentReact: React?,
-        postPosition: Int
+        postPosition: Int,
+        notifiedToken: String? = null
     )
 
     fun onCommentButtonClicked(
@@ -39,7 +41,8 @@ interface PostListener{
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
-        postPosition: Int
+        postPosition: Int,
+        notifiedToken: String? = null
     )
 
     fun onReactLayoutClicked(

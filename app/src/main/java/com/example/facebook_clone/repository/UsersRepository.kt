@@ -22,6 +22,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
+import kotlinx.coroutines.*
 import java.io.ByteArrayOutputStream
 
 private const val TAG = "UsersRepository"
@@ -173,9 +174,24 @@ class UsersRepository(
     }
 
 
-    fun getUserAsRegularObjectNotLiveData(userId: String): Task<DocumentSnapshot> {
-        return database.collection(USERS_COLLECTION).document(userId).get()
+    @ExperimentalCoroutinesApi
+    suspend fun getUserAsRegularObjectNotLiveData(userId: String): String {
+        Log.d(TAG, "JOJO getUserAsRegularObjectNotLiveData: ${get(userId).await()}")
+        return get(userId).await().toString()
     }
+    fun get(userId: String) = GlobalScope.async {
+        var token : String? = null
+            val task = database.collection(USERS_COLLECTION).document(userId).get()
+            task.addOnSuccessListener {
+                val user = it.toObject(User::class.java)
+                token = user?.token.toString()
+            }
+        if (token != null){
+            return@async token
+        }
+        token
+    }
+
     fun getUsersLiveDataAfterSearchingByName(query: String): LiveData<List<User>> {
         val liveData = MutableLiveData<List<User>>()
         database.collection(USERS_COLLECTION)

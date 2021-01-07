@@ -12,22 +12,34 @@ interface NotificationListener {
     fun onClickReactOnPostNotification(
         postPublisherId: String,
         postId: String,
+        firstCollectionType: String,
+        creatorReferenceId: String,
+        secondCollectionType: String
     )
 
     fun onClickShareOnPostNotification(
         postPublisherId: String,
         postId: String,
+        firstCollectionType: String,
+        creatorReferenceId: String,
+        secondCollectionType: String
     )
 
     fun onClickCommentOnPostNotification(
         postPublisherId: String,
         postId: String,
+        firstCollectionType: String,
+        creatorReferenceId: String,
+        secondCollectionType: String,
         commentPosition: Int
     )
 
     fun onClickReactsOnCommentNotification(
         postPublisherId: String,
         postId: String,
+        firstCollectionType: String,
+        creatorReferenceId: String,
+        secondCollectionType: String,
         commentPosition: Int
     )
 

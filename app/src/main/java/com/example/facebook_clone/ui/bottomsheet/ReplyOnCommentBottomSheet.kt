@@ -197,7 +197,7 @@ class ReplyOnCommentBottomSheet(
                                                         it.notifiedId = this.superComment.commenterId.toString()
                                                         it.notificationType = "commentOnComment"
                                                         it.postId = postId
-                                                        it.commentPosition = commentPosition
+//                                                        it.commentPosition = commentPosition
                                                         it.handleNotificationCreationAndFiring()
                                                     }
                                                 }
@@ -211,7 +211,7 @@ class ReplyOnCommentBottomSheet(
                                                             it.notifiedToken = subComment.commenterToken
                                                             it.notificationType = "commentOnComment"
                                                             it.postId = postId
-                                                            it.commentPosition = commentPosition
+//                                                            it.commentPosition = commentPosition
                                                             it.handleNotificationCreationAndFiring()
                                                         }
                                                     }
@@ -285,7 +285,7 @@ class ReplyOnCommentBottomSheet(
                                                         it.notifiedId = this.superComment.commenterId.toString()
                                                         it.notificationType = "commentOnComment"
                                                         it.postId = postId
-                                                        it.commentPosition = commentPosition
+//                                                        it.commentPosition = commentPosition
                                                         it.handleNotificationCreationAndFiring()
                                                     }
                                                 }
@@ -299,7 +299,7 @@ class ReplyOnCommentBottomSheet(
                                                             it.notifiedToken = subComment.commenterToken
                                                             it.notificationType = "commentOnComment"
                                                             it.postId = postId
-                                                            it.commentPosition = commentPosition
+//                                                            it.commentPosition = commentPosition
                                                             it.handleNotificationCreationAndFiring()
                                                         }
                                                     }
@@ -350,7 +350,7 @@ class ReplyOnCommentBottomSheet(
                                                 it.notifiedId = this.superComment.commenterId.toString()
                                                 it.notificationType = "commentOnComment"
                                                 it.postId = postId
-                                                it.commentPosition = commentPosition
+//                                                it.commentPosition = commentPosition
                                                 it.handleNotificationCreationAndFiring()
                                             }
                                         }
@@ -363,7 +363,7 @@ class ReplyOnCommentBottomSheet(
                                                     it.notifiedToken = subComment.commenterToken
                                                     it.notificationType = "commentOnComment"
                                                     it.postId = postId
-                                                    it.commentPosition = commentPosition
+//                                                    it.commentPosition = commentPosition
                                                     it.handleNotificationCreationAndFiring()
                                                 }
                                             }
@@ -755,7 +755,7 @@ class ReplyOnCommentBottomSheet(
                     if (comment.commenterId.toString() != interactorId) {
                         notificationsHandler.also {
                             it.notificationType = "reactOnComment"
-                            it.commentPosition = commentPosition
+//                            it.commentPosition = commentPosition
                             it.reactType = 1
                             it.postId = postId
                             it.handleNotificationCreationAndFiring()
@@ -920,7 +920,7 @@ class ReplyOnCommentBottomSheet(
                 if (commenterId!= interactorId) {
                     notificationsHandler.also {
                         it.notificationType = "reactOnComment"
-                        it.commentPosition = commentPosition
+//                        it.commentPosition = commentPosition
                         it.postId = postId
                         it.reactType = react.react
                         it.handleNotificationCreationAndFiring()

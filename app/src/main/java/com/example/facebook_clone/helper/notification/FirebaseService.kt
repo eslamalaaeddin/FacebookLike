@@ -32,6 +32,9 @@ class FirebaseService : FirebaseMessagingService() {
         val postId = message.data["postId"]
         val postPublisherId= message.data["postPublisherId"]
         val commentPosition = message.data["commentPosition"]?.toInt()
+        val firstCollectionType = message.data["firstCollectionType"]
+        val secondCollectionType = message.data["secondCollectionType"]
+        val creatorReferenceId = message.data["creatorReferenceId"]
 
         Log.i(TAG, "FAWZY onMessageReceived: $message")
         Log.i(TAG, "FAWZY onMessageReceived: ${message.data}")
@@ -60,7 +63,7 @@ class FirebaseService : FirebaseMessagingService() {
         notifiedId: String?,
         postId: String?,
         postPublisherId:String?,
-        commentPosition: Int?
+        commentPosition: Int?,
     ){
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -81,7 +84,13 @@ class FirebaseService : FirebaseMessagingService() {
                             imageUrl = notifierImageUrl,
                             imageBitmap = bitmap
                         )
-                        BaseApplication.fireClientSideNotification(notificationType!!, notifier, postId,postPublisherId , commentPosition, notifiedId)
+                        BaseApplication.fireClientSideNotification(
+                            notificationType!!,
+                            notifier,
+                            postId,
+                            postPublisherId ,
+                            commentPosition,
+                            notifiedId)
                     }
                 })
         }

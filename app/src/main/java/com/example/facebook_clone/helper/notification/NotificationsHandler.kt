@@ -1,13 +1,16 @@
 package com.example.facebook_clone.helper.notification
 
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import com.example.facebook_clone.model.notification.Notification
+import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.viewmodel.NotificationsFragmentViewModel
 import com.example.facebook_clone.viewmodel.OthersProfileActivityViewModel
 import com.google.android.gms.tasks.Task
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.google.firebase.firestore.DocumentSnapshot
+import kotlinx.coroutines.*
 
 private const val TAG = "NotificationsHandler"
 class NotificationsHandler(
@@ -22,12 +25,17 @@ class NotificationsHandler(
     var postId: String? = null,
     var groupName: String? = null,
     var reactType: Int? = null,
-    var commentPosition: Int? = null,
+    var commentId: String? = null,
     var groupId: String? = null,
+    var firstCollectionType: String = "",
+    var creatorReferenceId: String = "",
+    var secondCollectionType: String = "",
+//    var post: Post,
 
     private val othersProfileActivityViewModel: OthersProfileActivityViewModel,
     private val notificationsFragmentViewModel: NotificationsFragmentViewModel
-) {
+) : AppCompatActivity(){
+
 
     //[1]
    private fun createNotification(): Notification{
@@ -38,11 +46,14 @@ class NotificationsHandler(
             notifierName = notifierName,
             notifierImageUrl = notifierImageUrl,
             postId = postId,
+            postPublisherId = postPublisherId,
             groupName = groupName,
             groupId = groupId,
             reactType = reactType,
-            commentPosition = commentPosition,
-            postPublisherId = postPublisherId
+            firstCollectionType = firstCollectionType,
+            creatorReferenceId = creatorReferenceId,
+            secondCollectionType = secondCollectionType,
+            commentId = commentId
         )
     }
 
@@ -84,10 +95,10 @@ class NotificationsHandler(
         othersProfileActivityViewModel.deleteNotificationIdFromNotifiedDocument(notificationId!!, notifiedId!!)
     }
 
+
     private fun fireServerSideNotification(notification: Notification) = CoroutineScope(
         Dispatchers.IO).launch {
         try {
-            //userIAmViewing.token.toString()
             val pushNotification = PushNotification(
                 data = notification,
                 to = notifiedToken
@@ -102,6 +113,7 @@ class NotificationsHandler(
             Log.e(TAG, e.toString())
         }
     }
+
 
 
 }

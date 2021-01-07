@@ -41,8 +41,7 @@ class PostViewerActivityPostsHandler(
             context,
             postViewModel,
             notificationsFragmentViewModel,
-            othersProfileActivityViewModel,
-            notifiedToken
+            othersProfileActivityViewModel
         )
 
     override fun onReactTextViewClicked(
@@ -124,8 +123,7 @@ class PostViewerActivityPostsHandler(
                 interactorName,
                 interactorImageUrl,
                 postPosition,
-                null,
-                ""
+                null
             )
             Toast.makeText(context, "To Profile", Toast.LENGTH_SHORT).show()
         } else {
@@ -135,8 +133,7 @@ class PostViewerActivityPostsHandler(
                 interactorName,
                 interactorImageUrl,
                 postPosition,
-                othersProfileActivityPostsHandler,
-                notifiedToken
+                othersProfileActivityPostsHandler
             )
         }
     }

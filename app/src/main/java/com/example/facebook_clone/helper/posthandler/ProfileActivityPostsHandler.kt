@@ -46,7 +46,8 @@ class ProfileActivityPostsHandler(
         interactorImageUrl: String,
         reacted: Boolean,
         currentReact: React?,
-        postPosition: Int
+        postPosition: Int,
+        notifiedToken: String?
     ) {
         currentEditedPostPosition = postPosition
         val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
@@ -71,7 +72,8 @@ class ProfileActivityPostsHandler(
         interactorImageUrl: String,
         reacted: Boolean,
         currentReact: React?,
-        postPosition: Int
+        postPosition: Int,
+        notifiedToken: String?
     ) {
         val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
         currentEditedPostPosition = postPosition
@@ -93,7 +95,7 @@ class ProfileActivityPostsHandler(
         postPosition: Int
     ) {
         val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
-        openCommentsBottomSheet(modifiedPost, interactorId, interactorName, interactorImageUrl, postPosition, null,"")
+        openCommentsBottomSheet(modifiedPost, interactorId, interactorName, interactorImageUrl, postPosition, null)
     }
 
     override fun onShareButtonClicked(
@@ -101,7 +103,8 @@ class ProfileActivityPostsHandler(
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
-        postPosition: Int
+        postPosition: Int,
+        notifiedToken: String?
     ) {
         val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
         currentEditedPostPosition = postPosition
@@ -123,7 +126,7 @@ class ProfileActivityPostsHandler(
         postPosition: Int
     ) {
         val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
-        openCommentsBottomSheet(modifiedPost, interactorId, interactorName, interactorImageUrl, postPosition, null, "")
+        openCommentsBottomSheet(modifiedPost, interactorId, interactorName, interactorImageUrl, postPosition, null)
     }
 
     override fun onMediaPostClicked(mediaUrl: String) { handleMediaClicks(mediaUrl) }

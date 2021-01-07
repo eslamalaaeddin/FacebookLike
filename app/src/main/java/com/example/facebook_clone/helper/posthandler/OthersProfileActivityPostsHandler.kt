@@ -26,7 +26,7 @@ class OthersProfileActivityPostsHandler(
     private val postViewModel: PostViewModel,
     private val notificationsFragmentViewModel: NotificationsFragmentViewModel,
     private val othersProfileActivityViewModel: OthersProfileActivityViewModel,
-    private val notifiedToken: String
+//    private val notifiedToken: String
 ) :
     BasePostHandler(
         context,
@@ -40,7 +40,7 @@ class OthersProfileActivityPostsHandler(
         othersProfileActivityViewModel = othersProfileActivityViewModel
     )
 
-    fun dummy(name: String){
+    fun dummy(name: String) {
         Toast.makeText(context, name, Toast.LENGTH_SHORT).show()
     }
 
@@ -51,7 +51,8 @@ class OthersProfileActivityPostsHandler(
         interactorImageUrl: String,
         reacted: Boolean,
         currentReact: React?,
-        postPosition: Int
+        postPosition: Int,
+        notifiedToken: String?
     ) {
         currentEditedPostPosition = postPosition
         val modifiedPost = handlePostLocation(
@@ -67,10 +68,13 @@ class OthersProfileActivityPostsHandler(
                 notifierName = interactorName,
                 notifierImageUrl = interactorImageUrl,
                 notifiedId = post.publisherId.orEmpty(),
-                notifiedToken = notifiedToken,
+                notifiedToken = notifiedToken.orEmpty(),
                 notificationType = "reactOnPost",
                 postPublisherId = post.publisherId.orEmpty(),
-                postId = post.id.orEmpty()
+                postId = post.id.orEmpty(),
+                firstCollectionType = post.firstCollectionType,
+                creatorReferenceId = post.creatorReferenceId,
+                secondCollectionType = post.secondCollectionType,
             )
 
             notificationsHandler.reactType = 1
@@ -91,7 +95,8 @@ class OthersProfileActivityPostsHandler(
         interactorImageUrl: String,
         reacted: Boolean,
         currentReact: React?,
-        postPosition: Int
+        postPosition: Int,
+        notifiedToken: String?
     ) {
 
         val modifiedPost = handlePostLocation(
@@ -105,10 +110,13 @@ class OthersProfileActivityPostsHandler(
             notifierName = interactorName,
             notifierImageUrl = interactorImageUrl,
             notifiedId = post.publisherId.orEmpty(),
-            notifiedToken = notifiedToken,
+            notifiedToken = notifiedToken.orEmpty(),
             notificationType = "reactOnPost",
             postPublisherId = post.publisherId.orEmpty(),
             postId = post.id.orEmpty(),
+            firstCollectionType = post.firstCollectionType,
+            creatorReferenceId = post.creatorReferenceId,
+            secondCollectionType = post.secondCollectionType,
         )
         currentEditedPostPosition = postPosition
         showReactsChooserDialog(
@@ -141,8 +149,7 @@ class OthersProfileActivityPostsHandler(
             interactorName,
             interactorImageUrl,
             postPosition,
-            this,
-            notifiedToken
+            this
         )
 
     }
@@ -152,7 +159,8 @@ class OthersProfileActivityPostsHandler(
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
-        postPosition: Int
+        postPosition: Int,
+        notifiedToken: String?
     ) {
         val modifiedPost = handlePostLocation(
             post,
@@ -162,7 +170,17 @@ class OthersProfileActivityPostsHandler(
         )
 
         val notificationsHandler =
-            buildNotificationHandlerForPostShares(modifiedPost, interactorId, interactorName, interactorImageUrl, postPosition, notifiedToken)
+            buildNotificationHandlerForPostShares(
+                modifiedPost,
+                interactorId,
+                interactorName,
+                interactorImageUrl,
+                postPosition,
+                notifiedToken.orEmpty(),
+                firstCollectionType = post.firstCollectionType,
+                creatorReferenceId = post.creatorReferenceId,
+                secondCollectionType = post.secondCollectionType,
+            )
 
         currentEditedPostPosition = postPosition
         val share = Share(
@@ -246,8 +264,7 @@ class OthersProfileActivityPostsHandler(
             interactorName,
             interactorImageUrl,
             postPosition,
-            this,
-            notifiedToken
+            this
         )
     }
 
@@ -264,10 +281,36 @@ class OthersProfileActivityPostsHandler(
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    override fun onAnotherUserCommented(commentPosition: Int, commentId: String, postId: String) {
-        Log.i(TAG, "ISLAM onAnotherUserCommented: $commentPosition")
-        Log.i(TAG, "ISLAM onAnotherUserCommented: $commentId")
-        Toast.makeText(context, "Notify him", Toast.LENGTH_SHORT).show()
+    override fun onAnotherUserCommented(
+        notifierId: String,
+        notifierName: String,
+        notifierImageUrl: String,
+        notifiedId: String,
+        notifiedToken: String,
+        notificationType: String,
+        postPublisherId: String,
+        postId: String,
+        firstCollectionType: String,
+        creatorReferenceId: String,
+        secondCollectionType: String,
+        commentId: String
+    ) {
+
+        val notificationsHandler = buildNotificationHandlerForPostComments(
+            notifierId,
+            notifierName,
+            notifierImageUrl,
+            notifiedId,
+            notifiedToken,
+            notificationType,
+            postPublisherId,
+            postId,
+            firstCollectionType,
+            creatorReferenceId,
+            secondCollectionType,
+            commentId
+        )
+        notificationsHandler.handleNotificationCreationAndFiring()
     }
 
 

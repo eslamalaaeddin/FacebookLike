@@ -17,7 +17,10 @@ data class Notification(
     var groupName: String? = null,
     var postId: String? = null,
     var reactType: Int? = 1,
-    var commentPosition: Int? = null,
+    var commentId: String? = null,
     val id: String? = UUID.randomUUID().toString(),
-    val notificationTime: Timestamp = Timestamp(Date())
+    val notificationTime: Timestamp = Timestamp(Date()),
+    var firstCollectionType: String = "",
+    var creatorReferenceId: String = "",
+    var secondCollectionType: String = ""
 )

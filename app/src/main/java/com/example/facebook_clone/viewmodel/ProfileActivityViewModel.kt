@@ -17,6 +17,7 @@ class ProfileActivityViewModel(private val usersRepository: UsersRepository) : V
         return usersRepository.getUserLiveData(userId)
     }
 
+
 //    fun addUserToRecentLoggedInUsers(recentUser: RecentLoggedInUser): Task<Void>{
 //        return usersRepository.addUserToRecentLoggedInUsers(recentUser)
 //    }

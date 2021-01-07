@@ -48,7 +48,8 @@ class GroupsActivityPostsHandler(
         interactorImageUrl: String,
         reacted: Boolean,
         currentReact: React?,
-        postPosition: Int
+        postPosition: Int,
+        notifiedToken: String?
     ) {
         currentEditedPostPosition = postPosition
         val modifiedPost =
@@ -77,7 +78,8 @@ class GroupsActivityPostsHandler(
         interactorImageUrl: String,
         reacted: Boolean,
         currentReact: React?,
-        postPosition: Int
+        postPosition: Int,
+        notifiedToken: String?
     ) {
         val modifiedPost = handlePostLocation(
             post,
@@ -115,8 +117,7 @@ class GroupsActivityPostsHandler(
             interactorName,
             interactorImageUrl,
             postPosition,
-            this,
-            "" //i have to modify it later
+            this
         )
     }
 
@@ -125,7 +126,8 @@ class GroupsActivityPostsHandler(
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
-        postPosition: Int
+        postPosition: Int,
+        notifiedToken: String?
     ) {
         Toast.makeText(context, "لا يا أخي؟!", Toast.LENGTH_SHORT).show()
     }
@@ -153,8 +155,7 @@ class GroupsActivityPostsHandler(
             interactorName,
             interactorImageUrl,
             postPosition,
-            this,
-            ""
+            this
         )
     }
 
@@ -176,7 +177,20 @@ class GroupsActivityPostsHandler(
         Toast.makeText(context, "Shared Post", Toast.LENGTH_SHORT).show()
     }
 
-    override fun onAnotherUserCommented(commentPosition: Int, commentId: String, postId: String) {
+    override fun onAnotherUserCommented(
+        notifierId: String,
+        notifierName: String,
+        notifierImageUrl: String,
+        notifiedId: String,
+        notifiedToken: String,
+        notificationType: String,
+        postPublisherId: String,
+        postId: String ,
+        firstCollectionType: String,
+        creatorReferenceId: String,
+        secondCollectionType: String,
+        commentId: String
+    ) {
 //        notificationsHandler.also {
 //            it.notificationType = "commentOnPost"
 //            it.postId = postId

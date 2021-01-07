@@ -165,11 +165,16 @@ class NotificationsAdapter(private var notifications: List<Notification>,
             val postPublisherId = currentNotification.postPublisherId.toString()
             val notifierName = currentNotification.notifierName.toString()
             val notifierImageUrl = currentNotification.notifierImageUrl.toString()
+
+            val firstCollectionType = currentNotification.firstCollectionType
+            val creatorReferenceId = currentNotification.creatorReferenceId
+            val secondCollectionType = currentNotification.secondCollectionType
+
             //val whereTheActionOccurred = currentNotification.whereTheActionOccurred.toString()
            // val placeId = currentNotification.placeId.toString()
            // val postPosition = currentNotification.postPosition
             val postId = currentNotification.postId.toString()
-            val commentPosition = currentNotification.commentPosition
+//            val commentPosition = currentNotification.commentPosition
             //val commentId = currentNotification.commentId.toString()
             val id = currentNotification.id.toString()
             val groupId = currentNotification.groupId.toString()
@@ -178,26 +183,41 @@ class NotificationsAdapter(private var notifications: List<Notification>,
                 "friendRequest" ->  notListener.onClickFriendRequestNotification(notifierId)
                 "reactOnPost" -> notListener.onClickReactOnPostNotification(
                     postPublisherId = postPublisherId,
-                    postId = postId
+                    postId = postId,
+                    firstCollectionType = firstCollectionType,
+                    creatorReferenceId = creatorReferenceId,
+                    secondCollectionType = secondCollectionType
                 )
                 "commentOnPost" -> notListener.onClickCommentOnPostNotification(
                     postPublisherId = postPublisherId,
                     postId = postId,
-                    commentPosition = commentPosition!!
+                    commentPosition = 0,
+                    firstCollectionType = firstCollectionType,
+                    creatorReferenceId = creatorReferenceId,
+                    secondCollectionType = secondCollectionType
                 )
                 "commentOnComment" -> notListener.onClickCommentOnPostNotification(
                     postPublisherId = postPublisherId,
                     postId = postId,
-                    commentPosition = commentPosition!!
+                    commentPosition = 0,
+                    firstCollectionType = firstCollectionType,
+                    creatorReferenceId = creatorReferenceId,
+                    secondCollectionType = secondCollectionType
                 )
                 "share" -> notListener.onClickShareOnPostNotification(
                     postPublisherId = postPublisherId,
                     postId = postId,
+                    firstCollectionType = firstCollectionType,
+                    creatorReferenceId = creatorReferenceId,
+                    secondCollectionType = secondCollectionType
                 )
                 "reactOnComment" -> notListener.onClickReactsOnCommentNotification(
                     postPublisherId = postPublisherId,
                     postId = postId,
-                    commentPosition = commentPosition!!
+                    commentPosition = 0,
+                    firstCollectionType = firstCollectionType,
+                    creatorReferenceId = creatorReferenceId,
+                    secondCollectionType = secondCollectionType
                 )
 
                 "groupInvitation" -> {

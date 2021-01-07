@@ -173,8 +173,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
                     this,
                     postViewModel,
                     notificationsFragmentViewModel,
-                    othersProfileActivityViewModel,
-                    user.token.orEmpty()
+                    othersProfileActivityViewModel
                 )
                 updateUserInfo(user)
                 updateUserFriends(user.friends.orEmpty())
@@ -324,9 +323,21 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         interactorImageUrl: String,
         reacted: Boolean,
         currentReact: React?,
-        postPosition: Int
+        postPosition: Int,
+        notifiedToken: String?
     ) {
-        othersProfileActivityPostsHandler.onReactButtonClicked(post, interactorId, interactorName, interactorImageUrl, reacted, currentReact, postPosition)
+        //Here i will provide token, but there is a problem because onReact method may be clicked to delete react not to create it
+        if (!reacted){
+            val userToBeNotified = profileActivityViewModel.getAnotherUser(post.publisherId.orEmpty())
+            userToBeNotified?.observe(this){user ->
+                val token = user.token
+                othersProfileActivityPostsHandler.onReactButtonClicked(post, interactorId, interactorName, interactorImageUrl, reacted, currentReact, postPosition, token)
+                userToBeNotified.removeObservers(this)
+            }
+        }
+        else{
+            othersProfileActivityPostsHandler.onReactButtonClicked(post, interactorId, interactorName, interactorImageUrl, reacted, currentReact, postPosition)
+        }
     }
 
     override fun onReactButtonLongClicked(
@@ -336,9 +347,21 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         interactorImageUrl: String,
         reacted: Boolean,
         currentReact: React?,
-        postPosition: Int
+        postPosition: Int,
+        notifiedToken: String?
     ) {
-        othersProfileActivityPostsHandler.onReactButtonLongClicked(post, interactorId, interactorName, interactorImageUrl, reacted, currentReact, postPosition)
+        if (!reacted){
+            val userToBeNotified = profileActivityViewModel.getAnotherUser(post.publisherId.orEmpty())
+            userToBeNotified?.observe(this){user ->
+                val token = user.token
+                othersProfileActivityPostsHandler.onReactButtonLongClicked(post, interactorId, interactorName, interactorImageUrl, reacted, currentReact, postPosition, token)
+                userToBeNotified.removeObservers(this)
+            }
+        }
+        else{
+            othersProfileActivityPostsHandler.onReactButtonLongClicked(post, interactorId, interactorName, interactorImageUrl, reacted, currentReact, postPosition)
+        }
+
     }
 
     override fun onCommentButtonClicked(
@@ -356,10 +379,15 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         interactorId: String,
         interactorName: String,
         interactorImageUrl: String,
-        postPosition: Int
+        postPosition: Int,
+        notifiedToken: String?
     ) {
-        othersProfileActivityPostsHandler.onShareButtonClicked(post, interactorId, interactorName, interactorImageUrl, postPosition)
-
+        val userToBeNotified = profileActivityViewModel.getAnotherUser(post.publisherId.orEmpty())
+        userToBeNotified?.observe(this){user ->
+            val token = user.token
+            othersProfileActivityPostsHandler.onShareButtonClicked(post, interactorId, interactorName, interactorImageUrl, postPosition, token)
+            userToBeNotified.removeObservers(this)
+        }
     }
 
     override fun onReactLayoutClicked(
@@ -384,7 +412,20 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
 
     }
 
-    override fun onAnotherUserCommented(commentPosition: Int, commentId: String, postId: String) {
+    override fun onAnotherUserCommented(
+        notifierId: String,
+        notifierName: String,
+        notifierImageUrl: String,
+        notifiedId: String,
+        notifiedToken: String,
+        notificationType: String,
+        postPublisherId: String,
+        postId: String ,
+        firstCollectionType: String,
+        creatorReferenceId: String,
+        secondCollectionType: String,
+        commentId: String
+    ) {
 //        notificationsHandler.also {
 //            it.notificationType = "commentOnPost"
 //            it.postId = postId

@@ -82,7 +82,10 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), Notific
         startActivity(intent)
     }
 
-    override fun onClickDeleteFriendRequestNotification(notifiedId: String, notificationId: String) {
+    override fun onClickDeleteFriendRequestNotification(
+        notifiedId: String,
+        notificationId: String
+    ) {
         deleteFriendRequestFromMeAndHim(notificationId)
         deleteNotification(auth.currentUser?.uid.toString(), notificationId)
     }
@@ -119,29 +122,44 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), Notific
 
     override fun onClickReactOnPostNotification(
         postPublisherId: String,
-        postId: String
+        postId: String,
+        firstCollectionType: String,
+        creatorReferenceId: String,
+        secondCollectionType: String
     ) {
-        navigateToPost(postPublisherId, postId)
+        navigateToPost(postPublisherId, postId, firstCollectionType, creatorReferenceId, secondCollectionType)
     }
 
-    override fun onClickShareOnPostNotification(postPublisherId: String, postId: String) {
-        navigateToPost(postPublisherId, postId)
+    override fun onClickShareOnPostNotification(
+        postPublisherId: String,
+        postId: String,
+        firstCollectionType: String,
+        creatorReferenceId: String,
+        secondCollectionType: String
+    ) {
+        navigateToPost(postPublisherId, postId, firstCollectionType, creatorReferenceId, secondCollectionType)
     }
 
     override fun onClickCommentOnPostNotification(
         postPublisherId: String,
         postId: String,
+        firstCollectionType: String,
+        creatorReferenceId: String,
+        secondCollectionType: String,
         commentPosition: Int
     ) {
-        navigateToComment(postPublisherId, postId, commentPosition)
+        navigateToComment(postPublisherId, postId, commentPosition, firstCollectionType, creatorReferenceId, secondCollectionType)
     }
 
     override fun onClickReactsOnCommentNotification(
         postPublisherId: String,
         postId: String,
+        firstCollectionType: String,
+        creatorReferenceId: String,
+        secondCollectionType: String,
         commentPosition: Int
     ) {
-        navigateToComment(postPublisherId, postId, commentPosition)
+        navigateToComment(postPublisherId, postId, commentPosition, firstCollectionType, creatorReferenceId, secondCollectionType)
     }
 
     override fun onNotificationLongClicked(notification: Notification) {
@@ -152,12 +170,17 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), Notific
         Toast.makeText(requireContext(), "$notifierId || $groupId", Toast.LENGTH_SHORT).show()
     }
 
-    override fun onAcceptGroupInvitationButtonClicked( groupId: String, notificationId: String) {
+    override fun onAcceptGroupInvitationButtonClicked(groupId: String, notificationId: String) {
 
-        val member = Member(id = currentUser.id, name = currentUser.name, imageUrl = currentUser.profileImageUrl, blocked = false)
+        val member = Member(
+            id = currentUser.id,
+            name = currentUser.name,
+            imageUrl = currentUser.profileImageUrl,
+            blocked = false
+        )
         groupViewModel.addMemberToGroup(member, groupId).addOnSuccessListener {
             val groupLiveData = groupViewModel.getGroupLiveData(groupId)
-            groupLiveData.observe(viewLifecycleOwner){
+            groupLiveData.observe(viewLifecycleOwner) {
                 val semiGroup = SemiGroup(it.id, it.name, it.coverImageUrl)
                 addGroupToUserGroups(userId = currentUser.id.toString(), semiGroup)
             }
@@ -170,7 +193,7 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), Notific
         deleteNotification(notifiedId, notificationId)
     }
 
-    private fun addGroupToUserGroups(userId: String, semiGroup: SemiGroup){
+    private fun addGroupToUserGroups(userId: String, semiGroup: SemiGroup) {
         groupViewModel.addGroupToUserGroups(userId, semiGroup)
     }
 
@@ -220,7 +243,7 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), Notific
             }
     }
 
-    private fun createFollowingRelationBetweenMeAndHim(){
+    private fun createFollowingRelationBetweenMeAndHim() {
 
     }
 
@@ -228,17 +251,36 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), Notific
         notificationsFragmentViewModel.deleteNotificationById(notifiedId, notificationId)
     }
 
-    private fun navigateToPost(postPublisherId: String, postId: String){
+    private fun navigateToPost(
+        postPublisherId: String,
+        postId: String,
+        firstCollectionType: String,
+        creatorReferenceId: String,
+        secondCollectionType: String
+    ) {
         val intent = Intent(requireContext(), PostViewerActivity::class.java)
         intent.putExtra("postPublisherId", postPublisherId)
         intent.putExtra("postId", postId)
+        intent.putExtra("firstCollectionType", firstCollectionType)
+        intent.putExtra("creatorReferenceId", creatorReferenceId)
+        intent.putExtra("secondCollectionType", secondCollectionType)
         startActivity(intent)
     }
 
-    private fun navigateToComment(postPublisherId: String, postId: String, commentPosition: Int) {
+    private fun navigateToComment(
+        postPublisherId: String,
+        postId: String,
+        commentPosition: Int,
+        firstCollectionType: String,
+        creatorReferenceId: String,
+        secondCollectionType: String
+        ) {
         val intent = Intent(requireContext(), PostViewerActivity::class.java)
         intent.putExtra("postPublisherId", postPublisherId)
         intent.putExtra("postId", postId)
+        intent.putExtra("firstCollectionType", firstCollectionType)
+        intent.putExtra("creatorReferenceId", creatorReferenceId)
+        intent.putExtra("secondCollectionType", secondCollectionType)
         intent.putExtra("commentPosition", commentPosition)
         startActivity(intent)
     }
@@ -255,7 +297,7 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), Notific
             dialog.dismiss()
         }
         deleteButton.setOnClickListener {
-           deleteNotification(notification.notifiedId.toString(), notification.id.toString())
+            deleteNotification(notification.notifiedId.toString(), notification.id.toString())
             dialog.dismiss()
         }
         dialog.show()

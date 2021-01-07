@@ -74,10 +74,14 @@ class PostViewerActivity : AppCompatActivity(), CommentsBottomSheetListener {
 
         val postPublisherId = intent.getStringExtra("postPublisherId").toString()
         val postId = intent.getStringExtra("postId").toString()
+        val firstCollectionType = intent.getStringExtra("firstCollectionType").toString()
+        val creatorReferenceId = intent.getStringExtra("creatorReferenceId").toString()
+        val secondCollectionType = intent.getStringExtra("secondCollectionType").toString()
 
-        post.firstCollectionType = POSTS_COLLECTION
-        post.creatorReferenceId = postPublisherId
-        post.secondCollectionType = PROFILE_POSTS_COLLECTION
+        //These four are to fetch the post
+        post.firstCollectionType = firstCollectionType
+        post.creatorReferenceId = creatorReferenceId
+        post.secondCollectionType = secondCollectionType
         post.id = postId
 
         val postLiveData = postViewerActivityViewModel.getPostLiveData(post)
@@ -303,15 +307,27 @@ class PostViewerActivity : AppCompatActivity(), CommentsBottomSheetListener {
         }
     }
 
-    override fun onAnotherUserCommented(commentPosition: Int, commentId: String, postId: String) {
-        notificationsHandler.also {
-            it.notifiedId = postPublisherId
-            it.notificationType = "commentOnPost"
-            it.postId = postId
-            it.commentPosition = commentPosition
-            it.handleNotificationCreationAndFiring()
-        }
-
+    override fun onAnotherUserCommented(
+        notifierId: String,
+        notifierName: String,
+        notifierImageUrl: String,
+        notifiedId: String,
+        notifiedToken: String,
+        notificationType: String,
+        postPublisherId: String,
+        postId: String ,
+        firstCollectionType: String,
+        creatorReferenceId: String,
+        secondCollectionType: String,
+        commentId: String
+    ) {
+//        notificationsHandler.also {
+//            it.notifiedId = postPublisherId
+//            it.notificationType = "commentOnPost"
+//            it.postId = postId
+////            it.commentPosition = commentPosition
+//            it.handleNotificationCreationAndFiring()
+//        }
     }
 
     private fun openPeopleWhoReactedLayout(commenterId: String?, commentId: String?, reactedOn: String) {

@@ -98,15 +98,19 @@ open class BasePostHandler(
         }
     }
 
-    fun buildNotificationHandlerForPostReacts(
-         notifierId: String,
-         notifierName: String,
-         notifierImageUrl: String,
-         notifiedId: String,
-         notifiedToken: String,
-         notificationType: String,
-         postPublisherId: String,
-         postId: String? = null,
+    fun buildNotificationHandlerForPostComments(
+        notifierId: String,
+        notifierName: String,
+        notifierImageUrl: String,
+        notifiedId: String,
+        notifiedToken: String,
+        notificationType: String,
+        postPublisherId: String,
+        postId: String ,
+        firstCollectionType: String,
+        creatorReferenceId: String,
+        secondCollectionType: String,
+        commentId: String
     ): NotificationsHandler{
         return notificationsHandler.apply{
             this.notifierId = notifierId
@@ -117,6 +121,39 @@ open class BasePostHandler(
             this.postPublisherId = postPublisherId
             this.postId = postId
             this.notificationType = notificationType
+            this.firstCollectionType =firstCollectionType
+            this.creatorReferenceId = creatorReferenceId
+            this.secondCollectionType = secondCollectionType
+            this.commentId = commentId
+        }
+    }
+
+    fun buildNotificationHandlerForPostReacts(
+         notifierId: String,
+         notifierName: String,
+         notifierImageUrl: String,
+         notifiedId: String,
+         notifiedToken: String,
+         notificationType: String,
+         postPublisherId: String,
+         postId: String? = null,
+         firstCollectionType: String,
+         creatorReferenceId: String,
+         secondCollectionType: String,
+
+    ): NotificationsHandler{
+        return notificationsHandler.apply{
+            this.notifierId = notifierId
+            this.notifierName = notifierName
+            this.notifierImageUrl = notifierImageUrl
+            this.notifiedId = notifiedId
+            this.notifiedToken = notifiedToken
+            this.postPublisherId = postPublisherId
+            this.postId = postId
+            this.notificationType = notificationType
+            this.firstCollectionType =firstCollectionType
+            this.creatorReferenceId = creatorReferenceId
+            this.secondCollectionType = secondCollectionType
         }
     }
 
@@ -126,7 +163,10 @@ open class BasePostHandler(
         interactorName: String,
         interactorImageUrl: String,
         postPosition: Int,
-        notifiedToken: String
+        notifiedToken: String,
+        firstCollectionType: String,
+        creatorReferenceId: String,
+        secondCollectionType: String,
     ): NotificationsHandler{
         return notificationsHandler.apply {
             this.notifierId = interactorId
@@ -137,6 +177,9 @@ open class BasePostHandler(
             this.postPublisherId = post.publisherId
             this.postId = post.id
             this.notificationType = "share"
+            this.firstCollectionType =firstCollectionType
+            this.creatorReferenceId = creatorReferenceId
+            this.secondCollectionType = secondCollectionType
         }
     }
 
@@ -226,8 +269,7 @@ open class BasePostHandler(
         interactorName: String,
         interactorImageUrl: String,
         postPosition: Int,
-        commentsBottomSheetListener: CommentsBottomSheetListener?,
-        notifiedToken: String
+        commentsBottomSheetListener: CommentsBottomSheetListener?
     ) {
         currentEditedPostPosition = postPosition
         val commentsBottomSheet = CommentsBottomSheet(
@@ -235,8 +277,7 @@ open class BasePostHandler(
             interactorId,
             interactorName,
             interactorImageUrl,
-            commentsBottomSheetListener,
-            notifiedToken,
+            commentsBottomSheetListener
         )
         commentsBottomSheet.show((context as AppCompatActivity).supportFragmentManager, commentsBottomSheet.tag)
     }
