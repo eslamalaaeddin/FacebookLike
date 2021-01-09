@@ -616,7 +616,7 @@ class CommentsBottomSheet(
                 interactorId,
                 interactorName,
                 interactorImageUrl,
-                commenterToken.toString(),
+//                commenterToken.toString(),
                 postId,
                 reacted,
                 currentReact

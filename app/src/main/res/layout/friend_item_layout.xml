@@ -10,12 +10,14 @@
     <androidx.cardview.widget.CardView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:layout_marginEnd="2dp"
+        android:layout_marginStart="2dp"
         app:cardCornerRadius="16dp">
 
         <ImageView
             android:id="@+id/friendImageView"
-            android:layout_width="124dp"
-            android:layout_height="136dp"
+            android:layout_width="120dp"
+            android:layout_height="132dp"
             android:scaleType="centerCrop" />
 
     </androidx.cardview.widget.CardView>

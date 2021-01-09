@@ -61,7 +61,7 @@ class ReplyOnCommentBottomSheet(
     private val interactorId: String,
     private val interactorName: String,
     private val interactorImageUrl: String,
-    private val commenterToken: String,//the person whom you are replying to
+    //private val commenterToken: String,//the person whom you are replying to (super comment owner)
     private val postId: String,
     private val reacted: Boolean,
     private val currentReact: React?
@@ -122,7 +122,10 @@ class ReplyOnCommentBottomSheet(
         notificationsHandler.notifierName = interactorName
         notificationsHandler.notifierImageUrl = interactorImageUrl
         notificationsHandler.postPublisherId = postPublisherId
-        notificationsHandler.notifiedToken = commenterToken
+//        notificationsHandler.notifiedToken = commenterToken
+        notificationsHandler.firstCollectionType = post.firstCollectionType
+        notificationsHandler.creatorReferenceId = post.creatorReferenceId
+        notificationsHandler.secondCollectionType = post.secondCollectionType
 
         commentEditText.requestFocus()
 
@@ -133,8 +136,7 @@ class ReplyOnCommentBottomSheet(
 
             if (commentContent.isEmpty() && commentData == null) {
                 Toast.makeText(requireContext(), "Add comment first", Toast.LENGTH_SHORT).show()
-            }
-            else {
+            } else {
                 if (commentData != null) {
                     mediaCommentLayoutPreview.visibility = View.VISIBLE
                     if (commentDataType == "image") {
@@ -191,31 +193,42 @@ class ReplyOnCommentBottomSheet(
                                                 //if you are not the commenter
                                                 mediaCommentLayoutPreview.visibility = View.GONE
                                                 commentData = null
-                                                // TODO: 11/24/2020  
-                                                if (this.superComment.commenterId.toString() != interactorId) {
-                                                    notificationsHandler.also {
-                                                        it.notifiedId = this.superComment.commenterId.toString()
-                                                        it.notificationType = "commentOnComment"
-                                                        it.postId = postId
-//                                                        it.commentPosition = commentPosition
-                                                        it.handleNotificationCreationAndFiring()
-                                                    }
-                                                }
 
-                                                var tempComment = ""
-                                                for (subComment in commentSubComments){
-                                                    if (subComment.commenterId != this.superComment.commenterId.toString() && subComment.commenterId != tempComment){
-                                                        tempComment = subComment.commenterId.toString()
+                                                if (this.superComment.commenterId.toString() != interactorId) {
+                                                    val commenterToBeNotifiedLiveData =
+                                                        notificationsFragmentViewModel.getUserLiveData(this.superComment.commenterId.toString())
+                                                    commenterToBeNotifiedLiveData?.observe(viewLifecycleOwner) { user ->
+                                                        val token = user.token
                                                         notificationsHandler.also {
-                                                            it.notifiedId = subComment.commenterId
-                                                            it.notifiedToken = subComment.commenterToken
+                                                            it.notifiedId =
+                                                                this.superComment.commenterId.toString()
                                                             it.notificationType = "commentOnComment"
                                                             it.postId = postId
-//                                                            it.commentPosition = commentPosition
+                                                            it.notifiedToken = token
+//                                                        it.commentPosition = commentPosition
                                                             it.handleNotificationCreationAndFiring()
+                                                            commenterToBeNotifiedLiveData.removeObservers(viewLifecycleOwner)
                                                         }
                                                     }
+
                                                 }
+
+//                                                var tempComment = ""
+//                                                for (subComment in commentSubComments) {
+//                                                    if (subComment.commenterId != this.superComment.commenterId.toString() && subComment.commenterId != tempComment) {
+//                                                        tempComment =
+//                                                            subComment.commenterId.toString()
+//                                                        notificationsHandler.also {
+//                                                            it.notifiedId = subComment.commenterId
+//                                                            it.notifiedToken =
+//                                                                subComment.commenterToken
+//                                                            it.notificationType = "commentOnComment"
+//                                                            it.postId = postId
+////                                                            it.commentPosition = commentPosition
+//                                                            it.handleNotificationCreationAndFiring()
+//                                                        }
+//                                                    }
+//                                                }
                                                 updateCommentsUI()
 
                                             } else {
@@ -281,22 +294,31 @@ class ReplyOnCommentBottomSheet(
                                                 commentData = null
 
                                                 if (this.superComment.commenterId.toString() != interactorId) {
-                                                    notificationsHandler.also {
-                                                        it.notifiedId = this.superComment.commenterId.toString()
-                                                        it.notificationType = "commentOnComment"
-                                                        it.postId = postId
-//                                                        it.commentPosition = commentPosition
-                                                        it.handleNotificationCreationAndFiring()
+                                                    val commenterToBeNotifiedLiveData =
+                                                        notificationsFragmentViewModel.getUserLiveData(this.superComment.commenterId.toString())
+                                                    commenterToBeNotifiedLiveData?.observe(viewLifecycleOwner) { user ->
+                                                        val token = user.token
+                                                        notificationsHandler.also {
+                                                            it.notifiedId =
+                                                                this.superComment.commenterId.toString()
+                                                            it.notificationType = "commentOnComment"
+                                                            it.postId = postId
+                                                            it.notifiedToken = token
+                                                            it.handleNotificationCreationAndFiring()
+                                                            commenterToBeNotifiedLiveData.removeObservers(viewLifecycleOwner)
+                                                        }
                                                     }
                                                 }
 
                                                 var tempComment = ""
-                                                for (subComment in commentSubComments){
-                                                    if (subComment.commenterId != this.superComment.commenterId.toString() && subComment.commenterId != tempComment){
-                                                        tempComment = subComment.commenterId.toString()
+                                                for (subComment in commentSubComments) {
+                                                    if (subComment.commenterId != this.superComment.commenterId.toString() && subComment.commenterId != tempComment) {
+                                                        tempComment =
+                                                            subComment.commenterId.toString()
                                                         notificationsHandler.also {
                                                             it.notifiedId = subComment.commenterId
-                                                            it.notifiedToken = subComment.commenterToken
+                                                            it.notifiedToken =
+                                                                subComment.commenterToken
                                                             it.notificationType = "commentOnComment"
                                                             it.postId = postId
 //                                                            it.commentPosition = commentPosition
@@ -346,31 +368,42 @@ class ReplyOnCommentBottomSheet(
                                 .addOnCompleteListener { task ->
                                     if (task.isSuccessful) {
                                         if (this.superComment.commenterId.toString() != interactorId) {
-                                            notificationsHandler.also {
-                                                it.notifiedId = this.superComment.commenterId.toString()
-                                                it.notificationType = "commentOnComment"
-                                                it.postId = postId
-//                                                it.commentPosition = commentPosition
-                                                it.handleNotificationCreationAndFiring()
-                                            }
-                                        }
-                                        var tempComment = ""
-                                        for (subComment in commentSubComments){
-                                            if (subComment.commenterId != this.superComment.commenterId.toString() && subComment.commenterId != tempComment){
-                                                tempComment = subComment.commenterId.toString()
+                                            val commenterToBeNotifiedLiveData =
+                                                notificationsFragmentViewModel.getUserLiveData(this.superComment.commenterId.toString())
+                                            commenterToBeNotifiedLiveData?.observe(viewLifecycleOwner) { user ->
+                                                val token = user.token
                                                 notificationsHandler.also {
-                                                    it.notifiedId = subComment.commenterId
-                                                    it.notifiedToken = subComment.commenterToken
+                                                    it.notifiedId =
+                                                        this.superComment.commenterId.toString()
                                                     it.notificationType = "commentOnComment"
                                                     it.postId = postId
-//                                                    it.commentPosition = commentPosition
+                                                    it.notifiedToken = token
                                                     it.handleNotificationCreationAndFiring()
+                                                    commenterToBeNotifiedLiveData.removeObservers(viewLifecycleOwner)
                                                 }
                                             }
                                         }
+                                        //to notify all commeners
+//                                        var tempComment = ""
+//                                        for (subComment in commentSubComments) {
+//                                            if (subComment.commenterId != this.superComment.commenterId.toString() && subComment.commenterId != tempComment) {
+//                                                tempComment = subComment.commenterId.toString()
+//                                                notificationsHandler.also {
+//                                                    it.notifiedId = subComment.commenterId
+//                                                    it.notifiedToken = subComment.commenterToken
+//                                                    it.notificationType = "commentOnComment"
+//                                                    it.postId = postId
+////                                                    it.commentPosition = commentPosition
+//                                                    it.handleNotificationCreationAndFiring()
+//                                                }
+//                                            }
+//                                        }
+                                    } else {
+                                        Utils.toastMessage(
+                                            requireContext(),
+                                            task.exception?.message.toString()
+                                        )
                                     }
-
-                                    else { Utils.toastMessage(requireContext(), task.exception?.message.toString()) }
                                 }
 
                         }
@@ -403,7 +436,7 @@ class ReplyOnCommentBottomSheet(
 
         constraintLayout.setOnLongClickListener {
             val longClickedCommentBottomSheet =
-                LongClickedCommentBottomSheet(null ,superComment, post, "comment")
+                LongClickedCommentBottomSheet(null, superComment, post, "comment")
             longClickedCommentBottomSheet.show(activity?.supportFragmentManager!!, "signature")
             true
         }
@@ -412,7 +445,10 @@ class ReplyOnCommentBottomSheet(
             var currentReact: React? = null
             var reacted: Boolean = false
 
-            postViewModel.getCommentById(superComment.commenterId.toString(), superComment.id.toString())
+            postViewModel.getCommentById(
+                superComment.commenterId.toString(),
+                superComment.id.toString()
+            )
                 .addOnCompleteListener {
                     val commentDoc =
                         it.result?.toObject(ReactionsAndSubComments::class.java)
@@ -433,8 +469,7 @@ class ReplyOnCommentBottomSheet(
                                 "click"
                             )
                         }
-                    }
-                    else {
+                    } else {
                         clicksConsumer.reactOnCommentFromRepliesDataProvider(
                             superComment,
                             commentPosition,
@@ -451,7 +486,10 @@ class ReplyOnCommentBottomSheet(
             var currentReact: React? = null
             var reacted: Boolean = false
 
-            postViewModel.getCommentById(superComment.commenterId.toString(), superComment.id.toString())
+            postViewModel.getCommentById(
+                superComment.commenterId.toString(),
+                superComment.id.toString()
+            )
                 .addOnCompleteListener {
                     val commentDoc =
                         it.result?.toObject(ReactionsAndSubComments::class.java)
@@ -488,7 +526,11 @@ class ReplyOnCommentBottomSheet(
         replyOnCommentTextView.setOnClickListener { commentEditText.requestFocus() }
 
         whoReactedOnCommentLayout.setOnClickListener {
-            openPeopleWhoReactedLayout(superComment.commenterId.toString(), superComment.id.toString(),"comment")
+            openPeopleWhoReactedLayout(
+                superComment.commenterId.toString(),
+                superComment.id.toString(),
+                "comment"
+            )
         }
     }
 
@@ -501,7 +543,7 @@ class ReplyOnCommentBottomSheet(
             val reactionsAndComments = value?.toObject(ReactionsAndSubComments::class.java)
 
             //if there is not document
-            if (reactionsAndComments == null){
+            if (reactionsAndComments == null) {
                 dismiss()
             }
             reactionsAndComments?.reactions?.let { reacts ->
@@ -656,8 +698,8 @@ class ReplyOnCommentBottomSheet(
 
                     }
                 } else {
-                    if (myReactPlaceHolder != null){
-                    myReactPlaceHolder.visibility = View.INVISIBLE
+                    if (myReactPlaceHolder != null) {
+                        myReactPlaceHolder.visibility = View.INVISIBLE
                     }
 
                     if (reactsCountTextView != null) {
@@ -687,7 +729,7 @@ class ReplyOnCommentBottomSheet(
                     postViewModel,
                     postPublisherId
                 )
-                if (subCommentsRecyclerView != null){
+                if (subCommentsRecyclerView != null) {
                     subCommentsRecyclerView.adapter = commentsAdapter
                 }
             }
@@ -728,7 +770,7 @@ class ReplyOnCommentBottomSheet(
 
     override fun onCommentLongClicked(comment: Comment) {
         val longClickedCommentBottomSheet =
-            LongClickedCommentBottomSheet(superComment,comment, post, "subComment")
+            LongClickedCommentBottomSheet(superComment, comment, post, "subComment")
         longClickedCommentBottomSheet.show(activity?.supportFragmentManager!!, "signature")
 
     }
@@ -814,7 +856,7 @@ class ReplyOnCommentBottomSheet(
         Toast.makeText(requireContext(), "Focused reply", Toast.LENGTH_SHORT).show()
     }
 
-    override fun onCommentReactionsLayoutClicked(commenterId: String,commentId: String) {
+    override fun onCommentReactionsLayoutClicked(commenterId: String, commentId: String) {
         openPeopleWhoReactedLayout(commenterId, commentId, "comment")
     }
 
@@ -858,7 +900,6 @@ class ReplyOnCommentBottomSheet(
             commentType = commentType,
             attachmentCommentUrl = attachmentCommentUrl,
             superCommentId = superCommentId,
-            commenterToken = NewsFeedActivity.getTokenFromSharedPreference(requireContext())
         )
     }
 
@@ -911,13 +952,13 @@ class ReplyOnCommentBottomSheet(
         commentPosition: Int
     ) {
         if (currentReact != null) {
-            deleteReactFromComment(commenterId, commentId,currentReact )
+            deleteReactFromComment(commenterId, commentId, currentReact)
         }
         addReactOnComment(commenterId, commentId, react).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 notificationsHandler.notifiedId = commenterId
                 Log.i(TAG, "TOOT handleLongReactOnCommentCreationAndDeletion: $commenterId")
-                if (commenterId!= interactorId) {
+                if (commenterId != interactorId) {
                     notificationsHandler.also {
                         it.notificationType = "reactOnComment"
 //                        it.commentPosition = commentPosition
@@ -956,32 +997,74 @@ class ReplyOnCommentBottomSheet(
         )
         dialog.loveReactButton.setOnClickListener {
             react.react = 2
-            handleLongReactOnCommentCreationAndDeletion(currentReact, react, commentId, postPublisherId, commenterId, commentPosition)
+            handleLongReactOnCommentCreationAndDeletion(
+                currentReact,
+                react,
+                commentId,
+                postPublisherId,
+                commenterId,
+                commentPosition
+            )
             dialog.dismiss()
         }
         dialog.careReactButton.setOnClickListener {
             react.react = 3
-            handleLongReactOnCommentCreationAndDeletion(currentReact, react, commentId, postPublisherId, commenterId, commentPosition)
+            handleLongReactOnCommentCreationAndDeletion(
+                currentReact,
+                react,
+                commentId,
+                postPublisherId,
+                commenterId,
+                commentPosition
+            )
             dialog.dismiss()
         }
         dialog.hahaReactButton.setOnClickListener {
             react.react = 4
-            handleLongReactOnCommentCreationAndDeletion(currentReact, react, commentId, postPublisherId, commenterId, commentPosition)
+            handleLongReactOnCommentCreationAndDeletion(
+                currentReact,
+                react,
+                commentId,
+                postPublisherId,
+                commenterId,
+                commentPosition
+            )
             dialog.dismiss()
         }
         dialog.wowReactButton.setOnClickListener {
             react.react = 5
-            handleLongReactOnCommentCreationAndDeletion(currentReact, react, commentId, postPublisherId, commenterId, commentPosition)
+            handleLongReactOnCommentCreationAndDeletion(
+                currentReact,
+                react,
+                commentId,
+                postPublisherId,
+                commenterId,
+                commentPosition
+            )
             dialog.dismiss()
         }
         dialog.sadReactButton.setOnClickListener {
             react.react = 6
-            handleLongReactOnCommentCreationAndDeletion(currentReact, react, commentId, postPublisherId, commenterId, commentPosition)
+            handleLongReactOnCommentCreationAndDeletion(
+                currentReact,
+                react,
+                commentId,
+                postPublisherId,
+                commenterId,
+                commentPosition
+            )
             dialog.dismiss()
         }
         dialog.angryReactButton.setOnClickListener {
             react.react = 7
-            handleLongReactOnCommentCreationAndDeletion(currentReact, react, commentId, postPublisherId, commenterId, commentPosition)
+            handleLongReactOnCommentCreationAndDeletion(
+                currentReact,
+                react,
+                commentId,
+                postPublisherId,
+                commenterId,
+                commentPosition
+            )
             dialog.dismiss()
         }
         dialog.show()
@@ -1023,9 +1106,18 @@ class ReplyOnCommentBottomSheet(
         }
     }
 
-    private fun openPeopleWhoReactedLayout(commenterId: String?, commentId: String?, reactedOn: String) {
+    private fun openPeopleWhoReactedLayout(
+        commenterId: String?,
+        commentId: String?,
+        reactedOn: String
+    ) {
         val peopleWhoReactedDialog =
-            PeopleWhoReactedBottomSheet(commenterId.toString(), commentId.toString(), post, reactedOn)
+            PeopleWhoReactedBottomSheet(
+                commenterId.toString(),
+                commentId.toString(),
+                post,
+                reactedOn
+            )
         peopleWhoReactedDialog.show(
             activity?.supportFragmentManager!!,
             peopleWhoReactedDialog.tag

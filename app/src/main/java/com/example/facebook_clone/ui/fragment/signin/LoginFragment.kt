@@ -55,6 +55,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         intent.putExtra("email", email)
         intent.putExtra("password", password)
         startActivity(intent)
+        activity?.finish()
     }
 
     private fun validateUserInputAndNavigateToNewsFeed(mailOrPhone :String, password : String){
