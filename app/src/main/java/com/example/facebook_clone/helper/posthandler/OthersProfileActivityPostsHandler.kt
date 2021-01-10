@@ -55,12 +55,12 @@ class OthersProfileActivityPostsHandler(
         notifiedToken: String?
     ) {
         currentEditedPostPosition = postPosition
-        val modifiedPost = handlePostLocation(
-            post,
-            FIRST_COLLECTION_TYPE,
-            post.publisherId.orEmpty(),
-            SECOND_COLLECTION_TYPE
-        )
+//        val modifiedPost = handlePostLocation(
+//            post,
+//            FIRST_COLLECTION_TYPE,
+//            post.publisherId.orEmpty(),
+//            SECOND_COLLECTION_TYPE
+//        )
         if (!reacted) {
             val myReact = createReact(interactorId, interactorName, interactorImageUrl)
             val notificationsHandler = buildNotificationHandlerForPostReacts(
@@ -78,9 +78,9 @@ class OthersProfileActivityPostsHandler(
             )
 
             notificationsHandler.reactType = 1
-            addReactOnPostToDb(interactorId, myReact, modifiedPost, notificationsHandler)
+            addReactOnPostToDb(interactorId, myReact, post, notificationsHandler)
         } else {
-            deleteReactFromPost(currentReact!!, modifiedPost).addOnCompleteListener { task ->
+            deleteReactFromPost(currentReact!!, post).addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     Utils.toastMessage(context, task.exception?.message.toString())
                 }
@@ -99,12 +99,12 @@ class OthersProfileActivityPostsHandler(
         notifiedToken: String?
     ) {
 
-        val modifiedPost = handlePostLocation(
-            post,
-            FIRST_COLLECTION_TYPE,
-            post.publisherId.orEmpty(),
-            SECOND_COLLECTION_TYPE
-        )
+//        val modifiedPost = handlePostLocation(
+//            post,
+//            FIRST_COLLECTION_TYPE,
+//            post.publisherId.orEmpty(),
+//            SECOND_COLLECTION_TYPE
+//        )
         val notificationsHandler = buildNotificationHandlerForPostReacts(
             notifierId = interactorId,
             notifierName = interactorName,
@@ -123,7 +123,7 @@ class OthersProfileActivityPostsHandler(
             interactorId,
             interactorName,
             interactorImageUrl,
-            modifiedPost,
+            post,
             currentReact,
             notificationsHandler
         )
@@ -136,15 +136,15 @@ class OthersProfileActivityPostsHandler(
         interactorImageUrl: String,
         postPosition: Int
     ) {
-        val modifiedPost = handlePostLocation(
-            post,
-            FIRST_COLLECTION_TYPE,
-            post.publisherId.orEmpty(),
-            SECOND_COLLECTION_TYPE
-        )
+//        val modifiedPost = handlePostLocation(
+//            post,
+//            FIRST_COLLECTION_TYPE,
+//            post.publisherId.orEmpty(),
+//            SECOND_COLLECTION_TYPE
+//        )
         currentEditedPostPosition = postPosition
         openCommentsBottomSheet(
-            modifiedPost,
+            post,
             interactorId,
             interactorName,
             interactorImageUrl,
@@ -162,16 +162,16 @@ class OthersProfileActivityPostsHandler(
         postPosition: Int,
         notifiedToken: String?
     ) {
-        val modifiedPost = handlePostLocation(
-            post,
-            FIRST_COLLECTION_TYPE,
-            post.publisherId.orEmpty(),
-            SECOND_COLLECTION_TYPE
-        )
+//        val modifiedPost = handlePostLocation(
+//            post,
+//            FIRST_COLLECTION_TYPE,
+//            post.publisherId.orEmpty(),
+//            SECOND_COLLECTION_TYPE
+//        )
 
         val notificationsHandler =
             buildNotificationHandlerForPostShares(
-                modifiedPost,
+                post,
                 interactorId,
                 interactorName,
                 interactorImageUrl,
@@ -188,25 +188,25 @@ class OthersProfileActivityPostsHandler(
             sharerName = interactorName,
             sharerImageUrl = interactorImageUrl,
             sharedPost = SharedPost(
-                id = modifiedPost.id,
-                content = modifiedPost.content,
-                attachmentUrl = modifiedPost.attachmentUrl,
-                attachmentType = modifiedPost.attachmentType,
-                publisherId = modifiedPost.publisherId,
-                publisherImageUrl = modifiedPost.publisherImageUrl,
-                publisherName = modifiedPost.publisherName,
-                visibility = modifiedPost.visibility,
-                creationTime = modifiedPost.creationTime
+                id = post.id,
+                content = post.content,
+                attachmentUrl = post.attachmentUrl,
+                attachmentType = post.attachmentType,
+                publisherId = post.publisherId,
+                publisherImageUrl = post.publisherImageUrl,
+                publisherName = post.publisherName,
+                visibility = post.visibility,
+                creationTime = post.creationTime
             )
         )
-        val postId = modifiedPost.id.toString()
-        val postPublisherId = modifiedPost.publisherId.toString()
-        modifiedPost.shares?.add(share)
-        modifiedPost.reacts = null
-        modifiedPost.comments = null
+        val postId = post.id.toString()
+        val postPublisherId = post.publisherId.toString()
+        post.shares?.add(share)
+        post.reacts = null
+        post.comments = null
 
 
-        addShareToPost(share, modifiedPost).addOnCompleteListener { task ->
+        addShareToPost(share, post).addOnCompleteListener { task ->
             val myPost = Post(
                 id = share.id,
                 publisherId = interactorId,
@@ -251,15 +251,15 @@ class OthersProfileActivityPostsHandler(
         interactorImageUrl: String,
         postPosition: Int
     ) {
-        val modifiedPost = handlePostLocation(
-            post,
-            FIRST_COLLECTION_TYPE,
-            post.publisherId.orEmpty(),
-            SECOND_COLLECTION_TYPE
-        )
+//        val modifiedPost = handlePostLocation(
+//            post,
+//            FIRST_COLLECTION_TYPE,
+//            post.publisherId.orEmpty(),
+//            SECOND_COLLECTION_TYPE
+//        )
         currentEditedPostPosition = postPosition
         openCommentsBottomSheet(
-            modifiedPost,
+            post,
             interactorId,
             interactorName,
             interactorImageUrl,

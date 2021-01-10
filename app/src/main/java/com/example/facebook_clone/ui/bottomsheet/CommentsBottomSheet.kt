@@ -489,6 +489,9 @@ class CommentsBottomSheet(
                                 it.notifiedToken = user.token
 //                                it.commentPosition = commentPosition
                                 it.reactType = 1
+                                it.firstCollectionType = post.firstCollectionType
+                                it.creatorReferenceId = post.creatorReferenceId
+                                it.secondCollectionType = post.secondCollectionType
                                 it.postId = postId
                                 it.handleNotificationCreationAndFiring()
                                 userToBeNotified.removeObservers(viewLifecycleOwner)//when i remove this line, it keeps notifiying me
@@ -546,6 +549,9 @@ class CommentsBottomSheet(
                                 it.notifiedToken = user.token
 //                                it.commentPosition = commentPosition
                                 it.reactType = 1
+                                it.firstCollectionType = post.firstCollectionType
+                                it.creatorReferenceId = post.creatorReferenceId
+                                it.secondCollectionType = post.secondCollectionType
                                 it.postId = postId
                                 it.handleNotificationCreationAndFiring()
                                 userToBeNotified.removeObservers(viewLifecycleOwner)//when i remove this line, it keeps notifiying me
@@ -789,6 +795,9 @@ class CommentsBottomSheet(
                             it.notifiedToken = user.token
 //                            it.commentPosition = commentPosition
                             it.reactType = react.react
+                            it.firstCollectionType = post.firstCollectionType
+                            it.creatorReferenceId = post.creatorReferenceId
+                            it.secondCollectionType = post.secondCollectionType
                             it.postId = postId
                             it.handleNotificationCreationAndFiring()
                             userToBeNotified.removeObservers(viewLifecycleOwner)//when i remove this line, it keeps notifiying me

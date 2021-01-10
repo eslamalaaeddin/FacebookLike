@@ -50,13 +50,13 @@ class ProfileActivityPostsHandler(
         notifiedToken: String?
     ) {
         currentEditedPostPosition = postPosition
-        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
+//        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
         if (!reacted) {
             val myReact = createReact(interactorId, interactorName, interactorImageUrl)
-            addReactOnPostToDb(interactorId, myReact, modifiedPost)
+            addReactOnPostToDb(interactorId, myReact, post)
         }
         else {
-            deleteReactFromPost(currentReact!!, modifiedPost).addOnCompleteListener { task ->
+            deleteReactFromPost(currentReact!!, post).addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     Utils.toastMessage(context, task.exception?.message.toString())
                 }
@@ -75,13 +75,13 @@ class ProfileActivityPostsHandler(
         postPosition: Int,
         notifiedToken: String?
     ) {
-        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
+//        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
         currentEditedPostPosition = postPosition
         showReactsChooserDialog(
             interactorId,
             interactorName,
             interactorImageUrl,
-            modifiedPost,
+            post,
             currentReact,
             null
         )
@@ -94,8 +94,8 @@ class ProfileActivityPostsHandler(
         interactorImageUrl: String,
         postPosition: Int
     ) {
-        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
-        openCommentsBottomSheet(modifiedPost, interactorId, interactorName, interactorImageUrl, postPosition, null)
+        //val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
+        openCommentsBottomSheet(post, interactorId, interactorName, interactorImageUrl, postPosition, null)
     }
 
     override fun onShareButtonClicked(
@@ -106,14 +106,14 @@ class ProfileActivityPostsHandler(
         postPosition: Int,
         notifiedToken: String?
     ) {
-        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
+        //val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
         currentEditedPostPosition = postPosition
         val share = Share(
             sharerId = interactorId,
             sharerName = interactorName,
             sharerImageUrl = interactorImageUrl,
         )
-        addShareToPost(share, modifiedPost).addOnCompleteListener { task ->
+        addShareToPost(share, post).addOnCompleteListener { task ->
             Utils.doAfterFinishing(context, task, "You shared this post")
         }
     }
@@ -125,15 +125,15 @@ class ProfileActivityPostsHandler(
         interactorImageUrl: String,
         postPosition: Int
     ) {
-        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
-        openCommentsBottomSheet(modifiedPost, interactorId, interactorName, interactorImageUrl, postPosition, null)
+       // val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
+        openCommentsBottomSheet(post, interactorId, interactorName, interactorImageUrl, postPosition, null)
     }
 
     override fun onMediaPostClicked(mediaUrl: String) { handleMediaClicks(mediaUrl) }
 
     override fun onPostMoreDotsClicked(interactorId: String, post: Post, shared: Boolean?) {
-        val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
-        openPostConfigurationsBottomSheet(modifiedPost, shared)
+       // val modifiedPost = handlePostLocation(post, FIRST_COLLECTION_TYPE, post.publisherId.orEmpty(), SECOND_COLLECTION_TYPE)
+        openPostConfigurationsBottomSheet(post, shared)
     }
 
     override fun onSharedPostClicked(originalPostPublisherId: String, postId: String) {

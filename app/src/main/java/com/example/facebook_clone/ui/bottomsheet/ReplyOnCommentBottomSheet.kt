@@ -560,67 +560,81 @@ class ReplyOnCommentBottomSheet(
 
                             when (react.react) {
                                 1 -> {
-                                    reactOnCommentTextView.text = "Like"
-                                    reactOnCommentTextView.setTextColor(
-                                        activity?.resources?.getColor(
-                                            R.color.dark_blue
-                                        )!!
-                                    )
-                                    myReactPlaceHolder.setImageResource(R.drawable.ic_like_react)
+                                    if (reactOnCommentTextView != null) {
+                                        reactOnCommentTextView.text = "Like"
+                                        reactOnCommentTextView.setTextColor(
+                                            activity?.resources?.getColor(
+                                                R.color.dark_blue
+                                            )!!
+                                        )
+                                        myReactPlaceHolder.setImageResource(R.drawable.ic_like_react)
+                                    }
                                 }
                                 2 -> {
-                                    reactOnCommentTextView.text = "Love"
-                                    reactOnCommentTextView.setTextColor(
-                                        activity?.resources?.getColor(
-                                            R.color.red
-                                        )!!
-                                    )
-                                    myReactPlaceHolder.setImageResource(R.drawable.ic_love_react)
+                                    if (reactOnCommentTextView != null) {
+                                        reactOnCommentTextView.text = "Love"
+                                        reactOnCommentTextView.setTextColor(
+                                            activity?.resources?.getColor(
+                                                R.color.red
+                                            )!!
+                                        )
+                                        myReactPlaceHolder.setImageResource(R.drawable.ic_love_react)
+                                    }
                                 }
                                 3 -> {
-                                    reactOnCommentTextView.text = "Care"
-                                    reactOnCommentTextView.setTextColor(
-                                        activity?.resources?.getColor(
-                                            R.color.orange
-                                        )!!
-                                    )
-                                    myReactPlaceHolder.setImageResource(R.drawable.ic_care_react)
+                                    if (reactOnCommentTextView != null) {
+                                        reactOnCommentTextView.text = "Care"
+                                        reactOnCommentTextView.setTextColor(
+                                            activity?.resources?.getColor(
+                                                R.color.orange
+                                            )!!
+                                        )
+                                        myReactPlaceHolder.setImageResource(R.drawable.ic_care_react)
+                                    }
                                 }
                                 4 -> {
-                                    reactOnCommentTextView.text = "Haha"
-                                    reactOnCommentTextView.setTextColor(
-                                        activity?.resources?.getColor(
-                                            R.color.orange
-                                        )!!
-                                    )
-                                    myReactPlaceHolder.setImageResource(R.drawable.ic_haha_react)
+                                    if (reactOnCommentTextView != null) {
+                                        reactOnCommentTextView.text = "Haha"
+                                        reactOnCommentTextView.setTextColor(
+                                            activity?.resources?.getColor(
+                                                R.color.orange
+                                            )!!
+                                        )
+                                        myReactPlaceHolder.setImageResource(R.drawable.ic_haha_react)
+                                    }
                                 }
                                 5 -> {
-                                    reactOnCommentTextView.text = "Wow"
-                                    reactOnCommentTextView.setTextColor(
-                                        activity?.resources?.getColor(
-                                            R.color.orange
-                                        )!!
-                                    )
-                                    myReactPlaceHolder.setImageResource(R.drawable.ic_wow_react)
+                                    if (reactOnCommentTextView != null) {
+                                        reactOnCommentTextView.text = "Wow"
+                                        reactOnCommentTextView.setTextColor(
+                                            activity?.resources?.getColor(
+                                                R.color.orange
+                                            )!!
+                                        )
+                                        myReactPlaceHolder.setImageResource(R.drawable.ic_wow_react)
+                                    }
                                 }
-                                6 -> {
-                                    reactOnCommentTextView.text = "Sad"
-                                    reactOnCommentTextView.setTextColor(
-                                        activity?.resources?.getColor(
-                                            R.color.yellow
-                                        )!!
-                                    )
-                                    myReactPlaceHolder.setImageResource(R.drawable.ic_sad_react)
-                                }
+                                6 ->{
+                                    if (reactOnCommentTextView != null) {
+                                            reactOnCommentTextView.text = "Sad"
+                                            reactOnCommentTextView.setTextColor(
+                                                activity?.resources?.getColor(
+                                                    R.color.yellow
+                                                )!!
+                                            )
+                                            myReactPlaceHolder.setImageResource(R.drawable.ic_sad_react)
+                                        }
+                                    }
                                 7 -> {
-                                    reactOnCommentTextView.text = "Angry"
-                                    reactOnCommentTextView.setTextColor(
-                                        activity?.resources?.getColor(
-                                            R.color.orange
-                                        )!!
-                                    )
-                                    myReactPlaceHolder.setImageResource(R.drawable.ic_angry_angry)
+                                    if (reactOnCommentTextView != null) {
+                                        reactOnCommentTextView.text = "Angry"
+                                        reactOnCommentTextView.setTextColor(
+                                            activity?.resources?.getColor(
+                                                R.color.orange
+                                            )!!
+                                        )
+                                        myReactPlaceHolder.setImageResource(R.drawable.ic_angry_angry)
+                                    }
                                 }
                             }
 

@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.format.DateFormat
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.bumptech.glide.Glide
@@ -77,6 +78,11 @@ class PostViewerActivity : AppCompatActivity(), CommentsBottomSheetListener {
         val firstCollectionType = intent.getStringExtra("firstCollectionType").toString()
         val creatorReferenceId = intent.getStringExtra("creatorReferenceId").toString()
         val secondCollectionType = intent.getStringExtra("secondCollectionType").toString()
+
+        Log.i(TAG, "TTTT onCreate: $firstCollectionType")
+        Log.i(TAG, "TTTT onCreate: $creatorReferenceId")
+        Log.i(TAG, "TTTT onCreate: $secondCollectionType")
+        Log.i(TAG, "TTTT onCreate: $postId")
 
         //These four are to fetch the post
         post.firstCollectionType = firstCollectionType
