@@ -154,6 +154,25 @@ class NotificationsAdapter(private var notifications: List<Notification>,
                     itemView.notificationDescription.text = "invited you to join\n${notification.groupName}"
                     itemView.notificationVisualDescription.setImageResource(R.drawable.ic_user_group)
                 }
+                if (notification.notificationType == "groupPost"){
+                    itemView.notifierName.text = notification.notifierName
+                    itemView.notificationDescription.text = "posted in ${notification.groupName}"
+                    itemView.notificationVisualDescription.setImageResource(R.drawable.ic_user_group)
+                    itemView.confirmFriendRequestButton.visibility = View.GONE
+                    itemView.cancelFriendRequestButton.visibility = View.GONE
+                    itemView.acceptGroupInvitationButton.visibility = View.GONE
+                    itemView.cancelGroupInvitationButton.visibility = View.GONE
+                }
+
+                if (notification.notificationType == "groupJoinRequest"){
+                    itemView.notifierName.text = notification.notifierName
+                    itemView.notificationDescription.text = "wants to join ${notification.groupName}"
+                    itemView.notificationVisualDescription.setImageResource(R.drawable.ic_user_group)
+                    itemView.confirmFriendRequestButton.visibility = View.GONE
+                    itemView.cancelFriendRequestButton.visibility = View.GONE
+                    itemView.acceptGroupInvitationButton.visibility = View.GONE
+                    itemView.cancelGroupInvitationButton.visibility = View.GONE
+                }
             }
         }
 
@@ -222,7 +241,17 @@ class NotificationsAdapter(private var notifications: List<Notification>,
 
                 "groupInvitation" -> {
                     notListener.onClickOnGroupInvitationNotification(notifierId, groupId)
+                }
 
+                "groupPost" -> {
+                    notListener.onClickCommentOnPostNotification(
+                        postPublisherId = postPublisherId,
+                        postId = postId,
+                        commentPosition = 0,
+                        firstCollectionType = firstCollectionType,
+                        creatorReferenceId = creatorReferenceId,
+                        secondCollectionType = secondCollectionType
+                    )
                 }
             }
 

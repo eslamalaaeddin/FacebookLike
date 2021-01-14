@@ -1,5 +1,6 @@
 package com.example.facebook_clone.repository
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.facebook_clone.helper.Utils
@@ -13,9 +14,11 @@ import com.example.facebook_clone.helper.Utils.USERS_COLLECTION
 import com.example.facebook_clone.livedata.GroupLiveData
 import com.example.facebook_clone.livedata.UserLiveData
 import com.example.facebook_clone.model.group.Group
+import com.example.facebook_clone.model.group.JoinRequest
 import com.example.facebook_clone.model.group.Member
 import com.example.facebook_clone.model.group.SemiGroup
 import com.example.facebook_clone.model.post.Post
+import com.example.facebook_clone.model.user.User
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
@@ -69,6 +72,53 @@ class GroupsRepository(
                 }
             }
         return postsLiveData
+    }
+
+    fun deleteMember(groupId: String, member: Member): Task<Void>{
+        return database
+            .collection(GROUPS_COLLECTION)
+            .document(groupId)
+            .update("members", FieldValue.arrayRemove(member))
+    }
+
+    fun deleteGroupFromUserGroups(member: Member, semiGroup: SemiGroup): Task<Void>{
+        return database.collection(USERS_COLLECTION)
+            .document(member.id.orEmpty())
+            .update("groups", FieldValue.arrayRemove(semiGroup))
+    }
+
+    fun getGroupsLiveDataAfterSearchingByName(query: String): LiveData<List<Group>> {
+        val liveData = MutableLiveData<List<Group>>()
+        database.collection(GROUPS_COLLECTION)
+            .addSnapshotListener { usersSnapshot, error ->
+                if (error != null) {
+                    return@addSnapshotListener
+                } else {
+                    liveData.postValue(
+                        usersSnapshot?.toObjects(Group::class.java)?.filterIndexed { _, group ->
+                            group.name?.contains(query.toLowerCase())!!
+                                    || group.name?.contains(query.toUpperCase())!!
+                                    || group.name?.contains(query)!!
+                        }
+                    )
+                }
+            }
+
+        return liveData
+    }
+
+    fun sendJoinRequestToGroupAdmins(group: Group?, joinRequest: JoinRequest): Task<Void>{
+        return database
+            .collection(GROUPS_COLLECTION)
+            .document(group?.id.orEmpty())
+            .update("joinRequests", FieldValue.arrayUnion(joinRequest))
+    }
+
+    fun deleteJoinRequest(group: Group, joinRequest: JoinRequest): Task<Void>{
+        return database
+            .collection(GROUPS_COLLECTION)
+            .document(group.id.orEmpty())
+            .update("joinRequests", FieldValue.arrayRemove(joinRequest))
     }
 
 

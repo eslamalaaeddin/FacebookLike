@@ -4,7 +4,7 @@ import com.google.firebase.Timestamp
 import java.util.*
 
 data class JoinRequest(
-    var requestId: String? = null,
-    var requester: Member,
+    val requestId: String? = UUID.randomUUID().toString(),
+    var requester: Member? = null,
     val requestTime:Timestamp = Timestamp(Date())
 )

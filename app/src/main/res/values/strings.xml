@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Facebook-Clone</string>
     <string name="channel_description">My Channel Description</string>
+    <string name="remove_member_info">Remove Member\n\nAre you sure you want to remove %1$s from this group?</string>
     <string-array name="visibility_options">
         <item>Public</item>
         <item>Friends</item>

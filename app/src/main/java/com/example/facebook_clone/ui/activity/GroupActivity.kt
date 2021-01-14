@@ -4,14 +4,21 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.Toast
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.ProfilePostsAdapter
 import com.example.facebook_clone.helper.Utils.POST_FROM_GROUP
 import com.example.facebook_clone.helper.listener.AdminToolsListener
+import com.example.facebook_clone.helper.listener.GroupPostsCreatorListener
 import com.example.facebook_clone.helper.listener.PostListener
+import com.example.facebook_clone.helper.posthandler.GroupsActivityPostsHandler
 import com.example.facebook_clone.helper.posthandler.OthersProfileActivityPostsHandler
 import com.example.facebook_clone.helper.posthandler.ProfileActivityPostsHandler
+import com.example.facebook_clone.model.group.Group
+import com.example.facebook_clone.model.group.JoinRequest
+import com.example.facebook_clone.model.group.Member
 //import com.example.facebook_clone.helper.posthandler.GroupsActivityPostsHandler
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.react.React
@@ -27,7 +34,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 private const val TAG = "GroupActivity"
 
-class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener {
+class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener,
+    GroupPostsCreatorListener {
     private val groupsViewModel by viewModel<GroupsViewModel>()
     private val profileActivityViewModel by viewModel<ProfileActivityViewModel>()
     private val notificationsFragmentViewModel by viewModel<NotificationsFragmentViewModel>()
@@ -40,10 +48,11 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener {
     private var groupId = ""
     private var groupName = ""
     private var adminId = ""
+    private var currentGroup: Group? = null
     private val picasso = Picasso.get()
     private lateinit var othersProfileActivityPostsHandler: OthersProfileActivityPostsHandler
     private lateinit var profileActivityPostsHandler: ProfileActivityPostsHandler
-//    private lateinit var groupsActivityPostsHandler: GroupsActivityPostsHandler
+    private lateinit var groupsActivityPostsHandler: GroupsActivityPostsHandler
     private lateinit var profilePostsAdapter: ProfilePostsAdapter
 
     @SuppressLint("SetTextI18n")
@@ -51,31 +60,87 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group)
 
-        othersProfileActivityPostsHandler = OthersProfileActivityPostsHandler(this, postViewModel, notificationsFragmentViewModel, othersProfileActivityViewModel)
-        profileActivityPostsHandler = ProfileActivityPostsHandler("",this, postViewModel, profileActivityViewModel)
+        othersProfileActivityPostsHandler = OthersProfileActivityPostsHandler(
+            this,
+            postViewModel,
+            notificationsFragmentViewModel,
+            othersProfileActivityViewModel
+        )
+        profileActivityPostsHandler =
+            ProfileActivityPostsHandler("", this, postViewModel, profileActivityViewModel)
 
         upButtonImageView.setOnClickListener { finish() }
 
         groupId = intent.getStringExtra("groupId").orEmpty()
 
-
-
-//        val groupPostsLiveData = groupsViewModel.getGroupPostsLiveData(groupId)
-//        groupPostsLiveData.observe(this){posts ->
-//            posts?.let {
+//        joinGroupButton.setOnClickListener {
+//            val currentMember = Member(id = currentUserId, imageUrl = currentUserImageUrl, name = currentUserName)
+//            val joinRequest = JoinRequest(requester = currentMember)
+//            currentGroup?.let {currentGroup ->
+//                groupsViewModel.sendJoinRequestToGroupAdmins(currentGroup, joinRequest).addOnCompleteListener { task ->
+//                    if (task.isSuccessful){
+//                        //Get admin id
+//                        //Notify him sound i don't want to
+//                        //Notify him
+//                        val adminLiveData = profileActivityViewModel.getAnotherUser(currentGroup.admins.orEmpty().first().id.orEmpty())
+//                        adminLiveData?.observe(this){admin ->
+//                            val adminToken = admin.token.orEmpty()
+//                           val notificationHandler =
+//                               othersProfileActivityPostsHandler.buildNotificationHandlerForGroupJoinRequest(
+//                                   notifierId = currentUserId,
+//                                   notifierName = currentUserName,
+//                                   notifierImageUrl = currentUserImageUrl,
+//                                   notifiedId = admin.id.orEmpty(),
+//                                   notifiedToken = adminToken,
+//                                   group = currentGroup
+//                               )
+//                            notificationHandler.handleNotificationCreationAndFiring()
+//                            adminLiveData.removeObservers(this)
 //
-//                profilePostsAdapter =
-//                    ProfilePostsAdapter(auth, posts, groupsActivityPostsHandler, currentUserName, currentUserImageUrl, null,currentUserId )
-//                groupPostsRecyclerView.adapter = profilePostsAdapter
+//                        }
+//                    }
+//                    else{
+//                        Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
+//                    }
+//                }
 //            }
 //        }
 
         val groupLiveData = groupsViewModel.getGroupLiveData(groupId)
         groupLiveData.observe(this) { group ->
+            currentGroup = group
             groupName = group.name.toString()
             adminId = group.admins.orEmpty().first().id.orEmpty()
-//            groupsActivityPostsHandler = GroupsActivityPostsHandler(this, group, postViewModel,profileActivityViewModel ,notificationsFragmentViewModel , othersProfileActivityViewModel )
+            groupsActivityPostsHandler = GroupsActivityPostsHandler(
+                this,
+                group,
+                postViewModel,
+                profileActivityViewModel,
+                notificationsFragmentViewModel,
+                othersProfileActivityViewModel
+            )
             val groupMembers = group.members.orEmpty()
+            for ((i, member) in groupMembers.withIndex()) {
+                if (member.id.orEmpty() == currentUserId){
+                    updateUIForMemberUser()
+                    break
+                }
+                else if (member.id.orEmpty() != currentUserId ) {
+                    Toast.makeText(this, "Not Member ${member.id}", Toast.LENGTH_SHORT).show()
+                    updateUIForNonMemberUser()
+//                    val groupJoinRequests = group.joinRequests.orEmpty()
+//                    if (groupJoinRequests.isNotEmpty()){
+//                        for (joinReq in groupJoinRequests){
+//                            //You made a request
+//                            if (joinReq.requester?.id.orEmpty() == currentUserId){
+//                                canceljoiningGroupButton.visibility = View.VISIBLE
+//                                joinGroupButton.visibility = View.GONE
+//                            }
+//                        }
+//                    }
+                }
+            }
+
             picasso.load(group.coverImageUrl).into(groupCoverImageView)
             groupNameTextView.text = group.name
             groupMembersCountTextView.text = "${groupMembers.size + 2} Members"
@@ -118,11 +183,11 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener {
 
         }
 
-        adminBadgeImageView.setOnClickListener { showAdminToolsBottomSheet(groupId) }
+        adminBadgeImageView.setOnClickListener { currentGroup?.let { g -> showAdminToolsBottomSheet(group = g) } }
 
         inviteFriendButton.setOnClickListener {
-            val inviteMembersBottomSheet = InviteMembersBottomSheet(groupId, groupName)
-            inviteMembersBottomSheet.show(supportFragmentManager, inviteMembersBottomSheet.tag)
+            val inviteMembersBottomSheet = currentGroup?.let { it1 -> InviteMembersBottomSheet(it1) }
+            inviteMembersBottomSheet?.show(supportFragmentManager, inviteMembersBottomSheet?.tag)
         }
 
         showGroupMembersLayout.setOnClickListener {
@@ -134,9 +199,21 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener {
         whatIsInYourMindButton.setOnClickListener { showPostCreatorDialog() }
     }
 
-    private fun showAdminToolsBottomSheet(groupId: String?) {
+    private fun updateUIForNonMemberUser() {
+        joinGroupButton.visibility = View.VISIBLE
+        adminBadgeImageView.visibility = View.GONE
+        whatIsInYourMindButton.visibility = View.GONE
+        smallUserImageView.visibility = View.GONE
+        moreImageView.visibility = View.VISIBLE
+    }
+
+    private fun updateUIForMemberUser() {
+        joinGroupButton.visibility = View.GONE
+    }
+
+    private fun showAdminToolsBottomSheet(group: Group) {
         val adminToolsBottomSheet =
-            AdminToolsBottomSheet(this, groupId.orEmpty(), groupName = "Friends4Ever")
+            AdminToolsBottomSheet(this, group)
         adminToolsBottomSheet.show(supportFragmentManager, adminToolsBottomSheet.tag)
     }
 
@@ -147,7 +224,7 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener {
     }
 
     private fun showPostCreatorDialog() {
-        val postCreatorDialog = PostCreatorDialog(POST_FROM_GROUP, groupId, groupName)
+        val postCreatorDialog = PostCreatorDialog(POST_FROM_GROUP, groupId, groupName, this)
         postCreatorDialog.show(supportFragmentManager, "signature")
         postCreatorDialog
             .setUserNameAndProfileImageUrl(
@@ -179,21 +256,45 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener {
         postPosition: Int,
         notifiedToken: String?
     ) {
-        if (!reacted){
-            if (post.publisherId == interactorId){
-                profileActivityPostsHandler.onReactButtonClicked(post, interactorId, interactorName, interactorImageUrl, reacted, currentReact, postPosition)
-            }
-            else{
-                val userToBeNotified = profileActivityViewModel.getAnotherUser(post.publisherId.orEmpty())
-                userToBeNotified?.observe(this){user ->
+        if (!reacted) {
+            if (post.publisherId == interactorId) {
+                profileActivityPostsHandler.onReactButtonClicked(
+                    post,
+                    interactorId,
+                    interactorName,
+                    interactorImageUrl,
+                    reacted,
+                    currentReact,
+                    postPosition
+                )
+            } else {
+                val userToBeNotified =
+                    profileActivityViewModel.getAnotherUser(post.publisherId.orEmpty())
+                userToBeNotified?.observe(this) { user ->
                     val token = user.token
-                    othersProfileActivityPostsHandler.onReactButtonClicked(post, interactorId, interactorName, interactorImageUrl, reacted, currentReact, postPosition, token)
+                    othersProfileActivityPostsHandler.onReactButtonClicked(
+                        post,
+                        interactorId,
+                        interactorName,
+                        interactorImageUrl,
+                        reacted,
+                        currentReact,
+                        postPosition,
+                        token
+                    )
                     userToBeNotified.removeObservers(this)
                 }
             }
-        }
-        else{
-            othersProfileActivityPostsHandler.onReactButtonClicked(post, interactorId, interactorName, interactorImageUrl, reacted, currentReact, postPosition)
+        } else {
+            othersProfileActivityPostsHandler.onReactButtonClicked(
+                post,
+                interactorId,
+                interactorName,
+                interactorImageUrl,
+                reacted,
+                currentReact,
+                postPosition
+            )
         }
     }
 
@@ -207,21 +308,45 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener {
         postPosition: Int,
         notifiedToken: String?
     ) {
-        if (!reacted){
-            if (post.publisherId == interactorId){
-                profileActivityPostsHandler.onReactButtonLongClicked(post, interactorId, interactorName, interactorImageUrl, reacted, currentReact, postPosition)
-            }
-            else{
-                val userToBeNotified = profileActivityViewModel.getAnotherUser(post.publisherId.orEmpty())
-                userToBeNotified?.observe(this){user ->
+        if (!reacted) {
+            if (post.publisherId == interactorId) {
+                profileActivityPostsHandler.onReactButtonLongClicked(
+                    post,
+                    interactorId,
+                    interactorName,
+                    interactorImageUrl,
+                    reacted,
+                    currentReact,
+                    postPosition
+                )
+            } else {
+                val userToBeNotified =
+                    profileActivityViewModel.getAnotherUser(post.publisherId.orEmpty())
+                userToBeNotified?.observe(this) { user ->
                     val token = user.token
-                    othersProfileActivityPostsHandler.onReactButtonLongClicked(post, interactorId, interactorName, interactorImageUrl, reacted, currentReact, postPosition, token)
+                    othersProfileActivityPostsHandler.onReactButtonLongClicked(
+                        post,
+                        interactorId,
+                        interactorName,
+                        interactorImageUrl,
+                        reacted,
+                        currentReact,
+                        postPosition,
+                        token
+                    )
                     userToBeNotified.removeObservers(this)
                 }
             }
-        }
-        else{
-            othersProfileActivityPostsHandler.onReactButtonLongClicked(post, interactorId, interactorName, interactorImageUrl, reacted, currentReact, postPosition)
+        } else {
+            othersProfileActivityPostsHandler.onReactButtonLongClicked(
+                post,
+                interactorId,
+                interactorName,
+                interactorImageUrl,
+                reacted,
+                currentReact,
+                postPosition
+            )
         }
     }
 
@@ -232,7 +357,13 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener {
         interactorImageUrl: String,
         postPosition: Int
     ) {
-        othersProfileActivityPostsHandler.onCommentButtonClicked(post, interactorId, interactorName, interactorImageUrl, postPosition)
+        othersProfileActivityPostsHandler.onCommentButtonClicked(
+            post,
+            interactorId,
+            interactorName,
+            interactorImageUrl,
+            postPosition
+        )
     }
 
     override fun onShareButtonClicked(
@@ -253,7 +384,13 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener {
         interactorImageUrl: String,
         postPosition: Int
     ) {
-        othersProfileActivityPostsHandler.onCommentButtonClicked(post, interactorId, interactorName, interactorImageUrl, postPosition)
+        othersProfileActivityPostsHandler.onCommentButtonClicked(
+            post,
+            interactorId,
+            interactorName,
+            interactorImageUrl,
+            postPosition
+        )
 
     }
 
@@ -262,16 +399,41 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener {
     }
 
     override fun onPostMoreDotsClicked(interactorId: String, post: Post, shared: Boolean?) {
-        if (interactorId == adminId){
+        if (interactorId == adminId) {
             Toast.makeText(this, "Show Admin tools", Toast.LENGTH_SHORT).show()
-        }
-        else{
+        } else {
             Toast.makeText(this, "Show member tools", Toast.LENGTH_SHORT).show()
         }
     }
 
     override fun onSharedPostClicked(originalPostPublisherId: String, postId: String) {
 
+    }
+
+    override fun onGroupPostCreated(post: Post) {
+        currentGroup?.let { group ->
+            val groupMembers = group.members.orEmpty()
+            for (member in groupMembers) {
+                if (member.id != post.publisherId) {
+                    val memberLiveData =
+                        profileActivityViewModel.getAnotherUser(member.id.orEmpty())
+                    memberLiveData?.observe(this) { user ->
+                        val userToken = user.token
+                        val notHandler =
+                            groupsActivityPostsHandler.buildNotificationHandlerForGroupPostCreation(
+                                post = post,
+                                interactorId = currentUserId,
+                                interactorName = currentUserName,
+                                interactorImageUrl = currentUserImageUrl,
+                                notifiedToken = userToken.orEmpty(),
+                            )
+                        notHandler.notifiedId = member.id.orEmpty()
+                        notHandler.handleNotificationCreationAndFiring()
+                        memberLiveData.removeObservers(this)
+                    }
+                }
+            }
+        }
     }
 
 }

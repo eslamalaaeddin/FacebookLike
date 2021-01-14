@@ -60,6 +60,7 @@ class NotificationsHandler(
     //[2]
     private fun addNotificationIdToNotifiedDocument(){
         val notification = createNotification()
+        Log.d(TAG, "TTTT addNotificationIdToNotifiedDocument: $notification")
         addNotificationToNotificationCollection(notification).addOnCompleteListener { task ->
             if (task.isSuccessful){
                 fireServerSideNotification(notification)

@@ -45,7 +45,7 @@ val profilePictureActivityViewModelModule = module { viewModel { ProfilePictureA
 
 val postCreatorViewModelModule = module { viewModel { PostViewModel(get()) } }
 
-val searchActivityViewModelModule = module { viewModel { SearchActivityViewModel(get()) } }
+val searchActivityViewModelModule = module { viewModel { SearchActivityViewModel(get(), get()) } }
 
 val othersProfileActivityViewModelModule = module { viewModel { OthersProfileActivityViewModel(get()) } }
 

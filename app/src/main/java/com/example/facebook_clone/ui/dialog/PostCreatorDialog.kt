@@ -26,6 +26,7 @@ import com.example.facebook_clone.helper.Utils.POST_FROM_PROFILE
 import com.example.facebook_clone.helper.Utils.PROFILE_POSTS_COLLECTION
 import com.example.facebook_clone.helper.Utils.SPECIFIC_GROUP_POSTS_COLLECTION
 import com.example.facebook_clone.helper.Utils.toastMessage
+import com.example.facebook_clone.helper.listener.GroupPostsCreatorListener
 import com.example.facebook_clone.helper.listener.PostAttachmentListener
 import com.example.facebook_clone.model.Visibility
 import com.example.facebook_clone.model.post.Post
@@ -42,7 +43,8 @@ private const val TAG = "PostCreatorDialog"
 
 class PostCreatorDialog(private val fromWhere: String,
                         private val groupId: String? = null,
-                        private val groupName: String? = null
+                        private val groupName: String? = null,
+                        private val groupPostsCreatorLstnr: GroupPostsCreatorListener? = null
 ) : DialogFragment(), AdapterView.OnItemSelectedListener, NameImageProvider,
     PostAttachmentListener {
     private val auth: FirebaseAuth by inject()
@@ -57,6 +59,7 @@ class PostCreatorDialog(private val fromWhere: String,
     private lateinit var userProfileImageUrl: String
     private var postAttachmentUrl: String? = null
     private var postAttachmentType: String? = null
+    private lateinit var groupPostsCreatorListener: GroupPostsCreatorListener
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -71,7 +74,9 @@ class PostCreatorDialog(private val fromWhere: String,
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        groupPostsCreatorLstnr?.let {
+            groupPostsCreatorListener = it
+        }
 
         setUpPostCreatorUI()
         addToPostButton.setOnClickListener {showPostAttachmentBottomSheet()}
@@ -245,6 +250,8 @@ class PostCreatorDialog(private val fromWhere: String,
                 post.firstCollectionType = GROUP_POSTS_COLLECTION
                 post.creatorReferenceId = groupId.orEmpty()
                 post.secondCollectionType = SPECIFIC_GROUP_POSTS_COLLECTION
+                groupPostsCreatorListener.onGroupPostCreated(post)
+                //Call some interface that GroupActivity implements and do what ever you want in that activity.
             }
 
 //            POST_FROM_PAGE -> {

@@ -18,10 +18,7 @@ import com.example.facebook_clone.model.notification.Notification
 import com.example.facebook_clone.model.notification.Notifier
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.repository.UsersRepository
-import com.example.facebook_clone.ui.activity.MainActivity
-import com.example.facebook_clone.ui.activity.OthersProfileActivity
-import com.example.facebook_clone.ui.activity.PostViewerActivity
-import com.example.facebook_clone.ui.activity.ProfileActivity
+import com.example.facebook_clone.ui.activity.*
 import com.google.api.Billing
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
@@ -112,7 +109,11 @@ class BaseApplication : Application() {
             postId: String?,
             postPublisherId: String?,
             commentPosition: Int?,
-            notifiedId: String?
+            notifiedId: String?,
+            firstCollectionType: String?,
+            creatorReferenceId: String?,
+            secondCollectionType: String?,
+            groupName: String?,
         ) {
 
             val remoteView = RemoteViews(context?.packageName, R.layout.custom_notification_layout)
@@ -174,11 +175,28 @@ class BaseApplication : Application() {
                     destination = PostViewerActivity::class.java
                 }
 
+                "groupInvitation" -> {
+                    remoteView.setTextViewText(
+                        R.id.notificationContentTextView,
+                        "${notifier.name} invited you to join $groupName"
+                    )
+                    destination = GroupActivity::class.java
+                }
+
                 "groupPost" -> {
                     remoteView.setTextViewText(
                         R.id.notificationContentTextView,
-                        "${notifier.name} sent you a friend request"
+                        "${notifier.name} posted in $groupName"
                     )
+                    destination = PostViewerActivity::class.java
+                }
+
+                "groupJoinRequest" -> {
+                    remoteView.setTextViewText(
+                        R.id.notificationContentTextView,
+                        "${notifier.name} wants to join $groupName"
+                    )
+                    destination = NewsFeedActivity::class.java
                 }
 
                 "acceptedInGroup" -> {
@@ -210,6 +228,10 @@ class BaseApplication : Application() {
             //3 Create the action
             val actionIntent = Intent(context, destination)
 
+            actionIntent.putExtra("firstCollectionType", firstCollectionType)
+            actionIntent.putExtra("creatorReferenceId", creatorReferenceId)
+            actionIntent.putExtra("secondCollectionType", secondCollectionType)
+//            actionIntent.putExtra("firstCollectionType", firstCollectionType)
             actionIntent.putExtra("friendRequester", notifier.id.toString())
             actionIntent.putExtra("postPublisherId", postPublisherId)
             actionIntent.putExtra("postId", postId)

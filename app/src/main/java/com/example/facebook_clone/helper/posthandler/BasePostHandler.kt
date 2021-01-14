@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.facebook_clone.R
 import com.example.facebook_clone.helper.listener.CommentsBottomSheetListener
 import com.example.facebook_clone.helper.notification.NotificationsHandler
+import com.example.facebook_clone.model.group.Group
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.model.post.share.Share
@@ -157,6 +158,26 @@ open class BasePostHandler(
         }
     }
 
+    fun buildNotificationHandlerForGroupJoinRequest(
+        notifierId: String,
+        notifierName: String,
+        notifierImageUrl: String,
+        notifiedId: String,
+        notifiedToken: String,
+        group: Group
+        ): NotificationsHandler{
+        return notificationsHandler.apply{
+            this.notifierId = notifierId
+            this.notifierName = notifierName
+            this.notifierImageUrl = notifierImageUrl
+            this.notifiedId = notifiedId
+            this.notifiedToken = notifiedToken
+            this.notificationType = "groupJoinRequest"
+            this.groupId = group.id
+            this.groupName = group.name
+        }
+    }
+
     fun buildNotificationHandlerForPostShares(
         post: Post,
         interactorId: String,
@@ -180,6 +201,29 @@ open class BasePostHandler(
             this.firstCollectionType =firstCollectionType
             this.creatorReferenceId = creatorReferenceId
             this.secondCollectionType = secondCollectionType
+        }
+    }
+
+    fun buildNotificationHandlerForGroupPostCreation(
+        post: Post,
+        interactorId: String,
+        interactorName: String,
+        interactorImageUrl: String,
+        notifiedToken: String,
+    ): NotificationsHandler{
+        return notificationsHandler.apply {
+            this.notifierId = interactorId
+            this.notifierName = interactorName
+            this.notifierImageUrl = interactorImageUrl
+//            this.notifiedId = post.publisherId
+            this.notifiedToken = notifiedToken
+            this.postPublisherId = post.publisherId
+            this.postId = post.id
+            this.groupName = post.groupName
+            this.notificationType = "groupPost"
+            this.firstCollectionType = post.firstCollectionType
+            this.creatorReferenceId = post.creatorReferenceId
+            this.secondCollectionType = post.secondCollectionType
         }
     }
 

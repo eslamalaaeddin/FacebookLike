@@ -63,7 +63,8 @@ class PostViewerActivityPostsHandler(
                 -1
             )
             Toast.makeText(context, "To Profile", Toast.LENGTH_SHORT).show()
-        } else {
+        }
+        else {
             othersProfileActivityPostsHandler.onReactButtonClicked(
                 post,
                 interactorId,
@@ -71,7 +72,8 @@ class PostViewerActivityPostsHandler(
                 interactorImageUrl,
                 reacted,
                 currentReact,
-                -1
+                -1,
+                notifiedToken = notifiedToken
             )
         }
     }
@@ -103,7 +105,8 @@ class PostViewerActivityPostsHandler(
                 interactorImageUrl,
                 reacted,
                 currentReact,
-                -1
+                -1,
+                notifiedToken = notifiedToken
             )
         }
     }
@@ -160,7 +163,8 @@ class PostViewerActivityPostsHandler(
                 interactorId,
                 interactorName,
                 interactorImageUrl,
-                postPosition
+                postPosition,
+                notifiedToken = notifiedToken
             )
         }
     }

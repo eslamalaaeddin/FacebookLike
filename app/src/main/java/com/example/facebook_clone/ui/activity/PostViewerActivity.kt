@@ -11,6 +11,7 @@ import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.facebook_clone.R
+import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.helper.Utils.POSTS_COLLECTION
 import com.example.facebook_clone.helper.Utils.PROFILE_POSTS_COLLECTION
 import com.example.facebook_clone.helper.listener.CommentsBottomSheetListener
@@ -263,15 +264,16 @@ class PostViewerActivity : AppCompatActivity(), CommentsBottomSheetListener {
         showCommentsTextView.setOnClickListener { openCommentsBottomSheet() }
 
         addShareOnPostTextView.setOnClickListener {
-            postViewerActivityPostsHandler.onShareButtonClicked(
-                post,
-                interactorId,
-                interactorName,
-                interactorImageUrl,
-                -1
-            )
+            if (post.firstCollectionType != Utils.GROUP_POSTS_COLLECTION) {
+                postViewerActivityPostsHandler.onShareButtonClicked(
+                    post,
+                    interactorId,
+                    interactorName,
+                    interactorImageUrl,
+                    -1
+                )
+            }
         }
-
         postViewerReactsLayout.setOnClickListener { openPeopleWhoReactedLayout(null, null, "post") }
 
         moreOnPost.setOnClickListener {

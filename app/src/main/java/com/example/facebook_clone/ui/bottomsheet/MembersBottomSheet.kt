@@ -10,6 +10,9 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.GroupMembersAdapter
+import com.example.facebook_clone.helper.listener.GroupMemberListener
+import com.example.facebook_clone.model.group.Group
+import com.example.facebook_clone.model.group.Member
 import com.example.facebook_clone.viewmodel.GroupsViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -20,11 +23,11 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 private const val TAG = "MembersBottomSheet"
-class MembersBottomSheet(private val groupId: String): BottomSheetDialogFragment() {
+class MembersBottomSheet(private val group: Group): BottomSheetDialogFragment(), GroupMemberListener {
     private val auth: FirebaseAuth by inject()
     private val currentUserId = auth.currentUser?.uid.toString()
     private val groupsViewModel by viewModel<GroupsViewModel>()
-    private var membersAdapter = GroupMembersAdapter(emptyList())
+    private lateinit var membersAdapter : GroupMembersAdapter
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
 
@@ -50,14 +53,19 @@ class MembersBottomSheet(private val groupId: String): BottomSheetDialogFragment
         super.onViewCreated(view, savedInstanceState)
         upButtonImageView.setOnClickListener { dismiss() }
         //Get the group live data and
-        val groupLiveData = groupsViewModel.getGroupLiveData(groupId)
+        val groupLiveData = groupsViewModel.getGroupLiveData(group.id.orEmpty())
         groupLiveData.observe(viewLifecycleOwner){
             val members = it.members.orEmpty()
-            Log.i(TAG, "ISLAM onViewCreated: $it")
-            membersAdapter = GroupMembersAdapter(members)
+            membersAdapter = GroupMembersAdapter(members, this)
             groupMemberRecyclerView.adapter = membersAdapter
         }
         
-        adminImageView.setOnClickListener { Toast.makeText(requireContext(), groupId, Toast.LENGTH_SHORT).show() }
+        adminImageView.setOnClickListener { Toast.makeText(requireContext(), group.id, Toast.LENGTH_SHORT).show() }
+    }
+
+    override fun onGroupMemberClicked(member: Member) {
+        //open GroupMember
+        val specificMemberBottomSheet = SpecificMemberBottomSheet(group, member)
+        specificMemberBottomSheet.show(activity?.supportFragmentManager!!, specificMemberBottomSheet.tag)
     }
 }

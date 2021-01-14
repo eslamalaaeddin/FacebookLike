@@ -11,6 +11,7 @@ import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.InvitedFriendsAdapter
 import com.example.facebook_clone.helper.listener.InvitedFriendsListener
 import com.example.facebook_clone.helper.notification.NotificationsHandler
+import com.example.facebook_clone.model.group.Group
 import com.example.facebook_clone.viewmodel.NotificationsFragmentViewModel
 import com.example.facebook_clone.viewmodel.OthersProfileActivityViewModel
 import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
@@ -22,7 +23,7 @@ import kotlinx.android.synthetic.main.invite_members_bottom_sheet.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class InviteMembersBottomSheet(private val groupId: String, private val groupName: String): BottomSheetDialogFragment(), InvitedFriendsListener {
+class InviteMembersBottomSheet(private val group: Group): BottomSheetDialogFragment(), InvitedFriendsListener {
     private val auth: FirebaseAuth by inject()
     private lateinit var invitedFriendsAdapter : InvitedFriendsAdapter
     private val currentUserId :String = auth.currentUser?.uid.toString()
@@ -67,7 +68,7 @@ class InviteMembersBottomSheet(private val groupId: String, private val groupNam
         myLiveData?.observe(viewLifecycleOwner){
             currentUserName = it.name
             currentUserImageUrl = it.profileImageUrl
-            invitedFriendsAdapter = InvitedFriendsAdapter(groupName = groupName, it.friends.orEmpty(), this)
+            invitedFriendsAdapter = InvitedFriendsAdapter(groupName = group.name.orEmpty(), it.friends.orEmpty(), this)
             friendsToBeInvitedRecyclerView.adapter = invitedFriendsAdapter
         }
 
@@ -79,7 +80,7 @@ class InviteMembersBottomSheet(private val groupId: String, private val groupNam
         notificationsHandler.notificationType = "groupInvitation"
         notificationsHandler.notifierImageUrl = currentUserImageUrl
         notificationsHandler.notifierName  = currentUserName
-        notificationsHandler.groupId = groupId
+        notificationsHandler.groupId = group.id.orEmpty()
         notificationsHandler.groupName = groupName
         //get the user live data
         //get its token

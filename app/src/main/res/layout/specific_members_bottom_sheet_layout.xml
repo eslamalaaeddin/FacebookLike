@@ -3,27 +3,67 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:elevation="12dp"
+        android:id="@+id/peopleWhoReactedLayout"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/upButtonImageView"
+            android:layout_width="24dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_semi_up_button" />
+
+        <TextView
+            android:id="@+id/memberNameTextView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:paddingEnd="56dp"
+            android:layout_marginStart="16dp"
+            android:gravity="center"
+            tools:text="Mahmoud Sanad"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/lastSeparator"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="16dp"
+        android:background="@color/medium_gray" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"
-        android:id="@+id/memberRequestsLayout"
+        android:layout_marginTop="16dp"
+        android:id="@+id/viewMemberProfileLayout"
         android:orientation="horizontal">
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginStart="8dp"
             android:layout_gravity="center"
-            app:srcCompat="@drawable/ic_member_request"
+            app:srcCompat="@drawable/ic_profile"
             app:tint="@color/medium_gray" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="36dp"
-            android:text="Member Requests"
+            android:text="View Profile"
             android:layout_gravity="center"
             android:textColor="@color/black"
             android:textSize="16sp"
@@ -34,7 +74,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"
-        android:id="@+id/membersLayout"
+        android:layout_marginTop="16dp"
+        android:id="@+id/blockMemberLayout"
         android:orientation="horizontal">
 
         <ImageView
@@ -42,14 +83,14 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginStart="8dp"
-            app:srcCompat="@drawable/ic_group_members"
+            app:srcCompat="@drawable/ic_block_user"
             app:tint="@color/medium_gray" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="36dp"
-            android:text="Members"
+            android:text="Block Member"
             android:layout_gravity="center"
             android:textColor="@color/black"
             android:textSize="16sp"
@@ -60,51 +101,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"
-        android:id="@+id/leaveGroupLayout"
+        android:layout_marginTop="16dp"
+        android:id="@+id/removeMemberLayout"
         android:orientation="horizontal">
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginStart="8dp"
             android:layout_gravity="center"
-            app:srcCompat="@drawable/ic_leave_group"
+            app:srcCompat="@drawable/ic_delete"
             app:tint="@color/medium_gray" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="36dp"
-            android:text="Leave Group"
+            android:text="Remove Member"
             android:layout_gravity="center"
             android:textColor="@color/black"
             android:textSize="16sp"
             />
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:id="@+id/addMemberLayout"
-        android:orientation="horizontal">
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginStart="8dp"
-            android:layout_gravity="center"
-            app:srcCompat="@drawable/ic_add_member"
-            app:tint="@color/medium_gray" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="36dp"
-            android:text="Add Member"
-            android:layout_gravity="center"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            />
-    </LinearLayout>
 
 
 

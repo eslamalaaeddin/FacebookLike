@@ -35,6 +35,7 @@ class FirebaseService : FirebaseMessagingService() {
         val firstCollectionType = message.data["firstCollectionType"]
         val secondCollectionType = message.data["secondCollectionType"]
         val creatorReferenceId = message.data["creatorReferenceId"]
+        val groupName = message.data["groupName"]
 
         Log.i(TAG, "FAWZY onMessageReceived: $message")
         Log.i(TAG, "FAWZY onMessageReceived: ${message.data}")
@@ -51,7 +52,12 @@ class FirebaseService : FirebaseMessagingService() {
             postId = postId,
             postPublisherId = postPublisherId,
             commentPosition = commentPosition,
-            notifiedId = notifiedId
+            notifiedId = notifiedId,
+            firstCollectionType = firstCollectionType,
+            creatorReferenceId = creatorReferenceId,
+            secondCollectionType = secondCollectionType,
+            groupName = groupName
+
         )
     }
 
@@ -64,6 +70,11 @@ class FirebaseService : FirebaseMessagingService() {
         postId: String?,
         postPublisherId:String?,
         commentPosition: Int?,
+        firstCollectionType: String?,
+        creatorReferenceId: String?,
+        secondCollectionType: String?,
+        groupName: String?,
+
     ){
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -90,7 +101,12 @@ class FirebaseService : FirebaseMessagingService() {
                             postId,
                             postPublisherId ,
                             commentPosition,
-                            notifiedId)
+                            notifiedId,
+                            firstCollectionType = firstCollectionType,
+                            creatorReferenceId = creatorReferenceId,
+                            secondCollectionType = secondCollectionType,
+                            groupName = groupName
+                        )
                     }
                 })
         }

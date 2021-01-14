@@ -64,7 +64,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_shield"
-        app:tint="@color/white" />
+        app:tint="@color/white"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/groupNameTextView"
@@ -91,12 +92,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/groupNameTextView" />
 
+
     <LinearLayout
         android:id="@+id/showGroupMembersLayout"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
         android:gravity="start|center"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -106,8 +109,8 @@
             android:id="@+id/secondMemberPlaceHolder"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:scaleType="centerCrop"
             android:layout_marginStart="16dp"
+            android:scaleType="centerCrop"
             android:src="@drawable/sarhan"
             app:civ_border_overlay="true"
             app:layout_constraintStart_toStartOf="parent"
@@ -146,14 +149,13 @@
             android:id="@+id/inviteFriendButton"
             android:layout_width="wrap_content"
             android:layout_height="36dp"
-            android:focusable="true"
             android:layout_marginStart="32dp"
             android:background="@drawable/round_background"
             android:backgroundTint="@color/light_blue"
+            android:focusable="true"
             android:text="invite"
             android:textAllCaps="false"
-            android:textColor="@color/white"
-           />
+            android:textColor="@color/white" />
 
     </LinearLayout>
 
@@ -218,6 +220,32 @@
         app:layout_constraintTop_toTopOf="@+id/moreImageView"
         app:srcCompat="@drawable/ic_search"
         app:tint="@color/white" />
+
+    <Button
+        android:id="@+id/joinGroupButton"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="Join Group"
+        app:layout_constraintBottom_toBottomOf="@+id/showGroupMembersLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/showGroupMembersLayout"
+        app:layout_constraintTop_toTopOf="@+id/showGroupMembersLayout"
+        tools:visibility="gone" />
+
+<!--    <Button-->
+<!--        android:id="@+id/canceljoiningGroupButton"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="52dp"-->
+<!--        android:layout_marginStart="8dp"-->
+<!--        android:layout_marginEnd="8dp"-->
+<!--        android:text="Cancel Joining Group"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/showGroupMembersLayout"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="@+id/showGroupMembersLayout"-->
+<!--        app:layout_constraintTop_toTopOf="@+id/showGroupMembersLayout"-->
+<!--        tools:visibility="gone" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
