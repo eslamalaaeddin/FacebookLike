@@ -34,6 +34,7 @@ class ProfileActivityViewModel(private val usersRepository: UsersRepository) : V
         return usersRepository.addImageToCloudStorage(bitmap,"profile")
     }
 
+
     fun uploadProfileImageToUserCollection(photoUrl: String): Task<Void> {
         return usersRepository.addProfileImageToUserCollection(photoUrl)
     }

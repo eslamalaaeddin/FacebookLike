@@ -1,6 +1,7 @@
 package com.example.facebook_clone.ui.bottomsheet
 
 import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,11 +14,14 @@ import com.example.facebook_clone.adapter.GroupMembersAdapter
 import com.example.facebook_clone.helper.listener.GroupMemberListener
 import com.example.facebook_clone.model.group.Group
 import com.example.facebook_clone.model.group.Member
+import com.example.facebook_clone.ui.activity.OthersProfileActivity
+import com.example.facebook_clone.ui.activity.ProfileActivity
 import com.example.facebook_clone.viewmodel.GroupsViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.group_members_bottom_sheet_layout.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -58,14 +62,35 @@ class MembersBottomSheet(private val group: Group): BottomSheetDialogFragment(),
             val members = it.members.orEmpty()
             membersAdapter = GroupMembersAdapter(members, this)
             groupMemberRecyclerView.adapter = membersAdapter
+
         }
+
+        setAdminUi()
         
-        adminImageView.setOnClickListener { Toast.makeText(requireContext(), group.id, Toast.LENGTH_SHORT).show() }
+        adminLayout.setOnClickListener {
+            navigateToMemberProfile(group.admins.orEmpty().first().id.orEmpty())
+        }
+    }
+
+    private fun setAdminUi() {
+        val admin = group.admins.orEmpty().first()
+        Picasso.get().load(admin.imageUrl.orEmpty()).into(adminImageView)
+        adminNameTextView.text = admin.name
     }
 
     override fun onGroupMemberClicked(member: Member) {
         //open GroupMember
         val specificMemberBottomSheet = SpecificMemberBottomSheet(group, member)
         specificMemberBottomSheet.show(activity?.supportFragmentManager!!, specificMemberBottomSheet.tag)
+    }
+
+    private fun navigateToMemberProfile(memberId: String) {
+        if (memberId == auth.currentUser?.uid.toString()) {
+            startActivity(Intent(requireContext(), ProfileActivity::class.java))
+        } else {
+            val intent = Intent(requireContext(), OthersProfileActivity::class.java)
+            intent.putExtra("userId", memberId)
+            startActivity(intent)
+        }
     }
 }

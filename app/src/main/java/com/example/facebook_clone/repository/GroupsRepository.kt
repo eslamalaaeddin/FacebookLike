@@ -1,5 +1,6 @@
 package com.example.facebook_clone.repository
 
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -26,6 +27,8 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.UploadTask
+import java.io.ByteArrayOutputStream
 
 class GroupsRepository(
     private val database: FirebaseFirestore,
@@ -120,6 +123,42 @@ class GroupsRepository(
             .document(group.id.orEmpty())
             .update("joinRequests", FieldValue.arrayRemove(joinRequest))
     }
+
+    fun turnOffPostCommenting(post: Post): Task<Void>{
+        return database
+            .collection(post.firstCollectionType)
+            .document(post.creatorReferenceId)
+            .collection(post.secondCollectionType)
+            .document(post.id.orEmpty())
+            .update("commentsAvailable", false)
+    }
+
+    fun turnOnPostCommenting(post: Post): Task<Void>{
+        return database
+            .collection(post.firstCollectionType)
+            .document(post.creatorReferenceId)
+            .collection(post.secondCollectionType)
+            .document(post.id.orEmpty())
+            .update("commentsAvailable", true)
+    }
+
+    fun uploadGroupCoverToCloudStorage(bitmap: Bitmap, groupId: String): UploadTask {
+        val firebaseStorageRef =
+            storage.reference.child(groupId).child("Cover images")
+                .child("${groupId}.jpeg")
+
+        val byteArrayOutputStream = ByteArrayOutputStream()
+
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+
+        return firebaseStorageRef.putBytes(byteArrayOutputStream.toByteArray())
+    }
+
+    fun addCoverImageToGroupCollection(photoUrl: String, groupId: String): Task<Void> {
+        return database.collection(GROUPS_COLLECTION).document(groupId)
+            .update("coverImageUrl", photoUrl)
+    }
+
 
 
 

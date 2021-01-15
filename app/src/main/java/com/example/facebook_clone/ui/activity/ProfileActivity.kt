@@ -11,11 +11,13 @@ import com.example.facebook_clone.adapter.FriendsAdapter
 import com.example.facebook_clone.adapter.ProfilePostsAdapter
 import com.example.facebook_clone.helper.posthandler.ProfileActivityPostsHandler
 import com.example.facebook_clone.helper.Utils.POST_FROM_PROFILE
+import com.example.facebook_clone.helper.listener.FriendClickListener
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.user.friend.Friend
 import com.example.facebook_clone.ui.bottomsheet.ProfileCoverBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.ProfileImageBottomSheet
+import com.example.facebook_clone.ui.bottomsheet.UserFriendsBottomSheet
 import com.example.facebook_clone.ui.dialog.PostCreatorDialog
 import com.example.facebook_clone.viewmodel.PostViewModel
 import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
@@ -38,7 +40,7 @@ private const val TAG = "ProfileActivity"
 private const val REQUEST_CODE_COVER_IMAGE = 123
 private const val REQUEST_CODE_PROFILE_IMAGE = 456
 
-class ProfileActivity() : AppCompatActivity() {
+class ProfileActivity() : AppCompatActivity(), FriendClickListener{
     private val profileActivityViewModel by viewModel<ProfileActivityViewModel>()
     private val postViewModel by viewModel<PostViewModel>()
     private val auth: FirebaseAuth by inject()
@@ -104,6 +106,15 @@ class ProfileActivity() : AppCompatActivity() {
                     currentUser.profileImageUrl.toString()
                 )
         }
+
+        seeAllFriendsButton.setOnClickListener {
+            showUserFriendsBottomSheet()
+        }
+    }
+
+    private fun showUserFriendsBottomSheet() {
+        val userFriendsBottomSheet = UserFriendsBottomSheet(friends = currentUser.friends.orEmpty(), this)
+        userFriendsBottomSheet.show(supportFragmentManager, userFriendsBottomSheet.tag)
     }
 
     @SuppressLint("SetTextI18n")
@@ -170,6 +181,19 @@ class ProfileActivity() : AppCompatActivity() {
         if (requestCode == REQUEST_CODE_PROFILE_IMAGE && resultCode == RESULT_OK) {
             val bitmap = data?.extras?.get("data") as Bitmap
             profileActivityPostsHandler.uploadProfileImageToCloudStorage(bitmap)
+        }
+    }
+
+    override fun onFriendClicked(friendId: String) {
+        if (friendId == currentUser.id){
+            val intent = Intent(this, ProfileActivity::class.java)
+            intent.putExtra("userId", friendId)
+            startActivity(intent)
+        }
+        else{
+            val intent = Intent(this, OthersProfileActivity::class.java)
+            intent.putExtra("userId", friendId)
+            startActivity(intent)
         }
     }
 }

@@ -28,16 +28,6 @@
         app:layout_constraintStart_toEndOf="@+id/memberImageView"
         app:layout_constraintTop_toTopOf="@+id/memberImageView" />
 
-    <ImageButton
-        android:id="@+id/moreOnMemberImageButton"
-        android:layout_width="64dp"
-        android:layout_height="36dp"
-        android:layout_marginEnd="8dp"
-        android:background="@drawable/round_buttons"
-        android:backgroundTint="@android:color/transparent"
-        android:src="@drawable/ic_more"
-        app:layout_constraintBottom_toBottomOf="@+id/memberNameTextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/memberNameTextView" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

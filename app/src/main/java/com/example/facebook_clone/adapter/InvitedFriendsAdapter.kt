@@ -6,12 +6,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.facebook_clone.R
 import com.example.facebook_clone.helper.listener.InvitedFriendsListener
+import com.example.facebook_clone.model.group.Group
 import com.example.facebook_clone.model.user.friend.Friend
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.invited_friend_item_layout.view.*
 
 class InvitedFriendsAdapter(
-    private val groupName: String,
+    private val group: Group,
     private val friends: List<Friend>,
     private val invitedFriendListener: InvitedFriendsListener
     ):
@@ -27,13 +28,27 @@ class InvitedFriendsAdapter(
                  //I forgot to desing the Friend model so that it contains friend Token, so will query it in the invite
                  //members bottom sheet
                  val currentFriendId = currentFriend.id.toString()
-                 invitedFriendLstnr.onInviteButtonClicked(currentFriendId, groupName)
+                 invitedFriendLstnr.onInviteButtonClicked(currentFriendId, group.name.orEmpty())
              }
          }
 
         fun bindFriends(friend: Friend){
-            itemView.invitedFriendNameTextView.text = friend.name
-            picasso.load(friend.imageUrl).into(itemView.smallUserImageView)
+                for (member in group.members.orEmpty()){
+                    if (friend.id == member.id){
+                        itemView.visibility = View.GONE
+                        itemView.layoutParams = RecyclerView.LayoutParams(0, 0)
+                    }
+                    else{
+                        itemView.visibility = View.VISIBLE
+                        itemView.layoutParams = RecyclerView.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT)
+                        itemView.invitedFriendNameTextView.text = friend.name
+                        picasso.load(friend.imageUrl).into(itemView.smallUserImageView)
+                    }
+                }
+
+
         }
 
     }

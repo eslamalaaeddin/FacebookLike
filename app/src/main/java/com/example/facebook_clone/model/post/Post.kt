@@ -13,20 +13,17 @@ import kotlin.collections.HashMap
 data class Post(
     var id: String? = UUID.randomUUID().toString(),
     var content: String? = null,
-    var attachmentUrl: String? = null,//it will hold urls for media as images, videos, and docs
-    var attachmentType: String? = null,//video, or image.....
+    var attachmentUrl: String? = null,
+    var attachmentType: String? = null,
     var comments: List<Comment>? = null,
+    var commentsAvailable: Boolean = true,
     var reacts: List<React>? = null,
     var shares: MutableList<Share>? = null,
     var publisherId: String? = null,
     var publisherImageUrl: String? = null,
     var publisherName: String? = null,
-    var visibility: Int? = 0, // 0 --> public, 1 --> private ......
+    var visibility: Int? = 0,
     val creationTime: Timestamp = Timestamp(Date()),
-   // var publisherToken: String? = null,
-//    @get:Exclude var firstCollectionType: String = "",
-//    @get:Exclude var creatorReferenceId: String = "",
-//    @get:Exclude var secondCollectionType: String = "",
     var firstCollectionType: String = "",
     var creatorReferenceId: String = "",
     var secondCollectionType: String = "",

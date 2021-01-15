@@ -219,6 +219,7 @@ class OthersProfileActivityPostsHandler(
                 comments = null,
                 //publisherToken = NewsFeedActivity.getTokenFromSharedPreference(context),
                 firstCollectionType = Utils.POSTS_COLLECTION,
+                creatorReferenceId = share.sharerId.orEmpty(),
                 secondCollectionType = Utils.PROFILE_POSTS_COLLECTION
             )
             if (task.isSuccessful) {

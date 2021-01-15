@@ -1,11 +1,13 @@
 package com.example.facebook_clone.ui.activity
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
+import android.view.Window
+import android.widget.TextView
 import android.widget.Toast
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.ProfilePostsAdapter
@@ -17,18 +19,22 @@ import com.example.facebook_clone.helper.posthandler.GroupsActivityPostsHandler
 import com.example.facebook_clone.helper.posthandler.OthersProfileActivityPostsHandler
 import com.example.facebook_clone.helper.posthandler.ProfileActivityPostsHandler
 import com.example.facebook_clone.model.group.Group
-import com.example.facebook_clone.model.group.JoinRequest
 import com.example.facebook_clone.model.group.Member
+import com.example.facebook_clone.model.group.SemiGroup
 //import com.example.facebook_clone.helper.posthandler.GroupsActivityPostsHandler
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.ui.bottomsheet.AdminToolsBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.InviteMembersBottomSheet
+import com.example.facebook_clone.ui.bottomsheet.MemberPostConfigurationBottomSheet
+import com.example.facebook_clone.ui.bottomsheet.MembersBottomSheet
+import com.example.facebook_clone.ui.dialog.ImageViewerDialog
 import com.example.facebook_clone.ui.dialog.PostCreatorDialog
 import com.example.facebook_clone.viewmodel.*
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_group.*
+import kotlinx.android.synthetic.main.profile_cover_bottom_sheet_layout.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -126,7 +132,7 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener,
                     break
                 }
                 else if (member.id.orEmpty() != currentUserId ) {
-                    Toast.makeText(this, "Not Member ${member.id}", Toast.LENGTH_SHORT).show()
+                   // Toast.makeText(this, "Not Member ${member.id}", Toast.LENGTH_SHORT).show()
                     updateUIForNonMemberUser()
 //                    val groupJoinRequests = group.joinRequests.orEmpty()
 //                    if (groupJoinRequests.isNotEmpty()){
@@ -141,14 +147,20 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener,
                 }
             }
 
+            groupCoverImageView.setOnClickListener {
+                val imageViewerDialog = ImageViewerDialog()
+                imageViewerDialog.show(supportFragmentManager, "signature")
+                imageViewerDialog.setMediaUrl(group.coverImageUrl.orEmpty())
+            }
+
             picasso.load(group.coverImageUrl).into(groupCoverImageView)
             groupNameTextView.text = group.name
-            groupMembersCountTextView.text = "${groupMembers.size + 2} Members"
+            groupMembersCountTextView.text = "${groupMembers.size } Members"
             if (groupMembers.size >= 2) {
                 val firstMember = groupMembers[0]
                 val secondMember = groupMembers[1]
 
-                picasso.load(firstMember.imageUrl).into(firstMemberPlaceHolder)
+                picasso.load(firstMember.imageUrl).into(thirdMemberPlaceHolder)
                 picasso.load(secondMember.imageUrl).into(secondMemberPlaceHolder)
             }
         }
@@ -187,16 +199,34 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener,
 
         inviteFriendButton.setOnClickListener {
             val inviteMembersBottomSheet = currentGroup?.let { it1 -> InviteMembersBottomSheet(it1) }
-            inviteMembersBottomSheet?.show(supportFragmentManager, inviteMembersBottomSheet?.tag)
+            inviteMembersBottomSheet?.show(supportFragmentManager, inviteMembersBottomSheet.tag)
         }
 
         showGroupMembersLayout.setOnClickListener {
-            Toast.makeText(this, "Islam love Alaa", Toast.LENGTH_SHORT).show()
+            currentGroup?.let { group ->
+                showMembersBottomSheet(group)
+            }
         }
 
         smallUserImageView.setOnClickListener { navigateToUserProfile() }
 
         whatIsInYourMindButton.setOnClickListener { showPostCreatorDialog() }
+
+        moreImageView.setOnClickListener {
+            //Should create bottom sheet that contains leave group nad info, but let it for now as it is
+            currentGroup?.let {group ->
+                val groupMembers = group.members.orEmpty()
+                if (groupMembers.isNotEmpty()){
+                    val member = groupMembers.first { member -> currentUserId == member.id }
+                    showLeaveGroupDialog(group, member)
+                }
+            }
+        }
+    }
+
+    private fun showMembersBottomSheet(group: Group) {
+        val membersBottomSheet = MembersBottomSheet(group)
+        membersBottomSheet.show(supportFragmentManager, membersBottomSheet.tag)
     }
 
     private fun updateUIForNonMemberUser() {
@@ -209,6 +239,8 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener,
 
     private fun updateUIForMemberUser() {
         joinGroupButton.visibility = View.GONE
+        whatIsInYourMindButton.visibility = View.VISIBLE
+        smallUserImageView.visibility = View.VISIBLE
     }
 
     private fun showAdminToolsBottomSheet(group: Group) {
@@ -238,6 +270,7 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener,
     }
 
     override fun onMembersClicked() {
+
     }
 
     override fun onLeaveClicked() {
@@ -400,15 +433,57 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener,
 
     override fun onPostMoreDotsClicked(interactorId: String, post: Post, shared: Boolean?) {
         if (interactorId == adminId) {
-            Toast.makeText(this, "Show Admin tools", Toast.LENGTH_SHORT).show()
+            showPostAdminTools(post)
         } else {
-            Toast.makeText(this, "Show member tools", Toast.LENGTH_SHORT).show()
+            if (interactorId == post.publisherId) {
+                showMemberPostTools(post)
+            }else{
+                showMemberPostTools(null)
+            }
         }
     }
 
     override fun onSharedPostClicked(originalPostPublisherId: String, postId: String) {
 
     }
+
+    private fun showPostAdminTools(post: Post){
+        val memberPostConfigurationBottomSheet = MemberPostConfigurationBottomSheet(post, "admin")
+        memberPostConfigurationBottomSheet.also {
+            it.show(supportFragmentManager, it.tag)
+        }
+    }
+
+    private fun showMemberPostTools(post: Post?){
+            val memberPostConfigurationBottomSheet = MemberPostConfigurationBottomSheet(post, "member")
+            memberPostConfigurationBottomSheet.also {
+                it.show(supportFragmentManager, it.tag)
+            }
+    }
+
+    private fun turnOffPostCommenting(post: Post){
+        groupsViewModel.turnOffPostCommenting(post).addOnCompleteListener { task ->
+            if (task.isSuccessful){
+
+            }
+            else{
+                Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun turnOnPostCommenting(post: Post){
+        groupsViewModel.turnOnPostCommenting(post).addOnCompleteListener { task ->
+            if (task.isSuccessful){
+
+            }
+            else{
+                Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+
 
     override fun onGroupPostCreated(post: Post) {
         currentGroup?.let { group ->
@@ -434,6 +509,46 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener,
                 }
             }
         }
+    }
+
+    private fun showLeaveGroupDialog(group: Group, member: Member) {
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.leave_group_layout)
+
+        val cancelButton = dialog.findViewById(R.id.cancelLeavingGroupTextView) as TextView
+        val leaveButton = dialog.findViewById(R.id.leaveGroupTextView) as TextView
+
+        cancelButton.setOnClickListener {
+            dialog.dismiss()
+        }
+        leaveButton.setOnClickListener {
+            groupsViewModel.deleteMemberFromGroup(group.id.orEmpty(), member).addOnCompleteListener {
+                if (it.isSuccessful){
+                    val semiGroup = SemiGroup(
+                        id = group.id,
+                        name = group.name,
+                        coverUrl = group.coverImageUrl
+                    )
+                    groupsViewModel.deleteGroupFromUserGroups(member, semiGroup).addOnCompleteListener {
+                        if (it.isSuccessful){
+                            Toast.makeText(this, "You left :(", Toast.LENGTH_SHORT).show()
+                        }
+                        else{
+                            Toast.makeText(this, it.exception?.message, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                }
+                else{
+                    Toast.makeText(this, it.exception?.message, Toast.LENGTH_SHORT).show()
+                }
+                dialog.dismiss()
+            }
+        }
+        dialog.show()
+
     }
 
 }

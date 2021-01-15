@@ -12,6 +12,7 @@ import com.example.facebook_clone.adapter.InvitedFriendsAdapter
 import com.example.facebook_clone.helper.listener.InvitedFriendsListener
 import com.example.facebook_clone.helper.notification.NotificationsHandler
 import com.example.facebook_clone.model.group.Group
+import com.example.facebook_clone.model.user.friend.Friend
 import com.example.facebook_clone.viewmodel.NotificationsFragmentViewModel
 import com.example.facebook_clone.viewmodel.OthersProfileActivityViewModel
 import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
@@ -68,7 +69,8 @@ class InviteMembersBottomSheet(private val group: Group): BottomSheetDialogFragm
         myLiveData?.observe(viewLifecycleOwner){
             currentUserName = it.name
             currentUserImageUrl = it.profileImageUrl
-            invitedFriendsAdapter = InvitedFriendsAdapter(groupName = group.name.orEmpty(), it.friends.orEmpty(), this)
+
+            invitedFriendsAdapter = InvitedFriendsAdapter(group = group, it.friends.orEmpty(), this)
             friendsToBeInvitedRecyclerView.adapter = invitedFriendsAdapter
         }
 
@@ -82,12 +84,15 @@ class InviteMembersBottomSheet(private val group: Group): BottomSheetDialogFragm
         notificationsHandler.notifierName  = currentUserName
         notificationsHandler.groupId = group.id.orEmpty()
         notificationsHandler.groupName = groupName
-        //get the user live data
-        //get its token
-        //notify him(notification in fragment || notification with sound )
-//        notificationsHandler.notifiedToken = token
-        //NOTIFICATION IN FRAGMENT
-        notificationsHandler.handleNotificationCreationAndFiring()
+
+        val notifiedLiveData = profileActivityViewModel.getAnotherUser(invitedId)
+        notifiedLiveData?.observe(viewLifecycleOwner){user ->
+            val token = user.token.orEmpty()
+            notificationsHandler.notifiedToken = token
+            notificationsHandler.handleNotificationCreationAndFiring()
+            Toast.makeText(requireContext(), "Invitation sent ", Toast.LENGTH_SHORT).show()
+            notifiedLiveData.removeObservers(viewLifecycleOwner)
+        }
     }
 
 

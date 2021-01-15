@@ -336,6 +336,8 @@ class PostsRepository(
             .update("shares", FieldValue.arrayUnion(share))
     }
 
+
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     fun uploadPostImageToCloudStorage(bitmap: Bitmap): UploadTask {

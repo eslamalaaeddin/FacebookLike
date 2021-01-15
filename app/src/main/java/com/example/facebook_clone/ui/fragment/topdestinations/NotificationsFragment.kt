@@ -167,7 +167,13 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), Notific
     }
 
     override fun onClickOnGroupInvitationNotification(notifierId: String, groupId: String) {
-        Toast.makeText(requireContext(), "$notifierId || $groupId", Toast.LENGTH_SHORT).show()
+        navigateToGroup(groupId)
+    }
+
+    private fun navigateToGroup(groupId: String) {
+        val intent = Intent(requireContext(), GroupActivity::class.java)
+        intent.putExtra("groupId", groupId)
+        startActivity(intent)
     }
 
     override fun onAcceptGroupInvitationButtonClicked(groupId: String, notificationId: String) {
@@ -194,7 +200,13 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), Notific
     }
 
     private fun addGroupToUserGroups(userId: String, semiGroup: SemiGroup) {
-        groupViewModel.addGroupToUserGroups(userId, semiGroup)
+        groupViewModel.addGroupToUserGroups(userId, semiGroup).addOnCompleteListener {
+            if (it.isSuccessful){
+                Toast.makeText(requireContext(), "You are now a member in ${semiGroup.name}", Toast.LENGTH_SHORT).show()
+            }else{
+                Toast.makeText(requireContext(), it.exception?.message, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun deleteFriendRequestFromMeAndHim(notificationId: String) {

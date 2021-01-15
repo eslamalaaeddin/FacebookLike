@@ -184,7 +184,7 @@
         android:layout_width="0dp"
         android:layout_height="12dp"
         android:layout_marginTop="16dp"
-        android:background="@color/gray"
+        android:background="#A8A8A8"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/seeAllFriendsButton" />
@@ -224,19 +224,23 @@
         app:layout_constraintStart_toStartOf="@+id/textView7"
         app:layout_constraintTop_toBottomOf="@+id/textView7" />
 
-    <TextView
+    <Button
         android:id="@+id/whatIsInYourMindButton"
+        style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
+        android:background="@drawable/rounded_stroked_background"
         android:gravity="center|start"
+        android:paddingStart="8dp"
         android:text="What is in your mind?"
+        android:textAllCaps="false"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="@+id/smallUserImageView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/smallUserImageView"
-        app:layout_constraintTop_toBottomOf="@+id/textView7" />
+        app:layout_constraintTop_toTopOf="@+id/smallUserImageView" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/profilePostsRecyclerView"

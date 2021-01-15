@@ -18,6 +18,7 @@ import com.example.facebook_clone.helper.Utils.POST_FROM_GROUP
 import com.example.facebook_clone.helper.listener.PostListener
 import com.example.facebook_clone.model.post.react.React
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.android.synthetic.main.post_visibility_item_layout.view.*
 import kotlinx.android.synthetic.main.profile_post_item.view.addCommentTextView
 import kotlinx.android.synthetic.main.profile_post_item.view.addReactTextView
 import kotlinx.android.synthetic.main.profile_post_item.view.addShareTextView
@@ -297,6 +298,13 @@ class ProfilePostsAdapter(
                 itemView.moreOnPost.visibility = View.VISIBLE
             } else {
                 itemView.moreOnPost.visibility = View.GONE
+            }
+
+            //To remove visibility icon in group
+            if (post.groupId != null || post.groupName != null){
+                itemView.postVisibilityImageView?.let { it.visibility = View.INVISIBLE}
+            }else{
+                itemView.postVisibilityImageView?.let { it.visibility = View.VISIBLE}
             }
         }
 

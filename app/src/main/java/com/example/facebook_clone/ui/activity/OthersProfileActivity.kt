@@ -39,6 +39,8 @@ import kotlinx.android.synthetic.main.activity_others_profile.*
 import kotlinx.android.synthetic.main.activity_others_profile.friendsCountTextView
 import kotlinx.android.synthetic.main.activity_others_profile.friendsRecyclerView
 import kotlinx.android.synthetic.main.activity_others_profile.profilePostsRecyclerView
+import kotlinx.android.synthetic.main.activity_others_profile.seeAllFriendsButton
+import kotlinx.android.synthetic.main.activity_profile.*
 import kotlinx.android.synthetic.main.activity_profile.bioTextView
 import kotlinx.android.synthetic.main.activity_profile.coverImageView
 import kotlinx.android.synthetic.main.activity_profile.joinDateTextView
@@ -82,7 +84,9 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             notificationsFragmentViewModel = notificationsFragmentViewModel
         )
 
-
+        seeAllFriendsButton.setOnClickListener {
+            showUserFriendsBottomSheet()
+        }
 
         val myLiveData = profileActivityViewModel.getMe(auth.currentUser?.uid.toString())
         myLiveData?.observe(this, { user ->
@@ -250,6 +254,11 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
             val usersRelationsBottomSheet = UserRelationsBottomSheet(userIdIAmViewing.toString())
             usersRelationsBottomSheet.show(supportFragmentManager, usersRelationsBottomSheet.tag)
         }
+    }
+
+    private fun showUserFriendsBottomSheet() {
+            val userFriendsBottomSheet = UserFriendsBottomSheet(friends = currentUser.friends.orEmpty(), this)
+            userFriendsBottomSheet.show(supportFragmentManager, userFriendsBottomSheet.tag)
     }
 
     private fun showUserImage(imageUrl: String){

@@ -95,10 +95,10 @@ class SpecificMemberBottomSheet(private val group: Group, private val member: Me
                         name = group.name,
                         coverUrl = group.coverImageUrl
                     )
+
                     groupsViewModel.deleteGroupFromUserGroups(member, semiGroup).addOnCompleteListener {
                         if (it.isSuccessful){
                             Toast.makeText(requireContext(), "${member.name} removed successfully", Toast.LENGTH_SHORT).show()
-                            dialog.dismiss()
                         }
                         else{
                             Toast.makeText(requireContext(), it.exception?.message, Toast.LENGTH_SHORT).show()
@@ -109,6 +109,7 @@ class SpecificMemberBottomSheet(private val group: Group, private val member: Me
                 else{
                     Toast.makeText(requireContext(), it.exception?.message, Toast.LENGTH_SHORT).show()
                 }
+                dialog.dismiss()
             }
         }
         dialog.show()
