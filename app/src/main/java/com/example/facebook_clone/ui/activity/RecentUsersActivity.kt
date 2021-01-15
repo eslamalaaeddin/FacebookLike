@@ -9,8 +9,8 @@ import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.helper.listener.RecentUsersClickListener
 import com.example.facebook_clone.model.user.recentloggedinuser.RecentLoggedInUser
 import com.example.facebook_clone.model.user.recentloggedinuser.RecentLoggedInUsersDocument
-import com.example.facebook_clone.viewmodel.LoginFragmentViewModel
-import com.example.facebook_clone.viewmodel.RecentUsersActivityViewModel
+import com.example.facebook_clone.viewmodel.fragment.LoginFragmentViewModel
+import com.example.facebook_clone.viewmodel.activity.RecentUsersActivityViewModel
 import com.google.android.gms.tasks.Task
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult

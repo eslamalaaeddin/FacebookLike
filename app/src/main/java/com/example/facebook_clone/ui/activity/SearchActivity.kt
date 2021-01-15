@@ -16,7 +16,7 @@ import com.example.facebook_clone.helper.listener.SearchedItemListener
 import com.example.facebook_clone.model.group.Group
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.model.user.search.Search
-import com.example.facebook_clone.viewmodel.SearchActivityViewModel
+import com.example.facebook_clone.viewmodel.activity.SearchActivityViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_search.*
 import org.koin.android.ext.android.inject

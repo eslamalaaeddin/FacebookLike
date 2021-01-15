@@ -13,7 +13,7 @@ import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.model.user.recentloggedinuser.RecentLoggedInUser
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.ui.activity.ProfilePictureActivity
-import com.example.facebook_clone.viewmodel.PasswordFragmentViewModel
+import com.example.facebook_clone.viewmodel.fragment.PasswordFragmentViewModel
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.iid.FirebaseInstanceId

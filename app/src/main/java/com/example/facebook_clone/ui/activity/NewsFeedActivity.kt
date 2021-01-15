@@ -9,7 +9,7 @@ import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.NewsFeedTabsAdapter
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.model.user.recentloggedinuser.RecentLoggedInUser
-import com.example.facebook_clone.viewmodel.NewsFeedActivityViewModel
+import com.example.facebook_clone.viewmodel.activity.NewsFeedActivityViewModel
 import com.example.facebook_clone.viewmodel.PostViewModel
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
@@ -101,7 +101,7 @@ class NewsFeedActivity : AppCompatActivity() {
 
 
         newsFeedTabLayout.getTabAt(0)?.setIcon(R.drawable.ic_news_feed)
-        newsFeedTabLayout.getTabAt(1)?.setIcon(R.drawable.ic_group)
+        newsFeedTabLayout.getTabAt(1)?.setIcon(R.drawable.ic_group_members)
         newsFeedTabLayout.getTabAt(2)?.setIcon(R.drawable.ic_alarm)
         newsFeedTabLayout.getTabAt(3)?.setIcon(R.drawable.ic_menu)
 

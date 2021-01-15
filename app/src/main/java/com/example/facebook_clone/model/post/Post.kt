@@ -28,6 +28,7 @@ data class Post(
     var creatorReferenceId: String = "",
     var secondCollectionType: String = "",
     var groupName: String? = null,
-    var groupId: String? = null
+    var groupId: String? = null,
+    var fromWhere: String? = null
 
 )

@@ -1,4 +1,4 @@
-package com.example.facebook_clone.viewmodel
+package com.example.facebook_clone.viewmodel.fragment
 
 import androidx.lifecycle.ViewModel
 import com.example.facebook_clone.repository.UsersRepository

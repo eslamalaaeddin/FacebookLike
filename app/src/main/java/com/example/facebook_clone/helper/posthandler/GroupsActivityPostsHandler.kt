@@ -3,10 +3,10 @@ package com.example.facebook_clone.helper.posthandler
 import android.content.Context
 import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.model.group.Group
-import com.example.facebook_clone.viewmodel.NotificationsFragmentViewModel
-import com.example.facebook_clone.viewmodel.OthersProfileActivityViewModel
+import com.example.facebook_clone.viewmodel.fragment.NotificationsFragmentViewModel
+import com.example.facebook_clone.viewmodel.activity.OthersProfileActivityViewModel
 import com.example.facebook_clone.viewmodel.PostViewModel
-import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
+import com.example.facebook_clone.viewmodel.activity.ProfileActivityViewModel
 
 private const val TAG = "GroupsActivityPostsHand"
 private const val FIRST_COLLECTION_TYPE = Utils.GROUP_POSTS_COLLECTION

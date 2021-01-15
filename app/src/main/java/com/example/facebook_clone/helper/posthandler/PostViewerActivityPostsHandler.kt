@@ -1,16 +1,14 @@
 package com.example.facebook_clone.helper.posthandler
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
-import com.example.facebook_clone.helper.listener.CommentsBottomSheetListener
 import com.example.facebook_clone.helper.listener.PostViewerActivityListener
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.react.React
-import com.example.facebook_clone.viewmodel.NotificationsFragmentViewModel
-import com.example.facebook_clone.viewmodel.OthersProfileActivityViewModel
+import com.example.facebook_clone.viewmodel.fragment.NotificationsFragmentViewModel
+import com.example.facebook_clone.viewmodel.activity.OthersProfileActivityViewModel
 import com.example.facebook_clone.viewmodel.PostViewModel
-import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
+import com.example.facebook_clone.viewmodel.activity.ProfileActivityViewModel
 
 private const val TAG = "PostViewerActivityPosts"
 

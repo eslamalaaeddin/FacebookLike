@@ -4,6 +4,8 @@ import com.example.facebook_clone.repository.GroupsRepository
 import com.example.facebook_clone.repository.PostsRepository
 import com.example.facebook_clone.repository.UsersRepository
 import com.example.facebook_clone.viewmodel.*
+import com.example.facebook_clone.viewmodel.activity.*
+import com.example.facebook_clone.viewmodel.fragment.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -60,6 +62,8 @@ val postViewerActivityViewModelModule = module { viewModel { PostViewerViewModel
 val groupsFragmentViewModel = module { viewModel { GroupsFragmentViewModel(get()) }}
 
 val groupsViewModelModule = module { viewModel { GroupsViewModel(get()) }}
+
+val newsFeedFragmentViewModelModule = module { viewModel { NewsFeedFragmentViewModel(get()) }}
 
 /////////////////////////////////////////////////REPOSITORIES///////////////////////////////////////
 

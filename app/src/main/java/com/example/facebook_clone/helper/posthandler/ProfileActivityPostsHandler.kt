@@ -1,14 +1,8 @@
 package com.example.facebook_clone.helper.posthandler
 
-import android.app.Dialog
-import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.view.Window
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import com.example.facebook_clone.R
 import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.helper.Utils.POSTS_COLLECTION
 import com.example.facebook_clone.helper.Utils.PROFILE_POSTS_COLLECTION
@@ -19,14 +13,8 @@ import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.model.post.share.Share
 import com.example.facebook_clone.ui.activity.OthersProfileActivity
 import com.example.facebook_clone.ui.activity.PostViewerActivity
-import com.example.facebook_clone.ui.activity.VideoPlayerActivity
-import com.example.facebook_clone.ui.bottomsheet.CommentsBottomSheet
-import com.example.facebook_clone.ui.bottomsheet.PostConfigurationsBottomSheet
-import com.example.facebook_clone.ui.dialog.ImageViewerDialog
 import com.example.facebook_clone.viewmodel.PostViewModel
-import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
-import com.google.android.gms.tasks.Task
-import kotlinx.android.synthetic.main.long_clicked_reacts_button.*
+import com.example.facebook_clone.viewmodel.activity.ProfileActivityViewModel
 
 private const val FIRST_COLLECTION_TYPE = POSTS_COLLECTION
 private const val SECOND_COLLECTION_TYPE = PROFILE_POSTS_COLLECTION

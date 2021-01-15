@@ -24,6 +24,7 @@ import com.example.facebook_clone.model.group.SemiGroup
 //import com.example.facebook_clone.helper.posthandler.GroupsActivityPostsHandler
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.react.React
+import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.ui.bottomsheet.AdminToolsBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.InviteMembersBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.MemberPostConfigurationBottomSheet
@@ -31,10 +32,12 @@ import com.example.facebook_clone.ui.bottomsheet.MembersBottomSheet
 import com.example.facebook_clone.ui.dialog.ImageViewerDialog
 import com.example.facebook_clone.ui.dialog.PostCreatorDialog
 import com.example.facebook_clone.viewmodel.*
+import com.example.facebook_clone.viewmodel.activity.OthersProfileActivityViewModel
+import com.example.facebook_clone.viewmodel.activity.ProfileActivityViewModel
+import com.example.facebook_clone.viewmodel.fragment.NotificationsFragmentViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_group.*
-import kotlinx.android.synthetic.main.profile_cover_bottom_sheet_layout.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -49,6 +52,7 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener,
     private val postViewModel by viewModel<PostViewModel>()
     private val auth: FirebaseAuth by inject()
     private val currentUserId = auth.currentUser?.uid.toString()
+    private var currentUser = User()
     private var currentUserName = ""
     private var currentUserImageUrl = ""
     private var groupId = ""
@@ -175,6 +179,7 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener,
         val currentUserLiveData = profileActivityViewModel.getMe(currentUserId)
         currentUserLiveData?.let {
             it.observe(this) { user ->
+                currentUser = user
                 picasso.load(user.profileImageUrl).into(smallUserImageView)
                 currentUserName = user.name.orEmpty()
                 currentUserImageUrl = user.profileImageUrl.orEmpty()
@@ -263,7 +268,7 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener,
     }
 
     private fun showPostCreatorDialog() {
-        val postCreatorDialog = PostCreatorDialog(POST_FROM_GROUP, groupId, groupName, this)
+        val postCreatorDialog = PostCreatorDialog(POST_FROM_GROUP, groupId, groupName, this, currentGroup = currentGroup)
         postCreatorDialog.show(supportFragmentManager, "signature")
         postCreatorDialog
             .setUserNameAndProfileImageUrl(

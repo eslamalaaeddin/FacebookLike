@@ -11,8 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.facebook_clone.R
 import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.model.user.recentloggedinuser.RecentLoggedInUser
-import com.example.facebook_clone.viewmodel.NewsFeedActivityViewModel
-import com.example.facebook_clone.viewmodel.ProfilePictureActivityViewModel
+import com.example.facebook_clone.viewmodel.activity.NewsFeedActivityViewModel
+import com.example.facebook_clone.viewmodel.activity.ProfilePictureActivityViewModel
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_profile_picture.*

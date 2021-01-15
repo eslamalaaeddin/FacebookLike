@@ -306,10 +306,14 @@ class ProfilePostsAdapter(
             }
 
             //To remove visibility icon in group
-            if (post.groupId != null || post.groupName != null){
-                itemView.postVisibilityImageView?.let { it.visibility = View.INVISIBLE}
+            if (post.fromWhere == POST_FROM_GROUP){
+                itemView.postVisibilityImageView?.let {
+                    it.setImageResource(R.drawable.ic_group_top)
+                }
             }else{
-                itemView.postVisibilityImageView?.let { it.visibility = View.VISIBLE}
+                itemView.postVisibilityImageView?.let {
+                    it.visibility = View.VISIBLE
+                }
             }
 
             if (post.commentsAvailable){

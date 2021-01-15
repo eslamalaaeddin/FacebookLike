@@ -1,4 +1,4 @@
-package com.example.facebook_clone.viewmodel
+package com.example.facebook_clone.viewmodel.activity
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel

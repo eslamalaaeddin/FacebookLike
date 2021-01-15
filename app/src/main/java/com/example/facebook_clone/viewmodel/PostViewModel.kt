@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.comment.ReactionsAndSubComments
@@ -209,5 +210,21 @@ class PostViewModel(private val repository: PostsRepository) : ViewModel() {
     fun updateReactedValue(postPublisherId: String, postId: String, reacted: Int?): Task<Void> {
         return repository.updateReactedValue(postPublisherId, postId, reacted)
     }
+
+    /////////////////////////////////////////////// NEWS FEED STUFF////////////////////////////
+
+    fun addPostToNewsFeedPostsCollection(currentUserId: String, post: Post): Task<Void>{
+        post.firstCollectionType = Utils.NEWS_FEED_POSTS_COLLECTION
+        post.creatorReferenceId = currentUserId
+        post.secondCollectionType = Utils.SPECIFIC_NEWS_FEED_POSTS_COLLECTION
+
+        return repository.createPost(post)
+    }
+
+    fun getUserNewsFeedPostsLiveData(userId: String): LiveData<List<Post>> {
+        return repository.getUserNewsFeedPostsLiveData(userId)
+    }
+
+
 
 }

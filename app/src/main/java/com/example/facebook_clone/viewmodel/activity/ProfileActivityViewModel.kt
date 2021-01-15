@@ -1,4 +1,4 @@
-package com.example.facebook_clone.viewmodel
+package com.example.facebook_clone.viewmodel.activity
 
 import android.graphics.Bitmap
 import androidx.lifecycle.LiveData

@@ -1,9 +1,7 @@
 package com.example.facebook_clone.ui.bottomsheet
 
 import android.app.Dialog
-import android.opengl.Visibility
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,8 +13,8 @@ import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.model.user.followed.Followed
 import com.example.facebook_clone.model.user.follower.Follower
 import com.example.facebook_clone.model.user.friend.Friend
-import com.example.facebook_clone.viewmodel.OthersProfileActivityViewModel
-import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
+import com.example.facebook_clone.viewmodel.activity.OthersProfileActivityViewModel
+import com.example.facebook_clone.viewmodel.activity.ProfileActivityViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.user_relations_bottom_sheet.*
@@ -97,7 +95,7 @@ class UserRelationsBottomSheet(private val friendId: String): BottomSheetDialogF
                     if (task.isSuccessful){
                         othersViewModel.addHimAsAFollowingToMyDocument(currentUser.id.toString(), himAsAFollowing).addOnCompleteListener {
                             if (it.isSuccessful){
-                                Toast.makeText(requireContext(), "You followed ${currentFriend?.name}", Toast.LENGTH_SHORT).show()
+                               // Toast.makeText(requireContext(), "You followed ${currentFriend?.name}", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
@@ -114,7 +112,7 @@ class UserRelationsBottomSheet(private val friendId: String): BottomSheetDialogF
                     if (task.isSuccessful){
                         othersViewModel.deleteHimAsAFollowingFromMyDocument(currentUser.id.toString(), himAsAFollowing).addOnCompleteListener {
                             if (it.isSuccessful){
-                                Toast.makeText(requireContext(), "You Un followed ${currentFriend?.name}", Toast.LENGTH_SHORT).show()
+                                //Toast.makeText(requireContext(), "You Un followed ${currentFriend?.name}", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }

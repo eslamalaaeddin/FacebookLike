@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.facebook_clone.R
 import com.example.facebook_clone.helper.Utils
-import com.example.facebook_clone.viewmodel.ForgetPasswordFragmentViewModel
+import com.example.facebook_clone.viewmodel.fragment.ForgetPasswordFragmentViewModel
 import kotlinx.android.synthetic.main.fragment_forget_password.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

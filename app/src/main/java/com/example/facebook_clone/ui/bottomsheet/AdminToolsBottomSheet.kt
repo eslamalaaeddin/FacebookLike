@@ -20,11 +20,9 @@ import com.example.facebook_clone.model.group.Group
 import com.example.facebook_clone.model.group.Member
 import com.example.facebook_clone.model.group.SemiGroup
 import com.example.facebook_clone.viewmodel.GroupsViewModel
-import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.admin_tools_bottom_sheet.*
-import kotlinx.android.synthetic.main.profile_images_bottom_sheet_layout.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.IOException
@@ -122,12 +120,13 @@ class AdminToolsBottomSheet(
     }
 
     private fun updateCoverImageToUserGroups(newGroupCoverUrl: String) {
-        val member = group.admins.orEmpty().first()
+        val members = group.members.orEmpty()
         val semiGroup = SemiGroup(
             id = group.id,
             name = group.name,
             coverUrl = group.coverImageUrl
         )
+        members.forEach { member ->
         groupsViewModel.deleteGroupFromUserGroups(member, semiGroup).addOnCompleteListener { task ->
             if (task.isSuccessful){
                 semiGroup.coverUrl = newGroupCoverUrl
@@ -136,6 +135,7 @@ class AdminToolsBottomSheet(
             else{
                 Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT).show()
             }
+        }
         }
     }
 

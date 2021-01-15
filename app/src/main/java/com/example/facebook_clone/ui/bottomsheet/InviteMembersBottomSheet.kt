@@ -16,10 +16,9 @@ import com.example.facebook_clone.helper.listener.InvitedFriendsListener
 import com.example.facebook_clone.helper.notification.NotificationsHandler
 import com.example.facebook_clone.model.group.Group
 import com.example.facebook_clone.model.user.User
-import com.example.facebook_clone.model.user.friend.Friend
-import com.example.facebook_clone.viewmodel.NotificationsFragmentViewModel
-import com.example.facebook_clone.viewmodel.OthersProfileActivityViewModel
-import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
+import com.example.facebook_clone.viewmodel.fragment.NotificationsFragmentViewModel
+import com.example.facebook_clone.viewmodel.activity.OthersProfileActivityViewModel
+import com.example.facebook_clone.viewmodel.activity.ProfileActivityViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment

@@ -18,9 +18,9 @@ import com.example.facebook_clone.model.group.Member
 import com.example.facebook_clone.model.group.SemiGroup
 import com.example.facebook_clone.model.group.SemiGroupDocument
 import com.example.facebook_clone.ui.activity.GroupActivity
-import com.example.facebook_clone.viewmodel.GroupsFragmentViewModel
+import com.example.facebook_clone.viewmodel.fragment.GroupsFragmentViewModel
 import com.example.facebook_clone.viewmodel.GroupsViewModel
-import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
+import com.example.facebook_clone.viewmodel.activity.ProfileActivityViewModel
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.fragment_groups.*

@@ -28,8 +28,11 @@ import com.example.facebook_clone.helper.Utils.SPECIFIC_GROUP_POSTS_COLLECTION
 import com.example.facebook_clone.helper.Utils.toastMessage
 import com.example.facebook_clone.helper.listener.GroupPostsCreatorListener
 import com.example.facebook_clone.helper.listener.PostAttachmentListener
+import com.example.facebook_clone.model.page.Page
 import com.example.facebook_clone.model.Visibility
+import com.example.facebook_clone.model.group.Group
 import com.example.facebook_clone.model.post.Post
+import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.ui.activity.NewsFeedActivity
 import com.example.facebook_clone.ui.bottomsheet.AddToPostBottomSheet
 import com.example.facebook_clone.viewmodel.PostViewModel
@@ -41,10 +44,14 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 private const val TAG = "PostCreatorDialog"
 
-class PostCreatorDialog(private val fromWhere: String,
-                        private val groupId: String? = null,
-                        private val groupName: String? = null,
-                        private val groupPostsCreatorLstnr: GroupPostsCreatorListener? = null
+class PostCreatorDialog(
+    private val fromWhere: String,
+    private val groupId: String? = null,
+    private val groupName: String? = null,
+    private val groupPostsCreatorLstnr: GroupPostsCreatorListener? = null,
+    private val currentGroup: Group? = null,
+    private val currentPage: Page? = null,
+    private val currentUser: User? = null
 ) : DialogFragment(), AdapterView.OnItemSelectedListener, NameImageProvider,
     PostAttachmentListener {
     private val auth: FirebaseAuth by inject()
@@ -79,7 +86,7 @@ class PostCreatorDialog(private val fromWhere: String,
         }
 
         setUpPostCreatorUI()
-        addToPostButton.setOnClickListener {showPostAttachmentBottomSheet()}
+        addToPostButton.setOnClickListener { showPostAttachmentBottomSheet() }
         postContentTextView.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
@@ -99,13 +106,6 @@ class PostCreatorDialog(private val fromWhere: String,
                 }
             }
         })
-
-
-        /*
-            if(from group){
-                all the sturr
-            }
-         */
 
         createPostButton.setOnClickListener {
             if (postData != null) {
@@ -129,21 +129,51 @@ class PostCreatorDialog(private val fromWhere: String,
                                     val post = createPost(postAttachmentUrl!!, postDataType!!)
                                     postViewModel.createPost(post).addOnCompleteListener { task ->
                                         progressDialog?.dismiss()
-                                        if (task.isSuccessful){
-//                                            if (fromWhere == POST_FROM_GROUP){
-//                                                postViewModel.addGroupPostToPosterCollection(post)
-//                                            }
-                                        }
-                                        else{
-                                            toastMessage(requireContext(), task.exception?.message.toString())
+                                        if (task.isSuccessful) {
+                                            postViewModel.addPostToNewsFeedPostsCollection(
+                                                currentUserId,
+                                                post
+                                            ).addOnCompleteListener {
+                                                //Add post to my followers news feed post
+                                                if (it.isSuccessful) {
+                                                    currentUser?.let { currentUser ->
+                                                        currentUser.followers.orEmpty()
+                                                            .forEach { follower ->
+                                                                val followerId =
+                                                                    follower.id.orEmpty()
+                                                                postViewModel.addPostToNewsFeedPostsCollection(
+                                                                    followerId,
+                                                                    post
+                                                                )
+                                                            }
+                                                    }
+
+                                                    if (post.fromWhere == POST_FROM_GROUP){
+                                                        //add post to to each member news feed, same applies with a little tweak to PAGE logic
+                                                        currentGroup?.let { currentGroup ->
+                                                            currentGroup.members.orEmpty().forEach { member ->
+                                                                val memberId = member.id.orEmpty()
+                                                                postViewModel.addPostToNewsFeedPostsCollection(
+                                                                    memberId,
+                                                                    post
+                                                                )
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        } else {
+                                            toastMessage(
+                                                requireContext(),
+                                                task.exception?.message.toString()
+                                            )
                                         }
                                     }
                                     dismiss()
                                 }
                             }
                         }
-                }
-                else if (postDataType == "video") {
+                } else if (postDataType == "video") {
                     val videoUri = postData!!.data!!
                     progressDialog = Utils.showProgressDialog(requireContext(), "Please wait...")
                     postViewModel.uploadPostVideoToCloudStorage(videoUri)
@@ -154,13 +184,43 @@ class PostCreatorDialog(private val fromWhere: String,
                                     val post = createPost(postAttachmentUrl!!, postDataType!!)
                                     postViewModel.createPost(post).addOnCompleteListener { task ->
                                         progressDialog?.dismiss()
-                                        if (task.isSuccessful){
-//                                            if (fromWhere == POST_FROM_GROUP){
-//                                                postViewModel.addGroupPostToPosterCollection(post)
-//                                            }
-                                        }
-                                        else{
-                                            toastMessage(requireContext(), task.exception?.message.toString())
+                                        if (task.isSuccessful) {
+                                            postViewModel.addPostToNewsFeedPostsCollection(
+                                                currentUserId,
+                                                post
+                                            ).addOnCompleteListener {
+                                                //Add post to my followers news feed post
+                                                if (it.isSuccessful) {
+                                                    currentUser?.let { currentUser ->
+                                                        currentUser.followers.orEmpty()
+                                                            .forEach { follower ->
+                                                                val followerId =
+                                                                    follower.id.orEmpty()
+                                                                postViewModel.addPostToNewsFeedPostsCollection(
+                                                                    followerId,
+                                                                    post
+                                                                )
+                                                            }
+                                                    }
+                                                    if (post.fromWhere == POST_FROM_GROUP){
+                                                        //add post to to each member news feed, same applies with a little tweak to PAGE logic
+                                                        currentGroup?.let { currentGroup ->
+                                                            currentGroup.members.orEmpty().forEach { member ->
+                                                                val memberId = member.id.orEmpty()
+                                                                postViewModel.addPostToNewsFeedPostsCollection(
+                                                                    memberId,
+                                                                    post
+                                                                )
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        } else {
+                                            toastMessage(
+                                                requireContext(),
+                                                task.exception?.message.toString()
+                                            )
                                         }
                                         dismiss()
                                     }
@@ -177,12 +237,36 @@ class PostCreatorDialog(private val fromWhere: String,
 
                 postViewModel.createPost(post).addOnCompleteListener { task ->
                     progressDialog?.dismiss()
-                    if (task.isSuccessful){
-//                        if (fromWhere == POST_FROM_GROUP){
-//                            postViewModel.addGroupPostToPosterCollection(post)
-//                        }
-                    }
-                    else{
+                    if (task.isSuccessful) {
+                        //Add post to my news feed posts
+                        postViewModel.addPostToNewsFeedPostsCollection(currentUserId, post)
+                            .addOnCompleteListener {
+                                //Add post to my followers news feed post
+                                if (it.isSuccessful) {
+                                    currentUser?.let { currentUser ->
+                                        currentUser.followers.orEmpty().forEach { follower ->
+                                            val followerId = follower.id.orEmpty()
+                                            postViewModel.addPostToNewsFeedPostsCollection(
+                                                followerId,
+                                                post
+                                            )
+                                        }
+                                    }
+                                    if (post.fromWhere == POST_FROM_GROUP){
+                                        //add post to to each member news feed, same applies with a little tweak to PAGE logic
+                                        currentGroup?.let { currentGroup ->
+                                            currentGroup.members.orEmpty().forEach { member ->
+                                                val memberId = member.id.orEmpty()
+                                                postViewModel.addPostToNewsFeedPostsCollection(
+                                                    memberId,
+                                                    post
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                    } else {
                         toastMessage(requireContext(), task.exception?.message.toString())
                     }
                     dismiss()
@@ -192,7 +276,7 @@ class PostCreatorDialog(private val fromWhere: String,
 
     }
 
-    private fun setUpPostCreatorUI(){
+    private fun setUpPostCreatorUI() {
         upButtonImageView.setOnClickListener { dismiss() }
 
         postVisibilitySpinner.onItemSelectedListener = this
@@ -210,7 +294,7 @@ class PostCreatorDialog(private val fromWhere: String,
         postVisibilitySpinner.adapter = adapter
     }
 
-    private fun showPostAttachmentBottomSheet(){
+    private fun showPostAttachmentBottomSheet() {
         val addToPostBottomSheet = AddToPostBottomSheet(this)
         addToPostBottomSheet.show(activity?.supportFragmentManager!!, addToPostBottomSheet.tag)
     }
@@ -224,7 +308,10 @@ class PostCreatorDialog(private val fromWhere: String,
 
     }
 
-    private fun createPost(postAttachmentUrl: String? = null, postAttachmentType: String? = null): Post {
+    private fun createPost(
+        postAttachmentUrl: String? = null,
+        postAttachmentType: String? = null
+    ): Post {
         val content = postContentTextView.text.toString()
         val post = Post(
             publisherId = currentUserId,
@@ -234,10 +321,10 @@ class PostCreatorDialog(private val fromWhere: String,
             publisherImageUrl = userProfileImageUrl,
             attachmentUrl = postAttachmentUrl,
             attachmentType = postAttachmentType,
-            //publisherToken = NewsFeedActivity.getTokenFromSharedPreference(requireContext())
-             )
+            fromWhere = fromWhere
+        )
 
-        when(fromWhere){
+        when (fromWhere) {
             POST_FROM_PROFILE -> {
                 post.firstCollectionType = POSTS_COLLECTION
                 post.creatorReferenceId = currentUserId

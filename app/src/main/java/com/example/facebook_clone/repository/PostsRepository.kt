@@ -8,8 +8,10 @@ import androidx.lifecycle.MutableLiveData
 import com.example.facebook_clone.helper.Utils.COMMENTS_COLLECTION
 import com.example.facebook_clone.helper.Utils.MY_COMMENTS_COLLECTION
 import com.example.facebook_clone.helper.Utils.MY_GROUP_POSTS_COLLECTION
+import com.example.facebook_clone.helper.Utils.NEWS_FEED_POSTS_COLLECTION
 import com.example.facebook_clone.helper.Utils.POSTS_COLLECTION
 import com.example.facebook_clone.helper.Utils.PROFILE_POSTS_COLLECTION
+import com.example.facebook_clone.helper.Utils.SPECIFIC_NEWS_FEED_POSTS_COLLECTION
 import com.example.facebook_clone.helper.Utils.USERS_COLLECTION
 import com.example.facebook_clone.livedata.PostLiveData
 import com.example.facebook_clone.model.post.comment.Comment
@@ -33,15 +35,6 @@ class PostsRepository(
     private val auth: FirebaseAuth,
     private val storage: FirebaseStorage
 ) {
-//    fun createPost(
-//        post: Post, firstCollectionType: String,
-//        creatorReferenceId: String,
-//        secondCollectionType: String
-//    ): Task<Void> {
-//        //Strings only
-//        return database.collection(POSTS_COLLECTION).document(post.publisherId.toString())
-//            .collection(PROFILE_POSTS_COLLECTION).document(post.id.toString()).set(post)
-//    }
 
     fun createPost(post: Post): Task<Void> {
         return database
@@ -82,11 +75,6 @@ class PostsRepository(
                 if (error != null) {
                     return@addSnapshotListener
                 } else {
-//                    for (document in postsSnapshot?.documentChanges!!){
-//                        val post = document?.document?.toObject(Post::class.java)
-//                        post?.let { posts?.add(it) }
-//                    }
-                    //Above code is not correct
                     posts = postsSnapshot?.toObjects(Post::class.java)
                     postsLiveData.postValue(posts)
                 }
@@ -461,5 +449,23 @@ class PostsRepository(
             }
         }
 
+    }
+
+    ///////////////////////////////////////////////// NEWS FEED /////////////////////////////////////
+    fun getUserNewsFeedPostsLiveData(userId: String): LiveData<List<Post>> {
+        var posts: MutableList<Post>? = mutableListOf()
+        val postsLiveData = MutableLiveData<List<Post>>()
+        database.collection(NEWS_FEED_POSTS_COLLECTION).document(userId)
+            .collection(SPECIFIC_NEWS_FEED_POSTS_COLLECTION)
+            .orderBy("creationTime", Query.Direction.DESCENDING)
+            .addSnapshotListener { postsSnapshot, error ->
+                if (error != null) {
+                    return@addSnapshotListener
+                } else {
+                    posts = postsSnapshot?.toObjects(Post::class.java)
+                    postsLiveData.postValue(posts)
+                }
+            }
+        return postsLiveData
     }
 }

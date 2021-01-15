@@ -18,8 +18,8 @@ import com.example.facebook_clone.ui.activity.VideoPlayerActivity
 import com.example.facebook_clone.ui.bottomsheet.CommentsBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.PostConfigurationsBottomSheet
 import com.example.facebook_clone.ui.dialog.ImageViewerDialog
-import com.example.facebook_clone.viewmodel.NotificationsFragmentViewModel
-import com.example.facebook_clone.viewmodel.OthersProfileActivityViewModel
+import com.example.facebook_clone.viewmodel.fragment.NotificationsFragmentViewModel
+import com.example.facebook_clone.viewmodel.activity.OthersProfileActivityViewModel
 import com.example.facebook_clone.viewmodel.PostViewModel
 import com.google.android.gms.tasks.Task
 import kotlinx.android.synthetic.main.long_clicked_reacts_button.*

@@ -1,4 +1,4 @@
-package com.example.facebook_clone.viewmodel
+package com.example.facebook_clone.viewmodel.fragment
 
 import android.widget.Toast
 import androidx.lifecycle.ViewModel

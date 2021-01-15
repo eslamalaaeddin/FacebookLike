@@ -12,8 +12,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.facebook_clone.R
 import com.example.facebook_clone.helper.Utils
-import com.example.facebook_clone.helper.Utils.POSTS_COLLECTION
-import com.example.facebook_clone.helper.Utils.PROFILE_POSTS_COLLECTION
 import com.example.facebook_clone.helper.listener.CommentsBottomSheetListener
 import com.example.facebook_clone.helper.notification.NotificationsHandler
 import com.example.facebook_clone.helper.posthandler.PostViewerActivityPostsHandler
@@ -23,6 +21,10 @@ import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.ui.bottomsheet.PeopleWhoReactedBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.PostConfigurationsBottomSheet
 import com.example.facebook_clone.viewmodel.*
+import com.example.facebook_clone.viewmodel.activity.OthersProfileActivityViewModel
+import com.example.facebook_clone.viewmodel.activity.PostViewerViewModel
+import com.example.facebook_clone.viewmodel.activity.ProfileActivityViewModel
+import com.example.facebook_clone.viewmodel.fragment.NotificationsFragmentViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_post_viewer.*
@@ -39,7 +41,6 @@ import kotlinx.android.synthetic.main.activity_post_viewer.reactImageViewGrey
 import kotlinx.android.synthetic.main.activity_post_viewer.reactsCountTextView
 import kotlinx.android.synthetic.main.activity_post_viewer.sharesCountTextView
 import kotlinx.android.synthetic.main.activity_post_viewer.userNameTextView
-import kotlinx.android.synthetic.main.profile_post_item.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

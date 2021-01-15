@@ -20,7 +20,7 @@ import com.example.facebook_clone.ui.bottomsheet.ProfileImageBottomSheet
 import com.example.facebook_clone.ui.bottomsheet.UserFriendsBottomSheet
 import com.example.facebook_clone.ui.dialog.PostCreatorDialog
 import com.example.facebook_clone.viewmodel.PostViewModel
-import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
+import com.example.facebook_clone.viewmodel.activity.ProfileActivityViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_profile.*
@@ -99,7 +99,7 @@ class ProfileActivity() : AppCompatActivity(), FriendClickListener{
         }
 
         whatIsInYourMindButton.setOnClickListener {
-            val postCreatorDialog = PostCreatorDialog(POST_FROM_PROFILE)
+            val postCreatorDialog = PostCreatorDialog(POST_FROM_PROFILE, currentUser = currentUser)
             postCreatorDialog.show(supportFragmentManager, "signature")
             postCreatorDialog.setUserNameAndProfileImageUrl(
                     currentUser.name.toString(),

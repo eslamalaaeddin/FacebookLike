@@ -5,16 +5,14 @@ import android.util.Log
 import android.widget.Toast
 import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.helper.listener.CommentsBottomSheetListener
-import com.example.facebook_clone.helper.listener.FriendClickListener
 import com.example.facebook_clone.helper.listener.PostListener
 import com.example.facebook_clone.helper.notification.NotificationsHandler
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.SharedPost
 import com.example.facebook_clone.model.post.react.React
 import com.example.facebook_clone.model.post.share.Share
-import com.example.facebook_clone.ui.activity.NewsFeedActivity
-import com.example.facebook_clone.viewmodel.NotificationsFragmentViewModel
-import com.example.facebook_clone.viewmodel.OthersProfileActivityViewModel
+import com.example.facebook_clone.viewmodel.fragment.NotificationsFragmentViewModel
+import com.example.facebook_clone.viewmodel.activity.OthersProfileActivityViewModel
 import com.example.facebook_clone.viewmodel.PostViewModel
 
 private const val FIRST_COLLECTION_TYPE = Utils.POSTS_COLLECTION

@@ -9,7 +9,7 @@ import com.example.facebook_clone.R
 import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.ui.activity.NewsFeedActivity
 import com.example.facebook_clone.ui.activity.RegisteringActivity
-import com.example.facebook_clone.viewmodel.LoginFragmentViewModel
+import com.example.facebook_clone.viewmodel.fragment.LoginFragmentViewModel
 import kotlinx.android.synthetic.main.fragment_login.*
 import org.koin.android.ext.android.inject
 

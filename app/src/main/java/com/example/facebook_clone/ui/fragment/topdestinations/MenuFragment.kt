@@ -2,16 +2,12 @@ package com.example.facebook_clone.ui.fragment.topdestinations
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import com.example.facebook_clone.R
-import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.ui.activity.ProfileActivity
 import com.example.facebook_clone.ui.activity.RecentUsersActivity
-import com.example.facebook_clone.viewmodel.ProfileActivityViewModel
+import com.example.facebook_clone.viewmodel.activity.ProfileActivityViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_menu.*
