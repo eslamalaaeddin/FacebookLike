@@ -117,6 +117,13 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener,
             currentGroup = group
             groupName = group.name.toString()
             adminId = group.admins.orEmpty().first().id.orEmpty()
+
+            if (group.coverImageUrl == null){
+                groupCoverImageView.setImageResource(R.drawable.facebook_group_cover)
+            }
+            else{
+                picasso.load(group.coverImageUrl).into(groupCoverImageView)
+            }
             groupsActivityPostsHandler = GroupsActivityPostsHandler(
                 this,
                 group,
@@ -153,7 +160,7 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener,
                 imageViewerDialog.setMediaUrl(group.coverImageUrl.orEmpty())
             }
 
-            picasso.load(group.coverImageUrl).into(groupCoverImageView)
+
             groupNameTextView.text = group.name
             groupMembersCountTextView.text = "${groupMembers.size } Members"
             if (groupMembers.size >= 2) {
@@ -460,30 +467,6 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener,
                 it.show(supportFragmentManager, it.tag)
             }
     }
-
-    private fun turnOffPostCommenting(post: Post){
-        groupsViewModel.turnOffPostCommenting(post).addOnCompleteListener { task ->
-            if (task.isSuccessful){
-
-            }
-            else{
-                Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun turnOnPostCommenting(post: Post){
-        groupsViewModel.turnOnPostCommenting(post).addOnCompleteListener { task ->
-            if (task.isSuccessful){
-
-            }
-            else{
-                Toast.makeText(this, task.exception?.message, Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-
 
     override fun onGroupPostCreated(post: Post) {
         currentGroup?.let { group ->

@@ -13,7 +13,10 @@ import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.friend_item_layout.view.*
 
 
-class FriendsAdapter(private val friends: List<Friend>, private val friendClickListener: FriendClickListener) :
+class FriendsAdapter(private val friends: List<Friend>,
+                     private val friendClickListener: FriendClickListener,
+                     private val layoutManager: String? = null
+                     ) :
     RecyclerView.Adapter<FriendsAdapter.FriendsHolder>() {
     private lateinit var frClickListener: FriendClickListener
     inner class FriendsHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
@@ -44,8 +47,13 @@ class FriendsAdapter(private val friends: List<Friend>, private val friendClickL
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FriendsHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.friend_item_layout, parent, false)
+        val view: View = if (layoutManager == "linear"){
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.bottom_sheet_friend_item_layout, parent, false)
+        } else{
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.friend_item_layout, parent, false)
+        }
 
         return FriendsHolder(view)
     }

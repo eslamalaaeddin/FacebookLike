@@ -257,7 +257,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
     }
 
     private fun showUserFriendsBottomSheet() {
-            val userFriendsBottomSheet = UserFriendsBottomSheet(friends = currentUser.friends.orEmpty(), this)
+            val userFriendsBottomSheet = UserFriendsBottomSheet(friends = userIAmViewing.friends.orEmpty(), this)
             userFriendsBottomSheet.show(supportFragmentManager, userFriendsBottomSheet.tag)
     }
 
@@ -463,7 +463,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
     }
 
     private fun updateUserFriends(friends: List<Friend>) {
-        friendsCountTextView.text = if (friends.isNotEmpty()) "${friends.size}" else ""
+        friendsCountTextView.text = if (friends.isNotEmpty()) "${friends.size} friends" else ""
         if (friends.size >= 6) {
             friendsAdapter = FriendsAdapter(friends.subList(0, 5), this)
             friendsRecyclerView.adapter = friendsAdapter

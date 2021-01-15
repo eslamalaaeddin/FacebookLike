@@ -75,8 +75,8 @@
             android:id="@+id/userFriendsRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-            app:spanCount="3" />
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            />
 
     </FrameLayout>
 

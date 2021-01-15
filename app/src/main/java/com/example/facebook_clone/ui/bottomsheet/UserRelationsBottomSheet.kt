@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.TextView
+import android.widget.Toast
 import com.example.facebook_clone.R
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.model.user.followed.Followed
@@ -87,8 +88,6 @@ class UserRelationsBottomSheet(private val friendId: String): BottomSheetDialogF
             }
         })
 
-
-
         followUserLayout.setOnClickListener {
             val meAsAFollower = Follower(currentUser.id, currentUser.name, currentUser.profileImageUrl)
             //following == followed
@@ -96,7 +95,11 @@ class UserRelationsBottomSheet(private val friendId: String): BottomSheetDialogF
             othersViewModel.addMeAsAFollowerToHisDocument(currentFriend?.id.toString(), meAsAFollower)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful){
-                        othersViewModel.addHimAsAFollowingToMyDocument(currentUser.id.toString(), himAsAFollowing)
+                        othersViewModel.addHimAsAFollowingToMyDocument(currentUser.id.toString(), himAsAFollowing).addOnCompleteListener {
+                            if (it.isSuccessful){
+                                Toast.makeText(requireContext(), "You followed ${currentFriend?.name}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     }
                 }
             dismiss()
@@ -109,7 +112,11 @@ class UserRelationsBottomSheet(private val friendId: String): BottomSheetDialogF
             othersViewModel.deleteMeAsAFollowerFromHisDocument(currentFriend?.id.toString(), meAsAFollower)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful){
-                        othersViewModel.deleteHimAsAFollowingFromMyDocument(currentUser.id.toString(), himAsAFollowing)
+                        othersViewModel.deleteHimAsAFollowingFromMyDocument(currentUser.id.toString(), himAsAFollowing).addOnCompleteListener {
+                            if (it.isSuccessful){
+                                Toast.makeText(requireContext(), "You Un followed ${currentFriend?.name}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     }
                 }
             dismiss()

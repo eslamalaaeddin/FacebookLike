@@ -40,6 +40,7 @@ class GroupsFragment : Fragment(R.layout.fragment_groups), GroupsItemListener {
     private lateinit var groupCreatorProfileImageUrl: String
     private val currentUserId = auth.currentUser?.uid.toString()
     private lateinit var groupsAdapter: GroupsAdapter
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -69,6 +70,7 @@ class GroupsFragment : Fragment(R.layout.fragment_groups), GroupsItemListener {
 
     }
 
+
     private fun createGroup(groupName: String): Group {
         val admin = Member(
             id = currentUserId,
@@ -77,7 +79,6 @@ class GroupsFragment : Fragment(R.layout.fragment_groups), GroupsItemListener {
         )
         return Group(
             name = groupName,
-            coverImageUrl = "https://firebasestorage.googleapis.com/v0/b/facebook-clone-5e8ed.appspot.com/o/xVfyUJlnN9RQpBwvN5KZuYdQKcl2%2FProfile%20images%2Fcover%2FxVfyUJlnN9RQpBwvN5KZuYdQKcl2.jpeg?alt=media&token=206bc8bf-c4d6-4eba-bbb4-49321d8004aa",
             admins = listOf(admin),
         )
     }
@@ -128,7 +129,8 @@ class GroupsFragment : Fragment(R.layout.fragment_groups), GroupsItemListener {
     private fun addGroupToUserGroups(userId: String, semiGroup: SemiGroup){
         groupViewModel.addGroupToUserGroups(userId, semiGroup).addOnCompleteListener {
             if (it.isSuccessful){
-                Toast.makeText(requireContext(), "Created successfully", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "${semiGroup.name} created successfully", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(requireContext(), GroupActivity::class.java).putExtra("groupId", semiGroup.id))
             }
             else{
                 Toast.makeText(requireContext(), it.exception?.message, Toast.LENGTH_SHORT).show()

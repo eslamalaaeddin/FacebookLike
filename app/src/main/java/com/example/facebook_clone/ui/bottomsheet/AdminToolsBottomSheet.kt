@@ -97,7 +97,7 @@ class AdminToolsBottomSheet(
                         if (task.isSuccessful) {
                             task.result?.storage?.downloadUrl?.addOnSuccessListener { photoUrl ->
                                 progressDialog?.dismiss()
-                                uploadProfileImageToGroupCollection(photoUrl.toString())
+                                uploadCoverImageToGroupCollection(photoUrl.toString())
 //                                dismiss()
                             }
                         }
@@ -109,13 +109,34 @@ class AdminToolsBottomSheet(
         }
     }
 
-    private fun uploadProfileImageToGroupCollection(photoUrl: String) {
+    private fun uploadCoverImageToGroupCollection(photoUrl: String) {
         groupsViewModel.addCoverImageToUserCollection(photoUrl, group.id.orEmpty())
             .addOnCompleteListener { task ->
-                if (!task.isSuccessful) {
+                if (task.isSuccessful){
+                    updateCoverImageToUserGroups(photoUrl)
+                }
+                else{
                     Utils.toastMessage(requireContext(), task.exception?.message.toString())
                 }
             }
+    }
+
+    private fun updateCoverImageToUserGroups(newGroupCoverUrl: String) {
+        val member = group.admins.orEmpty().first()
+        val semiGroup = SemiGroup(
+            id = group.id,
+            name = group.name,
+            coverUrl = group.coverImageUrl
+        )
+        groupsViewModel.deleteGroupFromUserGroups(member, semiGroup).addOnCompleteListener { task ->
+            if (task.isSuccessful){
+                semiGroup.coverUrl = newGroupCoverUrl
+                groupsViewModel.addGroupToUserGroups(member.id.orEmpty(), semiGroup)
+            }
+            else{
+                Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun showLeaveGroupDialog(group: Group, member: Member) {

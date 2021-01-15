@@ -60,6 +60,12 @@ class GroupsRepository(
             .update("groups", FieldValue.arrayUnion(semiGroup))
     }
 
+    fun deleteGroupFromUserGroups(member: Member, semiGroup: SemiGroup): Task<Void>{
+        return database.collection(USERS_COLLECTION)
+            .document(member.id.orEmpty())
+            .update("groups", FieldValue.arrayRemove(semiGroup))
+    }
+
     fun getGroupPostsLiveData(groupId: String): LiveData<List<Post>> {
         var posts: MutableList<Post>? = mutableListOf()
         val postsLiveData = MutableLiveData<List<Post>>()
@@ -84,11 +90,7 @@ class GroupsRepository(
             .update("members", FieldValue.arrayRemove(member))
     }
 
-    fun deleteGroupFromUserGroups(member: Member, semiGroup: SemiGroup): Task<Void>{
-        return database.collection(USERS_COLLECTION)
-            .document(member.id.orEmpty())
-            .update("groups", FieldValue.arrayRemove(semiGroup))
-    }
+
 
     fun getGroupsLiveDataAfterSearchingByName(query: String): LiveData<List<Group>> {
         val liveData = MutableLiveData<List<Group>>()
