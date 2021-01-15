@@ -49,7 +49,7 @@ class SpecificMemberBottomSheet(private val group: Group, private val member: Me
         }
 
         blockMemberLayout.setOnClickListener {
-            Toast.makeText(requireContext(), "${member.name}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Not implemented yet.", Toast.LENGTH_SHORT).show()
         }
 
         removeMemberLayout.setOnClickListener {

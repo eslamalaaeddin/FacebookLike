@@ -78,11 +78,9 @@
         android:id="@+id/imageView8"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
+        android:layout_marginEnd="8dp"
         app:layout_constraintBottom_toBottomOf="@+id/addCommentTextView"
         app:layout_constraintEnd_toStartOf="@+id/addShareTextView"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/addCommentTextView"
         app:layout_constraintTop_toTopOf="@+id/addCommentTextView"
         app:srcCompat="@drawable/ic_share" />
 
@@ -90,24 +88,21 @@
         android:id="@+id/addShareTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="32dp"
         android:text="Share"
         android:textColor="@color/gray"
         app:layout_constraintBottom_toBottomOf="@+id/imageView8"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/imageView8"
         app:layout_constraintTop_toTopOf="@+id/imageView8" />
 
     <TextView
         android:id="@+id/addReactTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:text="Like"
         android:textColor="@color/gray"
         app:layout_constraintBottom_toBottomOf="@+id/reactImageViewGrey"
-        app:layout_constraintEnd_toStartOf="@+id/imageView9"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/reactImageViewGrey"
         app:layout_constraintTop_toTopOf="@+id/reactImageViewGrey" />
 
@@ -127,7 +122,7 @@
         android:id="@+id/reactImageViewBlue"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="4dp"
         android:visibility="invisible"
         app:layout_constraintEnd_toStartOf="@+id/addReactTextView"
@@ -139,25 +134,25 @@
         android:id="@+id/addCommentTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:text="Comment"
         android:textColor="@color/gray"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView9"
-        app:layout_constraintEnd_toStartOf="@+id/imageView8"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/imageView9"
-        app:layout_constraintTop_toTopOf="@+id/imageView9" />
+        app:layout_constraintBottom_toBottomOf="@+id/addCommentImageView"
+        app:layout_constraintStart_toEndOf="@+id/addCommentImageView"
+        app:layout_constraintTop_toTopOf="@+id/addCommentImageView"
+        tools:visibility="visible" />
 
     <ImageView
-        android:id="@+id/imageView9"
+        android:id="@+id/addCommentImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
         app:layout_constraintBottom_toBottomOf="@+id/addReactTextView"
-        app:layout_constraintEnd_toStartOf="@+id/addCommentTextView"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/addReactTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.4"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/addReactTextView"
-        app:srcCompat="@drawable/ic_comment" />
+        app:srcCompat="@drawable/ic_comment"
+        tools:visibility="visible" />
 
     <View
         android:id="@+id/view3"
@@ -190,7 +185,8 @@
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/attachmentImageView">
+        app:layout_constraintTop_toBottomOf="@+id/attachmentImageView"
+        tools:visibility="visible">
 
 
         <ImageView

@@ -514,7 +514,7 @@ class GroupActivity : AppCompatActivity(), AdminToolsListener, PostListener,
     private fun showLeaveGroupDialog(group: Group, member: Member) {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setCancelable(false)
+        dialog.setCancelable(true)
         dialog.setContentView(R.layout.leave_group_layout)
 
         val cancelButton = dialog.findViewById(R.id.cancelLeavingGroupTextView) as TextView

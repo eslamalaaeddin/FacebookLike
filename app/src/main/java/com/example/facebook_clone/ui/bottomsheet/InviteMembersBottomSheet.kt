@@ -2,6 +2,9 @@ package com.example.facebook_clone.ui.bottomsheet
 
 import android.app.Dialog
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +15,7 @@ import com.example.facebook_clone.adapter.InvitedFriendsAdapter
 import com.example.facebook_clone.helper.listener.InvitedFriendsListener
 import com.example.facebook_clone.helper.notification.NotificationsHandler
 import com.example.facebook_clone.model.group.Group
+import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.model.user.friend.Friend
 import com.example.facebook_clone.viewmodel.NotificationsFragmentViewModel
 import com.example.facebook_clone.viewmodel.OthersProfileActivityViewModel
@@ -24,6 +28,7 @@ import kotlinx.android.synthetic.main.invite_members_bottom_sheet.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
+private const val TAG = "InviteMembersBottomShee"
 class InviteMembersBottomSheet(private val group: Group): BottomSheetDialogFragment(), InvitedFriendsListener {
     private val auth: FirebaseAuth by inject()
     private lateinit var invitedFriendsAdapter : InvitedFriendsAdapter
@@ -31,6 +36,7 @@ class InviteMembersBottomSheet(private val group: Group): BottomSheetDialogFragm
     private lateinit var notificationsHandler: NotificationsHandler
     private var currentUserName : String? = null
     private var currentUserImageUrl : String? = null
+    private var currentUser : User? = null
     private val othersProfileActivityViewModel by viewModel<OthersProfileActivityViewModel>()
     private val notificationsFragmentViewModel by viewModel<NotificationsFragmentViewModel>()
     private val profileActivityViewModel by viewModel<ProfileActivityViewModel>()
@@ -65,14 +71,36 @@ class InviteMembersBottomSheet(private val group: Group): BottomSheetDialogFragm
             notificationsFragmentViewModel = notificationsFragmentViewModel
         )
 
+
         val myLiveData = profileActivityViewModel.getMe(currentUserId)
         myLiveData?.observe(viewLifecycleOwner){
             currentUserName = it.name
             currentUserImageUrl = it.profileImageUrl
-
+            currentUser = it
             invitedFriendsAdapter = InvitedFriendsAdapter(group = group, it.friends.orEmpty(), this)
             friendsToBeInvitedRecyclerView.adapter = invitedFriendsAdapter
         }
+
+        searchForFriendsEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(text: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            }
+
+            override fun afterTextChanged(editableText: Editable?) {
+                var currentUserFriends = currentUser?.let { it.friends.orEmpty() }.orEmpty()
+                currentUserFriends =  currentUserFriends.filter { friend ->
+                    friend.name.orEmpty().toLowerCase().contains(editableText.toString().toLowerCase())
+                }
+                Log.i(TAG, "TOTO afterTextChanged: $currentUserFriends")
+                invitedFriendsAdapter =
+                    InvitedFriendsAdapter(group, currentUserFriends, this@InviteMembersBottomSheet)
+                friendsToBeInvitedRecyclerView.adapter = invitedFriendsAdapter
+            }
+        })
 
     }
 

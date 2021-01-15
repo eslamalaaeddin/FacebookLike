@@ -231,7 +231,7 @@ class PostConfigurationsBottomSheet(private val post: Post, private val shared: 
 
     }
 
-     private fun deleteComment(comment: Comment) {
+    private fun deleteComment(comment: Comment) {
         //[1]Get super comment
         postViewModel.getCommentById(comment.commenterId.toString(), comment.id.toString())
             .addOnCompleteListener {

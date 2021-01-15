@@ -3,6 +3,8 @@ package com.example.facebook_clone.ui.bottomsheet
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +13,7 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.GroupMembersAdapter
+import com.example.facebook_clone.adapter.InvitedFriendsAdapter
 import com.example.facebook_clone.helper.listener.GroupMemberListener
 import com.example.facebook_clone.model.group.Group
 import com.example.facebook_clone.model.group.Member
@@ -23,6 +26,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.group_members_bottom_sheet_layout.*
+import kotlinx.android.synthetic.main.group_members_bottom_sheet_layout.upButtonImageView
+import kotlinx.android.synthetic.main.invite_members_bottom_sheet.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -31,6 +36,7 @@ class MembersBottomSheet(private val group: Group): BottomSheetDialogFragment(),
     private val auth: FirebaseAuth by inject()
     private val currentUserId = auth.currentUser?.uid.toString()
     private val groupsViewModel by viewModel<GroupsViewModel>()
+    private var members : List<Member>? = mutableListOf()
     private lateinit var membersAdapter : GroupMembersAdapter
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
@@ -59,8 +65,8 @@ class MembersBottomSheet(private val group: Group): BottomSheetDialogFragment(),
         //Get the group live data and
         val groupLiveData = groupsViewModel.getGroupLiveData(group.id.orEmpty())
         groupLiveData.observe(viewLifecycleOwner){
-            val members = it.members.orEmpty()
-            membersAdapter = GroupMembersAdapter(members, this)
+            members = it.members.orEmpty()
+            membersAdapter = GroupMembersAdapter(members.orEmpty(), this)
             groupMemberRecyclerView.adapter = membersAdapter
 
         }
@@ -70,6 +76,26 @@ class MembersBottomSheet(private val group: Group): BottomSheetDialogFragment(),
         adminLayout.setOnClickListener {
             navigateToMemberProfile(group.admins.orEmpty().first().id.orEmpty())
         }
+
+        searchForMembersEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(text: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            }
+
+            override fun afterTextChanged(editableText: Editable?) {
+                var currentMembers = group.let { it.members.orEmpty() }
+                currentMembers =  currentMembers.filter { friend ->
+                    friend.name.orEmpty().toLowerCase().contains(editableText.toString().toLowerCase())
+                }
+                Log.i(TAG, "TOTO afterTextChanged: $members")
+                membersAdapter = GroupMembersAdapter(currentMembers.orEmpty(), this@MembersBottomSheet)
+                groupMemberRecyclerView.adapter = membersAdapter
+            }
+        })
     }
 
     private fun setAdminUi() {

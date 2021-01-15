@@ -95,7 +95,7 @@
             android:layout_height="24dp"
             android:layout_marginStart="8dp"
             android:layout_gravity="center"
-            app:srcCompat="@drawable/ic_outline_lock"
+            app:srcCompat="@drawable/ic_report"
             app:tint="@color/medium_gray" />
 
         <TextView

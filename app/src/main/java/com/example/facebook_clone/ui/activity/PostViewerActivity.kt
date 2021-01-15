@@ -39,6 +39,7 @@ import kotlinx.android.synthetic.main.activity_post_viewer.reactImageViewGrey
 import kotlinx.android.synthetic.main.activity_post_viewer.reactsCountTextView
 import kotlinx.android.synthetic.main.activity_post_viewer.sharesCountTextView
 import kotlinx.android.synthetic.main.activity_post_viewer.userNameTextView
+import kotlinx.android.synthetic.main.profile_post_item.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -138,6 +139,17 @@ class PostViewerActivity : AppCompatActivity(), CommentsBottomSheetListener {
                 sharesCountTextView.text = "${post.shares.orEmpty().size.toString()} Shares"
                 commentsCountsTextView.text = "${post.comments.orEmpty().size.toString()} Comments"
 
+                if (post.commentsAvailable){
+                    addCommentOnPostTextView.visibility = View.VISIBLE
+                    addCommentImageView.visibility = View.VISIBLE
+                    showCommentsTextView.visibility = View.VISIBLE
+                }
+                else{
+                    addCommentOnPostTextView.visibility = View.GONE
+                    addCommentImageView.visibility = View.GONE
+                    showCommentsTextView.visibility = View.GONE
+                }
+
                 post.reacts?.let { reacts ->
                     if (reacts.isEmpty()) {
                         reactImageViewGrey.visibility = View.VISIBLE
@@ -203,6 +215,8 @@ class PostViewerActivity : AppCompatActivity(), CommentsBottomSheetListener {
             interactorName = user.name.toString()
             interactorImageUrl = user.profileImageUrl.toString()
         })
+
+
 
         circleImageView.setOnClickListener { navigateToPostPublisherProfile(postPublisherId) }
 
@@ -274,7 +288,7 @@ class PostViewerActivity : AppCompatActivity(), CommentsBottomSheetListener {
                 )
             }
         }
-        postViewerReactsLayout.setOnClickListener { openPeopleWhoReactedLayout(null, null, "post") }
+       // postViewerReactsLayout.setOnClickListener { openPeopleWhoReactedLayout(null, null, "post") }
 
         moreOnPost.setOnClickListener {
             //but if it was not my post

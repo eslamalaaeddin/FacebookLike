@@ -18,13 +18,17 @@ import com.example.facebook_clone.helper.Utils.POST_FROM_GROUP
 import com.example.facebook_clone.helper.listener.PostListener
 import com.example.facebook_clone.model.post.react.React
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.android.synthetic.main.activity_post_viewer.view.*
 import kotlinx.android.synthetic.main.post_visibility_item_layout.view.*
+import kotlinx.android.synthetic.main.profile_post_item.view.addCommentImageView
 import kotlinx.android.synthetic.main.profile_post_item.view.addCommentTextView
 import kotlinx.android.synthetic.main.profile_post_item.view.addReactTextView
 import kotlinx.android.synthetic.main.profile_post_item.view.addShareTextView
+import kotlinx.android.synthetic.main.profile_post_item.view.attachmentImageView
 import kotlinx.android.synthetic.main.profile_post_item.view.circleImageView
 import kotlinx.android.synthetic.main.profile_post_item.view.commentsCountsTextView
 import kotlinx.android.synthetic.main.profile_post_item.view.moreOnPost
+import kotlinx.android.synthetic.main.profile_post_item.view.playButtonImageView
 import kotlinx.android.synthetic.main.profile_post_item.view.postContentTextView
 import kotlinx.android.synthetic.main.profile_post_item.view.postTimeTextView
 import kotlinx.android.synthetic.main.profile_post_item.view.postVisibilityImageView
@@ -35,6 +39,7 @@ import kotlinx.android.synthetic.main.profile_post_item.view.reactsLayout
 import kotlinx.android.synthetic.main.profile_post_item.view.sharesCountTextView
 import kotlinx.android.synthetic.main.profile_post_item.view.userNameTextView
 import kotlinx.android.synthetic.main.shared_post_layout.view.*
+import kotlinx.android.synthetic.main.shared_post_layout.view.addCommentImageView as addCommentImageView1
 
 private const val TAG = "ProfilePostsAdapter"
 
@@ -305,6 +310,17 @@ class ProfilePostsAdapter(
                 itemView.postVisibilityImageView?.let { it.visibility = View.INVISIBLE}
             }else{
                 itemView.postVisibilityImageView?.let { it.visibility = View.VISIBLE}
+            }
+
+            if (post.commentsAvailable){
+                itemView.addCommentTextView.visibility = View.VISIBLE
+                itemView.addCommentImageView.visibility = View.VISIBLE
+                itemView.reactsLayout.visibility = View.VISIBLE
+            }
+            else{
+                itemView.addCommentTextView.visibility = View.GONE
+                itemView.addCommentImageView.visibility = View.GONE
+                itemView.reactsLayout.visibility = View.GONE
             }
         }
 
