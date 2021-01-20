@@ -221,6 +221,7 @@ class PostViewModel(private val repository: PostsRepository) : ViewModel() {
         return repository.createPost(post)
     }
 
+
     fun getUserNewsFeedPostsLiveData(userId: String): LiveData<List<Post>> {
         return repository.getUserNewsFeedPostsLiveData(userId)
     }

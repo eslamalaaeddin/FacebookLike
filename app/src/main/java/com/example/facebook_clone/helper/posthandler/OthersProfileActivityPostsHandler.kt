@@ -53,12 +53,7 @@ class OthersProfileActivityPostsHandler(
         notifiedToken: String?
     ) {
         currentEditedPostPosition = postPosition
-//        val modifiedPost = handlePostLocation(
-//            post,
-//            FIRST_COLLECTION_TYPE,
-//            post.publisherId.orEmpty(),
-//            SECOND_COLLECTION_TYPE
-//        )
+
         if (!reacted) {
             val myReact = createReact(interactorId, interactorName, interactorImageUrl)
             val notificationsHandler = buildNotificationHandlerForPostReacts(
@@ -97,12 +92,6 @@ class OthersProfileActivityPostsHandler(
         notifiedToken: String?
     ) {
 
-//        val modifiedPost = handlePostLocation(
-//            post,
-//            FIRST_COLLECTION_TYPE,
-//            post.publisherId.orEmpty(),
-//            SECOND_COLLECTION_TYPE
-//        )
         val notificationsHandler = buildNotificationHandlerForPostReacts(
             notifierId = interactorId,
             notifierName = interactorName,
@@ -250,12 +239,7 @@ class OthersProfileActivityPostsHandler(
         interactorImageUrl: String,
         postPosition: Int
     ) {
-//        val modifiedPost = handlePostLocation(
-//            post,
-//            FIRST_COLLECTION_TYPE,
-//            post.publisherId.orEmpty(),
-//            SECOND_COLLECTION_TYPE
-//        )
+
         currentEditedPostPosition = postPosition
         openCommentsBottomSheet(
             post,

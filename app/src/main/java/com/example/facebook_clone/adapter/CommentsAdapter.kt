@@ -169,7 +169,10 @@ class CommentsAdapter(
         }
 
         fun bind(comment: Comment) {
-            picasso.load(comment.commenterImageUrl).into(itemView.commenterImageView)
+            if (comment.commenterImageUrl.orEmpty().isNotEmpty()){
+                picasso.load(comment.commenterImageUrl).into(itemView.commenterImageView)
+            }
+
             itemView.commentCreationTimeTextView.text =
                 format("EEE, MMM d, h:mm a", comment.commentTime.toDate())
             itemView.commenterNameTextView.text = comment.commenterName

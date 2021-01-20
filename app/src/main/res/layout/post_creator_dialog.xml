@@ -101,7 +101,7 @@
         android:hint="What is in your mind?"
         android:textColor="@color/black"
         android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline"
+        app:layout_constraintBottom_toTopOf="@+id/postAtachmentImageView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/smallUserImageView" />
@@ -163,6 +163,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:scaleType="fitXY"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline" />

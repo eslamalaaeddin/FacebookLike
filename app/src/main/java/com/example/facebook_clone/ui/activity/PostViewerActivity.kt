@@ -81,17 +81,37 @@ class PostViewerActivity : AppCompatActivity(), CommentsBottomSheetListener {
         val firstCollectionType = intent.getStringExtra("firstCollectionType").toString()
         val creatorReferenceId = intent.getStringExtra("creatorReferenceId").toString()
         val secondCollectionType = intent.getStringExtra("secondCollectionType").toString()
-
-        Log.i(TAG, "TTTT onCreate: $firstCollectionType")
-        Log.i(TAG, "TTTT onCreate: $creatorReferenceId")
-        Log.i(TAG, "TTTT onCreate: $secondCollectionType")
-        Log.i(TAG, "TTTT onCreate: $postId")
+        val fromWhere = intent.getStringExtra("fromWhere").orEmpty()
+        val groupId = intent.getStringExtra("groupId").orEmpty()
 
         //These four are to fetch the post
         post.firstCollectionType = firstCollectionType
         post.creatorReferenceId = creatorReferenceId
         post.secondCollectionType = secondCollectionType
         post.id = postId
+
+        //to change post direction (locally only not in the original post)
+        if (fromWhere.isNotEmpty()) {
+            when (fromWhere) {
+                Utils.POST_FROM_PROFILE -> {
+                    post.firstCollectionType = Utils.POSTS_COLLECTION
+                    post.creatorReferenceId = postPublisherId
+                    post.secondCollectionType = Utils.PROFILE_POSTS_COLLECTION
+                }
+
+                Utils.POST_FROM_GROUP -> {
+                    post.firstCollectionType = Utils.GROUP_POSTS_COLLECTION
+                    post.creatorReferenceId = groupId
+                    post.secondCollectionType = Utils.SPECIFIC_GROUP_POSTS_COLLECTION
+                }
+
+//            POST_FROM_PAGE -> {
+//                post.firstCollectionType = POSTS_COLLECTION
+//                post.creatorReferenceId = pageId
+//                post.firstCollectionType = PROFILE_POSTS_COLLECTION
+//            }
+            }
+        }
 
         val postLiveData = postViewerActivityViewModel.getPostLiveData(post)
         postLiveData?.observe(this, { post ->
@@ -183,6 +203,9 @@ class PostViewerActivity : AppCompatActivity(), CommentsBottomSheetListener {
                         }
                     }
                 }
+
+
+
             } else {
                 //finish()
                 Toast.makeText(this, postPublisherId, Toast.LENGTH_SHORT).show()

@@ -9,31 +9,43 @@
         android:id="@+id/reactorsLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
         android:layout_alignParentStart="true"
-        android:gravity="center"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="@id/commentsRecyclerViewLayout"
+        android:background="@color/white"
+        android:gravity="center"
         android:orientation="horizontal"
         android:paddingStart="4dp"
+        android:paddingTop="8dp"
         android:paddingEnd="4dp"
-      >
+        android:paddingBottom="8dp">
 
         <ImageView
             android:id="@+id/firstReactPlaceHolder"
             android:layout_width="21dp"
             android:layout_height="21dp"
             android:layout_marginEnd="1dp"
-            android:src="@drawable/ic_like_react" />
+            android:src="@drawable/ic_like_react"
+            android:visibility="gone" />
 
         <ImageView
             android:id="@+id/secondReactPlaceHolder"
             android:layout_width="21dp"
             android:layout_height="21dp"
             android:layout_marginEnd="4dp"
-            android:src="@drawable/ic_love_react" />
+            android:src="@drawable/ic_love_react"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/thirdReactPlaceHolder"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="4dp"
+            android:background="@color/white"
+            android:backgroundTint="@color/white"
+            android:scaleType="centerCrop"
+            android:src="@drawable/emojis" />
 
         <TextView
             android:id="@+id/reactsCountsInfoTextView"
@@ -41,15 +53,14 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center|start"
-            tools:text="You, and 5.7K others"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            tools:text=" You, and 5.7K others" />
 
         <ImageView
             android:id="@+id/myReactPlaceHolder"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_marginEnd="4dp"
-           />
+            android:layout_marginEnd="4dp" />
 
     </LinearLayout>
 
@@ -62,7 +73,6 @@
         android:layout_alignParentEnd="true"
         android:layout_gravity="bottom"
         android:background="@color/medium_gray" />
-
 
 
     <FrameLayout
@@ -83,29 +93,28 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
         <LinearLayout
+            android:id="@+id/emptyCommentsLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
             android:gravity="center"
-            android:visibility="gone"
-            android:id="@+id/emptyCommentsLayout"
-            >
+            android:orientation="vertical"
+            android:visibility="gone">
+
             <ImageView
                 android:layout_width="96dp"
                 android:layout_height="96dp"
-                android:src="@drawable/ic_comments_empty"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="16dp"
+                android:src="@drawable/ic_comments_empty" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="No Comments Yet\n Be the first to comment"
                 android:gravity="center"
-                android:textSize="24sp"/>
-            
-            
-        </LinearLayout>
+                android:text="No Comments Yet\n Be the first to comment"
+                android:textSize="24sp" />
 
+
+        </LinearLayout>
 
 
     </FrameLayout>
@@ -122,59 +131,56 @@
 
 
     <LinearLayout
-    android:id="@+id/commentLayout"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_alignParentStart="true"
-    android:layout_alignParentEnd="true"
-    android:layout_alignParentBottom="true"
-    android:layout_gravity="bottom"
-    android:gravity="center"
-    android:orientation="horizontal"
-    android:padding="8dp">
-
-    <ImageView
-        android:id="@+id/addAttachmentToComment"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:src="@drawable/ic_attachment"
-        app:tint="@color/medium_gray" />
-
-    <LinearLayout
+        android:id="@+id/commentLayout"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginStart="8dp"
-        android:background="@drawable/round_background"
-        android:backgroundTint="#EFEFEF"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
         android:gravity="center"
-        android:orientation="horizontal">
-
-        <EditText
-            android:id="@+id/commentEditText"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
-            android:layout_weight="1"
-            android:background="@null"
-            android:hint="Write a comment..."
-            android:paddingStart="4dp"
-            android:paddingEnd="4dp"
-            tools:ignore="RtlSymmetry" />
+        android:orientation="horizontal"
+        android:padding="8dp">
 
         <ImageView
-            android:id="@+id/sendCommentImageView"
-            android:layout_width="28dp"
-            android:layout_height="match_parent"
-            android:layout_margin="4dp"
-            android:src="@drawable/ic_comment_send"
-             />
+            android:id="@+id/addAttachmentToComment"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_attachment"
+            app:tint="@color/medium_gray" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/round_background"
+            android:backgroundTint="#EFEFEF"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/commentEditText"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:hint="Write a comment..."
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                tools:ignore="RtlSymmetry" />
+
+            <ImageView
+                android:id="@+id/sendCommentImageView"
+                android:layout_width="28dp"
+                android:layout_height="match_parent"
+                android:layout_margin="4dp"
+                android:src="@drawable/ic_comment_send" />
+
+        </LinearLayout>
 
     </LinearLayout>
-
-</LinearLayout>
-
-
 
 
     <androidx.cardview.widget.CardView
@@ -184,29 +190,28 @@
         android:layout_above="@id/commentLayout"
         android:layout_alignParentStart="true"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
         android:layout_marginBottom="4dp"
         android:visibility="gone"
-        android:layout_marginTop="4dp"
         app:cardCornerRadius="16dp">
 
         <FrameLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            >
+            android:layout_height="wrap_content">
+
             <ImageView
                 android:id="@+id/mediaCommentPreviewImg"
                 android:layout_width="96dp"
                 android:layout_height="120dp"
-                android:scaleType="centerCrop"
-                />
+                android:scaleType="centerCrop" />
 
             <ImageView
                 android:id="@+id/dismissMediaComment"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:scaleType="centerCrop"
                 android:layout_gravity="end"
                 android:background="@color/white"
+                android:scaleType="centerCrop"
                 app:srcCompat="@drawable/ic_cancel" />
 
         </FrameLayout>

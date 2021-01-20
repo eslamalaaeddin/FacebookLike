@@ -173,7 +173,8 @@ class PostCreatorDialog(
                                 }
                             }
                         }
-                } else if (postDataType == "video") {
+                }
+                else if (postDataType == "video") {
                     val videoUri = postData!!.data!!
                     progressDialog = Utils.showProgressDialog(requireContext(), "Please wait...")
                     postViewModel.uploadPostVideoToCloudStorage(videoUri)
@@ -371,6 +372,7 @@ class PostCreatorDialog(
                         postData!!.data
                     )
                 }
+                postAtachmentImageView.visibility = View.VISIBLE
                 postAtachmentImageView.setImageBitmap(bitmap)
             } else if (postDataType == "video") {
                 val videoUri = postData!!.data!!

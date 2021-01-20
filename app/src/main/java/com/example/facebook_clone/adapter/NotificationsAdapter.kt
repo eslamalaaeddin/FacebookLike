@@ -63,7 +63,9 @@ class NotificationsAdapter(private var notifications: List<Notification>,
 
         @SuppressLint("SetTextI18n")
         fun bind(notification: Notification) {
-            Picasso.get().load(notification.notifierImageUrl).into(itemView.notifierImageView)
+            if (notification.notifierImageUrl?.isNotEmpty() == true) {
+                Picasso.get().load(notification.notifierImageUrl).into(itemView.notifierImageView)
+            }
             itemView.notificationDateTextView.text =
                 DateFormat.format("EEEE, MMM d, h:mm a", notification.notificationTime.toDate())
 

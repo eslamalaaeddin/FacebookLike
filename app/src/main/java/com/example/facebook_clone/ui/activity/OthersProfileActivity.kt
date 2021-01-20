@@ -88,17 +88,17 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
 
                 //Check for friend requests
                 if (!currentUser.friendRequests.isNullOrEmpty()) {
-                   // Toast.makeText(this, "a", Toast.LENGTH_SHORT).show()
+                    // Toast.makeText(this, "a", Toast.LENGTH_SHORT).show()
                     currentUser.friendRequests?.forEach { friendRequest ->
                         if (friendRequest.fromId == currentUser.id) {
-                         //   Toast.makeText(this, "b", Toast.LENGTH_SHORT).show()
+                            //   Toast.makeText(this, "b", Toast.LENGTH_SHORT).show()
                             addFriendButton.visibility = View.INVISIBLE
                             addFriendButton.isEnabled = false
                             cancelRequestButton.isEnabled = true
                             cancelRequestButton.visibility = View.VISIBLE
                             currentFriendRequest = friendRequest
                         } else {
-                          //  Toast.makeText(this, "c", Toast.LENGTH_SHORT).show()
+                            //  Toast.makeText(this, "c", Toast.LENGTH_SHORT).show()
                             addFriendButton.isEnabled = true
                             cancelRequestButton.isEnabled = false
                             addFriendButton.visibility = View.VISIBLE
@@ -109,12 +109,12 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
 
                 //there might be a friendship
                 else if (currentUser.friends != null) {
-                   // Toast.makeText(this, "d", Toast.LENGTH_SHORT).show()
+                    // Toast.makeText(this, "d", Toast.LENGTH_SHORT).show()
                     if (currentUser.friends!!.isNotEmpty()) {
-                      //  Toast.makeText(this, "e", Toast.LENGTH_SHORT).show()
+                        //  Toast.makeText(this, "e", Toast.LENGTH_SHORT).show()
                         currentUser.friends?.forEach { friend ->
                             if (friend.id == userIdIAmViewing) {
-                             //   Toast.makeText(this, "f", Toast.LENGTH_SHORT).show()
+                                //   Toast.makeText(this, "f", Toast.LENGTH_SHORT).show()
                                 addFriendButton.isEnabled = false
                                 cancelRequestButton.isEnabled = false
                                 addFriendButton.visibility = View.INVISIBLE
@@ -137,7 +137,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
                     }
 
                 } else {
-                   // Toast.makeText(this, "g", Toast.LENGTH_SHORT).show()
+                    // Toast.makeText(this, "g", Toast.LENGTH_SHORT).show()
                     addFriendButton.isEnabled = true
                     cancelRequestButton.isEnabled = false
                     addFriendButton.visibility = View.VISIBLE
@@ -246,11 +246,12 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
     }
 
     private fun showUserFriendsBottomSheet() {
-            val userFriendsBottomSheet = UserFriendsBottomSheet(friends = userIAmViewing.friends.orEmpty(), this)
-            userFriendsBottomSheet.show(supportFragmentManager, userFriendsBottomSheet.tag)
+        val userFriendsBottomSheet =
+            UserFriendsBottomSheet(friends = userIAmViewing.friends.orEmpty(), this)
+        userFriendsBottomSheet.show(supportFragmentManager, userFriendsBottomSheet.tag)
     }
 
-    private fun showUserImage(imageUrl: String){
+    private fun showUserImage(imageUrl: String) {
         val imageViewerDialog = ImageViewerDialog()
         imageViewerDialog.show(supportFragmentManager, "signature")
         imageViewerDialog.setMediaUrl(imageUrl)
@@ -324,17 +325,20 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         postPosition: Int,
         notifiedToken: String?
     ) {
-        //Here i will provide token, but there is a problem because onReact method may be clicked to delete react not to create it
-        if (!reacted){
-            val userToBeNotified = profileActivityViewModel.getAnotherUser(post.publisherId.orEmpty())
-            userToBeNotified?.observe(this){user ->
-                val token = user.token
-                othersProfileActivityPostsHandler.onReactButtonClicked(post, interactorId, interactorName, interactorImageUrl, reacted, currentReact, postPosition, token)
-                userToBeNotified.removeObservers(this)
-            }
-        }
-        else{
-            othersProfileActivityPostsHandler.onReactButtonClicked(post, interactorId, interactorName, interactorImageUrl, reacted, currentReact, postPosition)
+        val userToBeNotified = profileActivityViewModel.getAnotherUser(post.publisherId.orEmpty())
+        userToBeNotified?.observe(this) { user ->
+            val token = user.token
+            othersProfileActivityPostsHandler.onReactButtonClicked(
+                post,
+                interactorId,
+                interactorName,
+                interactorImageUrl,
+                reacted,
+                currentReact,
+                postPosition,
+                token
+            )
+            userToBeNotified.removeObservers(this)
         }
     }
 
@@ -348,18 +352,21 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         postPosition: Int,
         notifiedToken: String?
     ) {
-        if (!reacted){
-            val userToBeNotified = profileActivityViewModel.getAnotherUser(post.publisherId.orEmpty())
-            userToBeNotified?.observe(this){user ->
-                val token = user.token
-                othersProfileActivityPostsHandler.onReactButtonLongClicked(post, interactorId, interactorName, interactorImageUrl, reacted, currentReact, postPosition, token)
-                userToBeNotified.removeObservers(this)
-            }
+        val userToBeNotified = profileActivityViewModel.getAnotherUser(post.publisherId.orEmpty())
+        userToBeNotified?.observe(this) { user ->
+            val token = user.token
+            othersProfileActivityPostsHandler.onReactButtonLongClicked(
+                post,
+                interactorId,
+                interactorName,
+                interactorImageUrl,
+                reacted,
+                currentReact,
+                postPosition,
+                token
+            )
+            userToBeNotified.removeObservers(this)
         }
-        else{
-            othersProfileActivityPostsHandler.onReactButtonLongClicked(post, interactorId, interactorName, interactorImageUrl, reacted, currentReact, postPosition)
-        }
-
     }
 
     override fun onCommentButtonClicked(
@@ -369,7 +376,13 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         interactorImageUrl: String,
         postPosition: Int
     ) {
-        othersProfileActivityPostsHandler.onCommentButtonClicked(post, interactorId, interactorName, interactorImageUrl, postPosition)
+        othersProfileActivityPostsHandler.onCommentButtonClicked(
+            post,
+            interactorId,
+            interactorName,
+            interactorImageUrl,
+            postPosition
+        )
     }
 
     override fun onShareButtonClicked(
@@ -381,9 +394,16 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         notifiedToken: String?
     ) {
         val userToBeNotified = profileActivityViewModel.getAnotherUser(post.publisherId.orEmpty())
-        userToBeNotified?.observe(this){user ->
+        userToBeNotified?.observe(this) { user ->
             val token = user.token
-            othersProfileActivityPostsHandler.onShareButtonClicked(post, interactorId, interactorName, interactorImageUrl, postPosition, token)
+            othersProfileActivityPostsHandler.onShareButtonClicked(
+                post,
+                interactorId,
+                interactorName,
+                interactorImageUrl,
+                postPosition,
+                token
+            )
             userToBeNotified.removeObservers(this)
         }
     }
@@ -395,7 +415,13 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         interactorImageUrl: String,
         postPosition: Int
     ) {
-        othersProfileActivityPostsHandler.onCommentButtonClicked(post, interactorId, interactorName, interactorImageUrl, postPosition)
+        othersProfileActivityPostsHandler.onCommentButtonClicked(
+            post,
+            interactorId,
+            interactorName,
+            interactorImageUrl,
+            postPosition
+        )
     }
 
     override fun onMediaPostClicked(mediaUrl: String) {
@@ -418,20 +444,12 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         notifiedToken: String,
         notificationType: String,
         postPublisherId: String,
-        postId: String ,
+        postId: String,
         firstCollectionType: String,
         creatorReferenceId: String,
         secondCollectionType: String,
         commentId: String
-    ) {
-//        notificationsHandler.also {
-//            it.notificationType = "commentOnPost"
-//            it.postId = postId
-//            it.commentPosition = commentPosition
-//            it.handleNotificationCreationAndFiring()
-//        }
-       // othersProfileActivityPostsHandler.onAnotherUserCommented(commentPosition, commentId, postId)
-    }
+    ) {}
 
     override fun onFriendClicked(friendId: String) {
         if (friendId == currentUser.id) {

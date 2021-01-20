@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/postLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/circleImageView"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:visibility="visible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/userNameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@+id/circleImageView"
+        app:layout_constraintTop_toTopOf="@+id/circleImageView"
+        tools:text="أسير الأناناس" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center|start"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="@+id/userNameTextView"
+        app:layout_constraintStart_toEndOf="@+id/userNameTextView"
+        app:layout_constraintTop_toTopOf="@+id/userNameTextView">
+
+        <ImageView
+            android:id="@+id/inGroupPostArrowImageView"
+            android:layout_width="21dp"
+            android:layout_height="21dp"
+            app:srcCompat="@drawable/ic_in_group_arrow"
+            app:tint="@color/black" />
+
+        <TextView
+            android:id="@+id/groupOrPageNameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            tools:text="Information Technology Jobs" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/postTimeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        app:layout_constraintBottom_toBottomOf="@+id/circleImageView"
+        app:layout_constraintStart_toStartOf="@+id/userNameTextView"
+        app:layout_constraintTop_toBottomOf="@+id/userNameTextView"
+        tools:text="22h" />
+
+    <ImageView
+        android:id="@+id/postVisibilityImageView"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/postTimeTextView"
+        app:layout_constraintStart_toEndOf="@+id/postTimeTextView"
+        app:layout_constraintTop_toTopOf="@+id/postTimeTextView"
+        app:srcCompat="@drawable/ic_public_visibility" />
+
+    <TextView
+        android:id="@+id/postContentTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/circleImageView"
+        tools:text='عندما كنت بالمرحلة الابتدائية كتبت على حائط المدرسة: لا تأتي غدا؛ فأنا قادم لخطبتكِ فلم تحضر مائة طالبة وعشرون معلمة والمديرة. ' />
+
+
+    <View
+        android:id="@+id/view5"
+        android:layout_width="0dp"
+        android:layout_height="12dp"
+        android:layout_marginTop="16dp"
+        android:background="#D3D3D3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/attachmentImageView" />
+
+
+    <ImageView
+        android:id="@+id/attachmentImageView"
+        android:layout_width="0dp"
+        android:layout_height="256dp"
+        android:layout_marginTop="4dp"
+        android:scaleType="fitXY"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/postContentTextView" />
+
+    <ImageView
+        android:id="@+id/playButtonImageView"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        app:layout_constraintBottom_toBottomOf="@+id/attachmentImageView"
+        app:layout_constraintEnd_toEndOf="@+id/attachmentImageView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/attachmentImageView"
+        app:srcCompat="@drawable/ic_baseline_play_arrow_24"
+        tools:visibility="gone" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

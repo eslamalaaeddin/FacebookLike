@@ -96,6 +96,10 @@ open class BasePostHandler(
             } else {
                 Toast.makeText(context, task.exception?.message, Toast.LENGTH_SHORT).show()
             }
+
+//            if (post.interactingFromNewsFeed){
+//                postViewModel.addReactToDB()
+//            }
         }
     }
 

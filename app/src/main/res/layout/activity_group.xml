@@ -25,8 +25,8 @@
     <ImageView
         android:id="@+id/groupCoverImageView"
         android:layout_width="0dp"
-        android:layout_height="216dp"
-        android:scaleType="fitCenter"
+        android:layout_height="256dp"
+        android:scaleType="fitXY"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
