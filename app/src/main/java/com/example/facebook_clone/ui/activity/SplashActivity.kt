@@ -26,17 +26,11 @@ class SplashActivity : AppCompatActivity() {
                 navigateToRecentUsersActivity()
             } else {
                 navigateToNewsFeedActivity()
-//                navigateToProfileActivity()
-//                navigateToOthersProfileActivity()
             }
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-            //navigateToRecentUsersActivity()
-            //finish()
 
         }, 3000)
     }
-
-
 
     private fun makeFullScreen() {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -58,15 +52,4 @@ class SplashActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun navigateToProfileActivity() {
-        val intent = Intent(this, ProfileActivity::class.java)
-        startActivity(intent)
-        finish()
-    }
-
-    private fun navigateToOthersProfileActivity() {
-        val intent = Intent(this, OthersProfileActivity::class.java)
-        startActivity(intent)
-        finish()
-    }
 }

@@ -8,13 +8,11 @@
     android:background="@color/white"
     tools:context="com.example.facebook_clone.ui.activity.SplashActivity">
 
-
     <de.hdodenhof.circleimageview.CircleImageView
-        android:layout_width="128dp"
-        android:layout_height="128dp"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
         android:layout_gravity="center"
-        android:src="@drawable/cat"
+        android:src="@drawable/ic_facebook_circular_logo"
         />
-<!--        android:src="@drawable/ic_facebook_circular_logo"/>-->
 
 </FrameLayout>

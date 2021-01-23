@@ -28,7 +28,7 @@ class ProfilePictureActivity : AppCompatActivity() {
     private val profilePictureActivityViewModel by viewModel<ProfilePictureActivityViewModel>()
     private val newsFeedActivityViewModel by viewModel<NewsFeedActivityViewModel>()
     private val auth: FirebaseAuth by inject()
-    private var progressDialog: ProgressDialog? = null
+//    private var progressDialog: ProgressDialog? = null
     private lateinit var userName: String
     private lateinit var email: String
     private lateinit var password: String
@@ -98,18 +98,20 @@ class ProfilePictureActivity : AppCompatActivity() {
         //image from camera
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
             val bitmap = data?.extras?.get("data") as Bitmap
+            profileImagePreView.setImageBitmap(bitmap)
             handleProfileImage(bitmap)
         }
         //image from gallery
         else if(requestCode == IMAGE_REQUEST_CODE && resultCode == RESULT_OK){
             val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, data?.data!!)
+            profileImagePreView.setImageBitmap(bitmap)
             handleProfileImage(bitmap)
         }
     }
 
     private fun handleProfileImage(bitmap: Bitmap){
         //profileImagePreView.setImageBitmap(bitmap)
-        progressDialog = Utils.showProgressDialog(this, "Please wait...")
+        //progressDialog = Utils.showProgressDialog(this, "Please wait...")
         profilePictureActivityViewModel.uploadProfileImageToCloudStorage(bitmap)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -125,7 +127,7 @@ class ProfilePictureActivity : AppCompatActivity() {
                                 ).show()
                             }
                         }
-                        progressDialog?.dismiss()
+                       // progressDialog?.dismiss()
                     }
                 }
             }
@@ -170,6 +172,7 @@ class ProfilePictureActivity : AppCompatActivity() {
 
     private fun navigateToProfileActivity() {
         val intent = Intent(this, ProfileActivity::class.java)
+        intent.putExtra("firstTime", true)
         startActivity(intent)
         finish()
     }

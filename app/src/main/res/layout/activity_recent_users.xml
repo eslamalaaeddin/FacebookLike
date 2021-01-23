@@ -35,11 +35,11 @@
             >
 
             <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recentUsersRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#A4F6F6F6"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                android:id="@+id/recentUsersRecyclerView"/>
+                android:background="#81F6F6F6"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
         </androidx.cardview.widget.CardView>
     </LinearLayout>

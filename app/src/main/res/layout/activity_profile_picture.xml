@@ -29,7 +29,7 @@
             android:layout_marginEnd="16dp"
             android:gravity="center|end"
             android:id="@+id/skipProfilePictureActivity"
-            android:text="Skip"
+            android:text="OK"
             android:textColor="@color/medium_gray"
             android:textSize="21sp" />
 
@@ -55,13 +55,20 @@
 
             />
 
-        <ImageView
+
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profileImagePreView"
+            android:scaleType="centerCrop"
+            app:civ_border_color="@color/white"
+            app:civ_border_width="4dp"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:layout_gravity="center"
-            android:src="@drawable/ic_user_picture" />
+            app:layout_constraintBottom_toBottomOf="@+id/coverImageView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/coverImageView"
+            app:layout_constraintTop_toBottomOf="@+id/coverImageView" />
 
 
     </LinearLayout>

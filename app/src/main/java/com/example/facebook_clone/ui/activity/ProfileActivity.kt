@@ -50,9 +50,12 @@ class ProfileActivity() : AppCompatActivity(), FriendClickListener{
     private var profilePostsAdapter: ProfilePostsAdapter? = null
     private lateinit var friendsAdapter: FriendsAdapter
     private var currentEditedPostPosition: Int = -1
+    private var firstTime = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
+
+        firstTime = intent.getBooleanExtra("firsTime", false)
 
         profileActivityPostsHandler = ProfileActivityPostsHandler("ProfileActivity", this, postViewModel, profileActivityViewModel)
         picasso = Picasso.get()
@@ -115,6 +118,16 @@ class ProfileActivity() : AppCompatActivity(), FriendClickListener{
     private fun showUserFriendsBottomSheet() {
         val userFriendsBottomSheet = UserFriendsBottomSheet(friends = currentUser.friends.orEmpty(), this)
         userFriendsBottomSheet.show(supportFragmentManager, userFriendsBottomSheet.tag)
+    }
+
+    override fun onBackPressed() {
+        if (firstTime){
+            startActivity(Intent(this, NewsFeedActivity::class.java))
+            finish()
+        }
+        else{
+            super.onBackPressed()
+        }
     }
 
     @SuppressLint("SetTextI18n")

@@ -125,6 +125,7 @@ class NewPasswordFragment : Fragment(R.layout.fragment_password) {
                                         }
 
                                     } else {
+                                        progressDialog?.dismiss()
                                         Utils.toastMessage(
                                             requireContext(),
                                             task.exception?.message.toString()

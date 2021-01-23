@@ -23,14 +23,15 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent">
+
                     <ImageView
+                        android:id="@+id/facebookLogoImageView"
                         android:layout_width="180dp"
-                        android:layout_gravity="start"
                         android:layout_height="match_parent"
+                        android:layout_gravity="start"
                         android:gravity="start"
-                        android:src="@drawable/facebook_logo"
                         android:scaleType="centerCrop"
-                        />
+                        android:src="@drawable/facebook_logo" />
 
                 </FrameLayout>
 

@@ -34,11 +34,16 @@ import com.example.facebook_clone.model.group.Group
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.user.User
 import com.example.facebook_clone.ui.activity.NewsFeedActivity
+import com.example.facebook_clone.ui.activity.VideoPlayerActivity
 import com.example.facebook_clone.ui.bottomsheet.AddToPostBottomSheet
 import com.example.facebook_clone.viewmodel.PostViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.post_creator_dialog.*
+import kotlinx.android.synthetic.main.post_creator_dialog.postContentTextView
+import kotlinx.android.synthetic.main.post_creator_dialog.userNameTextView
+import kotlinx.android.synthetic.main.profile_post_item.*
+import kotlinx.android.synthetic.main.profile_post_item.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -84,6 +89,8 @@ class PostCreatorDialog(
         groupPostsCreatorLstnr?.let {
             groupPostsCreatorListener = it
         }
+
+        playImageView.visibility = View.GONE
 
         setUpPostCreatorUI()
         addToPostButton.setOnClickListener { showPostAttachmentBottomSheet() }
@@ -373,9 +380,17 @@ class PostCreatorDialog(
                     )
                 }
                 postAtachmentImageView.visibility = View.VISIBLE
+                playImageView.visibility = View.GONE
                 postAtachmentImageView.setImageBitmap(bitmap)
             } else if (postDataType == "video") {
+                postAtachmentImageView.visibility = View.VISIBLE
+                playImageView.visibility = View.VISIBLE
                 val videoUri = postData!!.data!!
+//                playImageView.setOnClickListener {
+//                    val intent = Intent(requireContext(), VideoPlayerActivity::class.java)
+//                    intent.putExtra("videoUrl", videoUri)
+//                    startActivity(intent)
+//                }
                 val interval: Long = 1 * 1000
                 val options: RequestOptions = RequestOptions().frame(interval)
                 Glide.with(requireContext())

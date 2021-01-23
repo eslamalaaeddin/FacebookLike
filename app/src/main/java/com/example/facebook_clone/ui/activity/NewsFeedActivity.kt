@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.NewsFeedTabsAdapter
@@ -22,22 +23,27 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 private const val TAG = "NewsFeedActivity"
 private const val TOKEN = "token"
+
 class NewsFeedActivity : AppCompatActivity() {
     private val newsFeedActivityViewModel by viewModel<NewsFeedActivityViewModel>()
     private val postViewModel by viewModel<PostViewModel>()
     private var fromRecentUsersActivity = false
     private val auth: FirebaseAuth by inject()
     private lateinit var currentUser: User
-    private var email:String? = null
-    private var password:String? = null
+    private var email: String? = null
+    private var password: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_news_feed)
         setUpTabs()
-         email = intent.getStringExtra("email").toString()
-         password = intent.getStringExtra("password").toString()
+        email = intent.getStringExtra("email").toString()
+        password = intent.getStringExtra("password").toString()
         fromRecentUsersActivity = intent.getBooleanExtra("fromRecent", false)
-      //  Toast.makeText(this, "$fromRecentUsersActivity", Toast.LENGTH_SHORT).show()
+
+        Log.d(TAG, "YYYY onCreate: $email")
+        Log.d(TAG, "YYYY onCreate: $password")
+        Log.d(TAG, "YYYY onCreate: $fromRecentUsersActivity")
+
         val myLiveData = newsFeedActivityViewModel.getMe(auth.currentUser?.uid.toString())
         myLiveData?.observe(this, { user ->
             currentUser = user
@@ -46,14 +52,6 @@ class NewsFeedActivity : AppCompatActivity() {
                 val tokenFromSharedPref = getTokenFromSharedPreference(this)
                 if (newToken != tokenFromSharedPref) {
                     saveTokenToSharedPreference(this, newToken)
-//                    updateTokenInCurrentUserPosts(user.id.toString(), "newToken")
-//                    val userGroups = user.groups.orEmpty()
-//                    if (userGroups.isNotEmpty()){
-//                        for (group in userGroups){
-//                            updateTokenInUserGroupPosts(user.id.orEmpty(), group.id.orEmpty(), "newToken")
-//                        }
-//                    }
-
                 }
                 updateUserToken(newToken, currentUser.id.toString())
             }
@@ -93,57 +91,19 @@ class NewsFeedActivity : AppCompatActivity() {
     }
 
     private fun setUpTabs() {
-       val tabsAdapter = NewsFeedTabsAdapter(supportFragmentManager)
-        if (viewPager != null){
+        val tabsAdapter = NewsFeedTabsAdapter(supportFragmentManager)
+        if (viewPager != null) {
             viewPager.adapter = tabsAdapter
             newsFeedTabLayout.setupWithViewPager(viewPager)
         }
-
 
         newsFeedTabLayout.getTabAt(0)?.setIcon(R.drawable.ic_news_feed)
         newsFeedTabLayout.getTabAt(1)?.setIcon(R.drawable.ic_group_members)
         newsFeedTabLayout.getTabAt(2)?.setIcon(R.drawable.ic_alarm)
         newsFeedTabLayout.getTabAt(3)?.setIcon(R.drawable.ic_menu)
-
-
-//        newsFeedTabLayout.setOnTabSelectedListener(
-//            object : ViewPagerOnTabSelectedListener(viewPager) {
-//                override fun onTabSelected(tab: TabLayout.Tab) {
-//                    super.onTabSelected(tab)
-//                    val tabIconColor = ContextCompat.getColor(this@NewsFeedActivity, R.color.medium_blue)
-//                    when(tab.position){
-//                        0 -> {
-//                            tab.icon = R.drawable.ic_news_feed_filled
-//                        }
-//                        1 -> {
-//
-//                        }
-//                        2 -> {
-//
-//                        }
-//                        3 -> {
-//
-//                        }
-//                    }
-//
-//                }
-//
-//                override fun onTabUnselected(tab: TabLayout.Tab) {
-//                    super.onTabUnselected(tab)
-//                    val tabIconColor =
-//                        ContextCompat.getColor(this@NewsFeedActivity, R.color.black)
-//                    tab.icon!!.setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN)
-//                }
-//
-//                override fun onTabReselected(tab: TabLayout.Tab) {
-//                    super.onTabReselected(tab)
-//                }
-//            }
-//        )
-
     }
 
-    private fun addUserToRecentUsers(user: RecentLoggedInUser, token: String): Task<Void>{
+    private fun addUserToRecentUsers(user: RecentLoggedInUser, token: String): Task<Void> {
         return newsFeedActivityViewModel.addUserToRecentLoggedInUsers(user, token)
     }
 
@@ -164,17 +124,6 @@ class NewsFeedActivity : AppCompatActivity() {
             return prefs.getString(TOKEN, "")
         }
     }
-//    private fun updateTokenInCurrentUserPosts(userId: String, token: String){
-//        postViewModel.updateTokenInProfilePost(userId, token)
-//    }
-
-//    private fun updateTokenInUserGroupPosts(userId: String, groupId: String, token: String){
-//        postViewModel.updateTokenInGroupPost(userId, groupId, token)
-//    }
-
-//    private fun updateTokenInCurrentUserComments(userId: String, token: String){
-//        postViewModel.updateTokenInComment(userId, token)
-//    }
 
 
 }

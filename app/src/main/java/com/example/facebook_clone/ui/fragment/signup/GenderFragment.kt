@@ -31,8 +31,6 @@ class GenderFragment : Fragment(R.layout.fragment_gender) {
         month = args.month
         year = args.year
 
-        Log.i(TAG, "ISLAM onViewCreated: $args")
-
         nextButtonInGenderFragment.setOnClickListener {
            validateUserInputAndNavigateToUserMailFragment(maleOrFemale())
         }
@@ -50,17 +48,17 @@ class GenderFragment : Fragment(R.layout.fragment_gender) {
     }
 
     private fun maleOrFemale() : String{
-
-        when (maleFemaleRadioGroup.checkedRadioButtonId) {
-
-            1 -> {gender = "male"
-            return gender}
-            2 -> {gender = "female"
-            return gender
+        return when (maleFemaleRadioGroup.checkedRadioButtonId) {
+            1 -> {
+                gender = "male"
+                "male"
             }
-
+            2 -> {
+                gender = "female"
+                "female"
+            }
+            else -> ""
         }
-        return ""
     }
     private fun validateUserInputAndNavigateToUserMailFragment(gender:String){
         if (gender.isEmpty()){
