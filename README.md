@@ -88,7 +88,7 @@
          <tr>
              <td><img src="images\Group\7-GroupPost.jpg" width=288 height=512></td>
              <td><img src="images\Group\8-InviteFriends.jpg" width=288 height=512></td>
-           <td><img src="images\FriendRequestNotification.jpg" width=288 height=512></td>
+           <td><img src="images\FriendRequestNot.jpg" width=288 height=512></td>
         </tr>
    </table>
    
