@@ -1,19 +1,19 @@
 # Facebook-Clone
 # Features
-o	Email and password authentication. 
-o	User profile and others profiles.
-o	Searching for users, groups. 
-o	Friend requests accepting and removing.
-o	Unfriend, follow, and block users.
-o	Different post types (texts, images, videos, mix).
-o	Post interactions (reacts, comments, replies, edits, and shares).
-o	Posts multiple visibilities.
-o	Different comment types (texts, images, videos, mix).
-o	Groups creation.
-o	Groups invitations, and joins.
-o	Admins authorities.
-o	Interactive Notifications on (friend requests, post interactions, comments, replies, group invitations, posting in groups).
 
+Email and password authentication. <br>
+User profile and others profiles. <br>
+Searching for users, groups.<br>
+Friend requests accepting and removing.<br>
+Unfriend, follow, and block users.<br>
+Different post types (texts, images, videos, mix).<br>
+Post interactions (reacts, comments, replies, edits, and shares).<br>
+Posts multiple visibilities.<br>
+Different comment types (texts, images, videos, mix).<br>
+Groups creation.<br>
+Groups invitations, and joins.<br>
+Admins authorities.<br>
+Interactive notifications on (friend requests, post interactions, comments, replies, group invitations, posting in groups).<br>
 
 <!DOCTYPE html>
 <html>
