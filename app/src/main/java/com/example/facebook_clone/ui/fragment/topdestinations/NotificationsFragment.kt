@@ -238,6 +238,10 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), Notific
         }
     }
 
+    private fun deleteNotification(notifiedId: String, notificationId: String) {
+        notificationsFragmentViewModel.deleteNotificationById(notifiedId, notificationId)
+    }
+
     private fun createFriendshipBetweenMeAndHim(
         notificationId: String,
         meAsFriend: Friend,
@@ -257,9 +261,7 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), Notific
 
     }
 
-    private fun deleteNotification(notifiedId: String, notificationId: String) {
-        notificationsFragmentViewModel.deleteNotificationById(notifiedId, notificationId)
-    }
+
 
     private fun navigateToPost(
         postPublisherId: String,

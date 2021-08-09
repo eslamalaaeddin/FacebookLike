@@ -3,6 +3,7 @@ package com.example.facebook_clone.ui.activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.example.facebook_clone.R
@@ -51,6 +52,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
 
     private val auth: FirebaseAuth by inject()
     private lateinit var currentUser: User
+    private var crrentUser: User? = null
     private var currentNotificationId: String? = null
     private lateinit var userIAmViewing: User
     private var currentFriendRequest: FriendRequest? = null
@@ -82,40 +84,44 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         myLiveData?.observe(this, { user ->
             user?.let {
                 currentUser = user
-
+                crrentUser = user
                 notificationsHandler.notifierId = currentUser.id
                 notificationsHandler.notifierName = currentUser.name
                 notificationsHandler.notifierImageUrl = currentUser.profileImageUrl
 
                 //Check for friend requests
                 if (!currentUser.friendRequests.isNullOrEmpty()) {
-                    // Toast.makeText(this, "a", Toast.LENGTH_SHORT).show()
+//                     Toast.makeText(this, "a", Toast.LENGTH_SHORT).show()
                     currentUser.friendRequests?.forEach { friendRequest ->
+                        //I changed my mind and want to delete the friend request that i sent.
                         if (friendRequest.fromId == currentUser.id) {
-                            //   Toast.makeText(this, "b", Toast.LENGTH_SHORT).show()
+//                               Toast.makeText(this, "b", Toast.LENGTH_SHORT).show()
                             addFriendButton.visibility = View.INVISIBLE
                             addFriendButton.isEnabled = false
                             cancelRequestButton.isEnabled = true
                             cancelRequestButton.visibility = View.VISIBLE
                             currentFriendRequest = friendRequest
-                        } else {
-                            //  Toast.makeText(this, "c", Toast.LENGTH_SHORT).show()
-                            addFriendButton.isEnabled = true
-                            cancelRequestButton.isEnabled = false
-                            addFriendButton.visibility = View.VISIBLE
-                            cancelRequestButton.visibility = View.INVISIBLE
+                        }
+                        //Some one sent me a friend request and i entered his profile
+                        else {
+//                              Toast.makeText(this, "c", Toast.LENGTH_SHORT).show()
+                            addFriendButton.isEnabled = false
+                            cancelRequestButton.isEnabled = true
+                            addFriendButton.visibility = View.INVISIBLE
+                            cancelRequestButton.visibility = View.VISIBLE
+                            currentFriendRequest = friendRequest
                         }
                     }
                 }
 
                 //there might be a friendship
                 else if (currentUser.friends != null) {
-                    // Toast.makeText(this, "d", Toast.LENGTH_SHORT).show()
+//                     Toast.makeText(this, "d", Toast.LENGTH_SHORT).show()
                     if (currentUser.friends!!.isNotEmpty()) {
-                        //  Toast.makeText(this, "e", Toast.LENGTH_SHORT).show()
+//                          Toast.makeText(this, "e", Toast.LENGTH_SHORT).show()
                         currentUser.friends?.forEach { friend ->
                             if (friend.id == userIdIAmViewing) {
-                                //   Toast.makeText(this, "f", Toast.LENGTH_SHORT).show()
+//                                   Toast.makeText(this, "f", Toast.LENGTH_SHORT).show()
                                 addFriendButton.isEnabled = false
                                 cancelRequestButton.isEnabled = false
                                 addFriendButton.visibility = View.INVISIBLE
@@ -123,6 +129,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
                                 messageButton.isEnabled = true
                                 messageButton.visibility = View.VISIBLE
                             } else {
+//                                Toast.makeText(this, "g", Toast.LENGTH_SHORT).show()
                                 cancelRequestButton.isEnabled = false
                                 cancelRequestButton.visibility = View.INVISIBLE
                                 addFriendButton.isEnabled = true
@@ -138,7 +145,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
                     }
 
                 } else {
-                    // Toast.makeText(this, "g", Toast.LENGTH_SHORT).show()
+//                     Toast.makeText(this, "h", Toast.LENGTH_SHORT).show()
                     addFriendButton.isEnabled = true
                     cancelRequestButton.isEnabled = false
                     addFriendButton.visibility = View.VISIBLE
@@ -186,6 +193,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
                 val notificationsLiveData =
                     notificationsFragmentViewModel.getNotificationsLiveData(userIdIAmViewing!!)
                 notificationsLiveData.observe(this, { notifications ->
+
                     if (notifications != null) {
                         val userNotificationsIds = user.notificationsIds
                         if (userNotificationsIds != null) {
@@ -212,6 +220,47 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         addFriendButton.setOnClickListener { sendUserFriendRequest() }
 
         cancelRequestButton.setOnClickListener {
+                                deleteFriendRequestFromMeAndHim()
+                                //deleteFriendRequestNotificationFromMyNotifications()
+                                if (currentNotificationId != null) {
+                                    deleteNotification(userIdIAmViewing.orEmpty(), currentNotificationId.orEmpty())
+                                }
+        }
+
+        messageButton.setOnClickListener {
+            Toast.makeText(this, "ههه؟", Toast.LENGTH_SHORT).show()
+        }
+
+        userRelationsButton.setOnClickListener {
+            val usersRelationsBottomSheet = UserRelationsBottomSheet(userIdIAmViewing.toString())
+            usersRelationsBottomSheet.show(supportFragmentManager, usersRelationsBottomSheet.tag)
+        }
+    }
+
+    private fun deleteFriendRequestNotificationFromMyNotifications(){
+        val notificationsLiveData =
+            notificationsFragmentViewModel.getNotificationsLiveData(currentUser.id.toString())
+        notificationsLiveData.observe(this, { notifications ->
+
+            if (notifications != null) {
+                val userNotificationsIds = crrentUser?.notificationsIds
+                if (userNotificationsIds != null) {
+                    notifications.forEach { notification ->
+                        if (userNotificationsIds?.contains(notification.id.toString())!!) {
+                            //CURRENT NOT ID
+                            currentNotificationId = notification.id.toString()
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+    private fun deleteFriendRequestFromMeAndHim() {
+        Toast.makeText(this, "REQ", Toast.LENGTH_SHORT).show()
+        if (currentFriendRequest != null) {
+            Toast.makeText(this, "NOT NULL", Toast.LENGTH_SHORT).show()
+
             othersProfileActivityViewModel.removeFriendRequestFromHisDocument(currentFriendRequest!!)
                 .addOnCompleteListener { task1 ->
                     if (task1.isSuccessful) {
@@ -220,30 +269,32 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
                             currentFriendRequest!!
                         ).addOnCompleteListener { task2 ->
                             if (task2.isSuccessful) {
-                                if (currentNotificationId != null) {
-                                    //handleNotificationDeleting(currentNotificationId!!, userIdIAmViewing)
-                                }
+//                                deleteNotification(auth.currentUser?.uid.toString(), notificationId)
+                                Log.i(TAG, "MMMM FromMeAndHim:$userIdIAmViewing")
+                                //Log.i(TAG, "MMMM FromMeAndHim:$notificationId")
+                                //deleteNotification(userIdIAmViewing.orEmpty(), notificationId)
                             } else {
-                                Toast.makeText(this, task2.exception?.message, Toast.LENGTH_SHORT)
-                                    .show()
+                                Toast.makeText(
+                                    this,
+                                    task2.exception?.message,
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         }
                     } else {
-                        Toast.makeText(this, task1.exception?.message, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this,
+                            task1.exception?.message,
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
                     }
                 }
         }
+    }
 
-        messageButton.setOnClickListener {
-            Toast.makeText(this, "ههه؟", Toast.LENGTH_SHORT).show()
-        }
-        /*
-
-         */
-        userRelationsButton.setOnClickListener {
-            val usersRelationsBottomSheet = UserRelationsBottomSheet(userIdIAmViewing.toString())
-            usersRelationsBottomSheet.show(supportFragmentManager, usersRelationsBottomSheet.tag)
-        }
+    private fun deleteNotification(notifiedId: String, notificationId: String) {
+        notificationsFragmentViewModel.deleteNotificationById(notifiedId, notificationId)
     }
 
     private fun showUserFriendsBottomSheet() {
@@ -304,7 +355,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
                                     it.notificationType = "friendRequest"
                                     it.handleNotificationCreationAndFiring()
                                 }
-                                Toast.makeText(this, "Notifiacation", Toast.LENGTH_SHORT).show()
+                                //Toast.makeText(this, "Notifiacation", Toast.LENGTH_SHORT).show()
                             } else {
                                 Toast.makeText(this, task2.exception?.message, Toast.LENGTH_SHORT)
                                     .show()

@@ -7,10 +7,12 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -95,6 +97,18 @@ class PostCreatorDialog(
 
         // TODO: 8/4/2021 --> get all the data from the post and update it
         postToBeEdited?.let {
+            postContentTextView.setText(it.content.orEmpty())
+            postContentTextView.setSelection(postContentTextView.text.toString().length)//placing cursor at the end of the text
+            it.attachmentUrl?.let { attachmentUrl ->
+                if (it.attachmentType == "image"){
+                    Picasso.get().load(attachmentUrl).into(postAtachmentImageView)
+                }
+                else if (it.attachmentType == "video"){
+                    playImageView.visibility = View.VISIBLE
+                }
+            }
+
+            postVisibilitySpinner.setSelection(it.visibility ?: 0)
 
         }
 
@@ -121,173 +135,186 @@ class PostCreatorDialog(
         })
 
         createPostButton.setOnClickListener {
-            if (postData != null) {
-                if (postDataType == "image") {
-                    var bitmap: Bitmap? = null
-                    if (bitmapFromCamera) {
-                        bitmap = postData?.extras?.get("data") as Bitmap
-                    } else {
-                        bitmap = MediaStore.Images.Media.getBitmap(
-                            activity?.contentResolver,
-                            postData!!.data
-                        )
-                    }
-                    postAtachmentImageView.setImageBitmap(bitmap)
-                    progressDialog = Utils.showProgressDialog(requireContext(), "Please wait...")
-                    postViewModel.uploadPostImageToCloudStorage(bitmap!!)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                task.result?.storage?.downloadUrl?.addOnSuccessListener { photoUrl ->
-                                    postAttachmentUrl = photoUrl.toString()
-                                    val post = createPost(postAttachmentUrl!!, postDataType!!)
-                                    postViewModel.createPost(post).addOnCompleteListener { task ->
-                                        progressDialog?.dismiss()
-                                        if (task.isSuccessful) {
-                                            postViewModel.addPostToNewsFeedPostsCollection(
-                                                currentUserId,
-                                                post
-                                            ).addOnCompleteListener {
-                                                //Add post to my followers news feed post
-                                                if (it.isSuccessful) {
-                                                    currentUser?.let { currentUser ->
-                                                        currentUser.followers.orEmpty()
-                                                            .forEach { follower ->
-                                                                val followerId =
-                                                                    follower.id.orEmpty()
-                                                                postViewModel.addPostToNewsFeedPostsCollection(
-                                                                    followerId,
-                                                                    post
-                                                                )
-                                                            }
-                                                    }
 
-                                                    if (post.fromWhere == POST_FROM_GROUP){
-                                                        //add post to to each member news feed, same applies with a little tweak to PAGE logic
-                                                        currentGroup?.let { currentGroup ->
-                                                            currentGroup.members.orEmpty().forEach { member ->
-                                                                val memberId = member.id.orEmpty()
-                                                                postViewModel.addPostToNewsFeedPostsCollection(
-                                                                    memberId,
-                                                                    post
-                                                                )
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        } else {
-                                            toastMessage(
-                                                requireContext(),
-                                                task.exception?.message.toString()
-                                            )
-                                        }
-                                    }
-                                    dismiss()
-                                }
-                            }
-                        }
-                }
-                else if (postDataType == "video") {
-                    val videoUri = postData!!.data!!
-                    progressDialog = Utils.showProgressDialog(requireContext(), "Please wait...")
-                    postViewModel.uploadPostVideoToCloudStorage(videoUri)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                task.result?.storage?.downloadUrl?.addOnSuccessListener { videoUrl ->
-                                    postAttachmentUrl = videoUrl.toString()
-                                    val post = createPost(postAttachmentUrl!!, postDataType!!)
-                                    postViewModel.createPost(post).addOnCompleteListener { task ->
-                                        progressDialog?.dismiss()
-                                        if (task.isSuccessful) {
-                                            postViewModel.addPostToNewsFeedPostsCollection(
-                                                currentUserId,
-                                                post
-                                            ).addOnCompleteListener {
-                                                //Add post to my followers news feed post
-                                                if (it.isSuccessful) {
-                                                    currentUser?.let { currentUser ->
-                                                        currentUser.followers.orEmpty()
-                                                            .forEach { follower ->
-                                                                val followerId =
-                                                                    follower.id.orEmpty()
-                                                                postViewModel.addPostToNewsFeedPostsCollection(
-                                                                    followerId,
-                                                                    post
-                                                                )
-                                                            }
-                                                    }
-                                                    if (post.fromWhere == POST_FROM_GROUP){
-                                                        //add post to to each member news feed, same applies with a little tweak to PAGE logic
-                                                        currentGroup?.let { currentGroup ->
-                                                            currentGroup.members.orEmpty().forEach { member ->
-                                                                val memberId = member.id.orEmpty()
-                                                                postViewModel.addPostToNewsFeedPostsCollection(
-                                                                    memberId,
-                                                                    post
-                                                                )
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        } else {
-                                            toastMessage(
-                                                requireContext(),
-                                                task.exception?.message.toString()
-                                            )
-                                        }
-                                        dismiss()
-                                    }
-
-                                }
-                            }
-                        }
-                }
+            if (postToBeEdited != null){
+                postToBeEdited.content = postContentTextView.text.toString()
+                createOrUpdatePost(postToBeEdited)
             }
-            //Text post
-            else if (postContentTextView.text.toString().isNotEmpty()) {
-                val post = createPost()
-                progressDialog = Utils.showProgressDialog(requireContext(), "Please wait...")
 
-                postViewModel.createPost(post).addOnCompleteListener { task ->
-                    progressDialog?.dismiss()
-                    if (task.isSuccessful) {
-                        //Add post to my news feed posts
-                        postViewModel.addPostToNewsFeedPostsCollection(currentUserId, post)
-                            .addOnCompleteListener {
-                                //Add post to my followers news feed post
-                                if (it.isSuccessful) {
-                                    currentUser?.let { currentUser ->
-                                        currentUser.followers.orEmpty().forEach { follower ->
-                                            val followerId = follower.id.orEmpty()
-                                            postViewModel.addPostToNewsFeedPostsCollection(
-                                                followerId,
-                                                post
-                                            )
-                                        }
-                                    }
-                                    if (post.fromWhere == POST_FROM_GROUP){
-                                        //add post to to each member news feed, same applies with a little tweak to PAGE logic
-                                        currentGroup?.let { currentGroup ->
-                                            currentGroup.members.orEmpty().forEach { member ->
-                                                val memberId = member.id.orEmpty()
+            else{
+                if (postData != null) {
+                    if (postDataType == "image") {
+                        var bitmap: Bitmap? = null
+                        if (bitmapFromCamera) {
+                            bitmap = postData?.extras?.get("data") as Bitmap
+                        } else {
+                            bitmap = MediaStore.Images.Media.getBitmap(
+                                activity?.contentResolver,
+                                postData!!.data
+                            )
+                        }
+                        postAtachmentImageView.setImageBitmap(bitmap)
+                        progressDialog = Utils.showProgressDialog(requireContext(), "Please wait...")
+                        postViewModel.uploadPostImageToCloudStorage(bitmap!!)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    task.result?.storage?.downloadUrl?.addOnSuccessListener { photoUrl ->
+                                        postAttachmentUrl = photoUrl.toString()
+                                        val post = createPost(postAttachmentUrl!!, postDataType!!)
+                                        postViewModel.createPost(post).addOnCompleteListener { task ->
+                                            progressDialog?.dismiss()
+                                            if (task.isSuccessful) {
                                                 postViewModel.addPostToNewsFeedPostsCollection(
-                                                    memberId,
+                                                    currentUserId,
                                                     post
+                                                ).addOnCompleteListener {
+                                                    //Add post to my followers news feed post
+                                                    if (it.isSuccessful) {
+                                                        currentUser?.let { currentUser ->
+                                                            currentUser.followers.orEmpty()
+                                                                .forEach { follower ->
+                                                                    val followerId =
+                                                                        follower.id.orEmpty()
+                                                                    postViewModel.addPostToNewsFeedPostsCollection(
+                                                                        followerId,
+                                                                        post
+                                                                    )
+                                                                }
+                                                        }
+
+                                                        if (post.fromWhere == POST_FROM_GROUP){
+                                                            //add post to to each member news feed, same applies with a little tweak to PAGE logic
+                                                            currentGroup?.let { currentGroup ->
+                                                                currentGroup.members.orEmpty().forEach { member ->
+                                                                    val memberId = member.id.orEmpty()
+                                                                    postViewModel.addPostToNewsFeedPostsCollection(
+                                                                        memberId,
+                                                                        post
+                                                                    )
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            } else {
+                                                toastMessage(
+                                                    requireContext(),
+                                                    task.exception?.message.toString()
                                                 )
                                             }
                                         }
+                                        dismiss()
                                     }
                                 }
                             }
-                    } else {
-                        toastMessage(requireContext(), task.exception?.message.toString())
                     }
-                    dismiss()
+                    else if (postDataType == "video") {
+                        val videoUri = postData!!.data!!
+                        progressDialog = Utils.showProgressDialog(requireContext(), "Please wait...")
+                        postViewModel.uploadPostVideoToCloudStorage(videoUri)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    task.result?.storage?.downloadUrl?.addOnSuccessListener { videoUrl ->
+                                        postAttachmentUrl = videoUrl.toString()
+                                        val post = createPost(postAttachmentUrl!!, postDataType!!)
+                                        postViewModel.createPost(post).addOnCompleteListener { task ->
+                                            progressDialog?.dismiss()
+                                            if (task.isSuccessful) {
+                                                postViewModel.addPostToNewsFeedPostsCollection(
+                                                    currentUserId,
+                                                    post
+                                                ).addOnCompleteListener {
+                                                    //Add post to my followers news feed post
+                                                    if (it.isSuccessful) {
+                                                        currentUser?.let { currentUser ->
+                                                            currentUser.followers.orEmpty()
+                                                                .forEach { follower ->
+                                                                    val followerId =
+                                                                        follower.id.orEmpty()
+                                                                    postViewModel.addPostToNewsFeedPostsCollection(
+                                                                        followerId,
+                                                                        post
+                                                                    )
+                                                                }
+                                                        }
+                                                        if (post.fromWhere == POST_FROM_GROUP){
+                                                            //add post to to each member news feed, same applies with a little tweak to PAGE logic
+                                                            currentGroup?.let { currentGroup ->
+                                                                currentGroup.members.orEmpty().forEach { member ->
+                                                                    val memberId = member.id.orEmpty()
+                                                                    postViewModel.addPostToNewsFeedPostsCollection(
+                                                                        memberId,
+                                                                        post
+                                                                    )
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            } else {
+                                                toastMessage(
+                                                    requireContext(),
+                                                    task.exception?.message.toString()
+                                                )
+                                            }
+                                            dismiss()
+                                        }
+
+                                    }
+                                }
+                            }
+                    }
                 }
+                //Text post
+                else if (postContentTextView.text.toString().isNotEmpty()) {
+                    val post = createPost()
+                    progressDialog = Utils.showProgressDialog(requireContext(), "Please wait...")
+                    createOrUpdatePost(post)
+                }
+                Toast.makeText(requireContext(), "New Post", Toast.LENGTH_SHORT).show()
             }
+
         }
 
+    }
+
+    private fun createOrUpdatePost(post: Post){
+        postViewModel.createPost(post).addOnCompleteListener { task ->
+            progressDialog?.dismiss()
+            if (task.isSuccessful) {
+                //Add post to my news feed posts
+                postViewModel.addPostToNewsFeedPostsCollection(currentUserId, post)
+                    .addOnCompleteListener {
+                        //Add post to my followers news feed post
+                        if (it.isSuccessful) {
+                            currentUser?.let { currentUser ->
+                                currentUser.followers.orEmpty().forEach { follower ->
+                                    val followerId = follower.id.orEmpty()
+                                    postViewModel.addPostToNewsFeedPostsCollection(
+                                        followerId,
+                                        post
+                                    )
+                                }
+                            }
+                            if (post.fromWhere == POST_FROM_GROUP){
+                                //add post to to each member news feed, same applies with a little tweak to PAGE logic
+                                currentGroup?.let { currentGroup ->
+                                    currentGroup.members.orEmpty().forEach { member ->
+                                        val memberId = member.id.orEmpty()
+                                        postViewModel.addPostToNewsFeedPostsCollection(
+                                            memberId,
+                                            post
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+            } else {
+                toastMessage(requireContext(), task.exception?.message.toString())
+            }
+            dismiss()
+        }
     }
 
     private fun setUpPostCreatorUI() {

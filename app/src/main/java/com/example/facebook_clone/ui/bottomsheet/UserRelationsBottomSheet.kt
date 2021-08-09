@@ -47,6 +47,7 @@ class UserRelationsBottomSheet(private val friendId: String): BottomSheetDialogF
             for (friend in friends){
                 if (friend.id == friendId){
                     currentFriend = friend
+                    unFriendLayout.visibility = View.VISIBLE
                     break
                 }
             }
@@ -141,9 +142,23 @@ class UserRelationsBottomSheet(private val friendId: String): BottomSheetDialogF
                 othersViewModel.also {
                     //delete me from his friends list
                     val meFriend = Friend(auth.currentUser?.uid.toString(), currentUser.name, currentUser.profileImageUrl)
-                    it.deleteFriendFromFriends(meFriend, currentFriend.id.toString())
-                    //delete him from my friends list
-                    it.deleteFriendFromFriends(currentFriend, auth.currentUser?.uid.toString())
+                    it.deleteFriendFromFriends(meFriend, currentFriend.id.toString()).addOnCompleteListener {task ->
+                        if (task.isSuccessful){
+                            //delete him from my friends list
+                            it.deleteFriendFromFriends(currentFriend, auth.currentUser?.uid.toString()).addOnCompleteListener { t ->
+                                if (t.isSuccessful){
+                                    dismiss()
+                                }
+                                else{
+                                    Toast.makeText(requireContext(), t.exception?.message, Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                        else{
+                            Toast.makeText(requireContext(), task.exception?.message, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
                 }
             }
             dialog.dismiss()

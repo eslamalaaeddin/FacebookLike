@@ -53,24 +53,17 @@ class PostConfigurationsBottomSheet(private val post: Post, private val shared: 
 
         // TODO: 8/4/2021 Bad Code of course, but i won't touch it |:
         editPostLayout.setOnClickListener {
-//            val userLiveDate = profileActivityViewModel.getMe(auth.currentUser?.uid.toString())
-//            userLiveDate?.observe(this, { user ->
-//                user?.let {
-//                    val postCreatorDialog = PostCreatorDialog(Utils.POST_FROM_PROFILE, currentUser = it, postToBeEdited = post)
-//                    postCreatorDialog.show(activity?.supportFragmentManager!!, "signature")
-//                    postCreatorDialog.setUserNameAndProfileImageUrl(
-//                        it.name.toString(),
-//                        it.profileImageUrl.toString()
-//                    )
-//                }
-//            })
-
-            Toast.makeText(
-                requireContext(),
-                "TODO",
-                Toast.LENGTH_SHORT
-            ).show()
-            dismiss()
+            val userLiveDate = profileActivityViewModel.getMe(auth.currentUser?.uid.toString())
+            userLiveDate?.observe(this, { user ->
+                user?.let {
+                    val postCreatorDialog = PostCreatorDialog(Utils.POST_FROM_PROFILE, currentUser = it, postToBeEdited = post)
+                    postCreatorDialog.show(activity?.supportFragmentManager!!, "signature")
+                    postCreatorDialog.setUserNameAndProfileImageUrl(
+                        it.name.toString(),
+                        it.profileImageUrl.toString()
+                    )
+                }
+            })
         }
 
         editPostPrivacyLayout.setOnClickListener {
