@@ -1,4 +1,20 @@
 # Facebook-Clone
+# Features
+
+Email and password authentication. <br>
+User profile and others profiles. <br>
+Searching for users, groups.<br>
+Friend requests accepting and removing.<br>
+Unfriend, follow, and block users.<br>
+Different post types (texts, images, videos, mix).<br>
+Post interactions (reacts, comments, replies, edits, and shares).<br>
+Posts multiple visibilities.<br>
+Different comment types (texts, images, videos, mix).<br>
+Groups creation.<br>
+Groups invitations, and joins.<br>
+Admins authorities.<br>
+Interactive notifications on (friend requests, post interactions, comments, replies, group invitations, posting in groups).<br>
+
 <!DOCTYPE html>
 <html>
    <head>
@@ -88,7 +104,7 @@
          <tr>
              <td><img src="images\Group\7-GroupPost.jpg" width=288 height=512></td>
              <td><img src="images\Group\8-InviteFriends.jpg" width=288 height=512></td>
-           <td><img src="images\FriendRequestNotification.jpg" width=288 height=512></td>
+           <td><img src="images\FriendRequestNot.jpg" width=288 height=512></td>
         </tr>
    </table>
    
