@@ -14,13 +14,20 @@ import com.example.facebook_clone.helper.Utils
 import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.post.comment.Comment
 import com.example.facebook_clone.model.post.comment.ReactionsAndSubComments
+import com.example.facebook_clone.ui.dialog.PostCreatorDialog
 import com.example.facebook_clone.viewmodel.PostViewModel
+import com.example.facebook_clone.viewmodel.activity.ProfileActivityViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.post_configurations_bottom_sheet.*
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PostConfigurationsBottomSheet(private val post: Post, private val shared: Boolean?) : BottomSheetDialogFragment() {
     private val postViewModel by viewModel<PostViewModel>()
+    private val profileActivityViewModel by viewModel<ProfileActivityViewModel>()
+    private val auth: FirebaseAuth by inject()
+
     private lateinit var postPublisherId: String
     private val postId = post.id.toString()
     override fun onCreateView(
@@ -44,10 +51,23 @@ class PostConfigurationsBottomSheet(private val post: Post, private val shared: 
             }
 
 
+        // TODO: 8/4/2021 Bad Code of course, but i won't touch it |:
         editPostLayout.setOnClickListener {
+//            val userLiveDate = profileActivityViewModel.getMe(auth.currentUser?.uid.toString())
+//            userLiveDate?.observe(this, { user ->
+//                user?.let {
+//                    val postCreatorDialog = PostCreatorDialog(Utils.POST_FROM_PROFILE, currentUser = it, postToBeEdited = post)
+//                    postCreatorDialog.show(activity?.supportFragmentManager!!, "signature")
+//                    postCreatorDialog.setUserNameAndProfileImageUrl(
+//                        it.name.toString(),
+//                        it.profileImageUrl.toString()
+//                    )
+//                }
+//            })
+
             Toast.makeText(
                 requireContext(),
-                "Edit post",
+                "TODO",
                 Toast.LENGTH_SHORT
             ).show()
             dismiss()

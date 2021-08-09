@@ -60,22 +60,24 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_height="156dp"
+        android:layout_height="wrap_content"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:id="@+id/usersSearchResultRecyclerView"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_height="156dp"
+        android:layout_height="wrap_content"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:id="@+id/groupsSearchResultRecyclerView"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:visibility="gone"
         android:background="@color/light_gray"
         android:id="@+id/pagesSearchResultRecyclerView"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="156dp"
-        android:visibility="gone"
-        android:id="@+id/groupsSearchResultRecyclerView"/>
+
 
 
 

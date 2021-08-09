@@ -29,9 +29,11 @@ class RecentUsersActivity : AppCompatActivity(), RecentUsersClickListener {
 
         getUserToken().addOnSuccessListener {
             recentUsersActivityViewModel.getRecentLoggedInUsers(it.token).addSnapshotListener { value, error ->
-                val recentUsers = value?.toObject(RecentLoggedInUsersDocument::class.java)?.recentUsers
-                recentLoggedInUsersAdapter = RecentLoggedInUsersAdapter(recentUsers.orEmpty(), this)
+                val recentUsers = value?.toObject(RecentLoggedInUsersDocument::class.java)?.recentUsers.orEmpty()
+
+                recentLoggedInUsersAdapter = RecentLoggedInUsersAdapter(recentUsers.distinctBy { recUser -> recUser.email }, this)
                 recentUsersRecyclerView.adapter = recentLoggedInUsersAdapter
+
             }
         }
         createNewFacebookAccount.setOnClickListener {navigateToUserNameFragment()}

@@ -22,10 +22,7 @@ import com.example.facebook_clone.model.post.Post
 import com.example.facebook_clone.model.user.User
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import java.io.ByteArrayOutputStream
@@ -90,7 +87,9 @@ class GroupsRepository(
             .update("members", FieldValue.arrayRemove(member))
     }
 
-
+    fun searchForGroups(): Task<QuerySnapshot> {
+        return database.collection(GROUPS_COLLECTION).get()
+    }
 
     fun getGroupsLiveDataAfterSearchingByName(query: String): LiveData<List<Group>> {
         val liveData = MutableLiveData<List<Group>>()

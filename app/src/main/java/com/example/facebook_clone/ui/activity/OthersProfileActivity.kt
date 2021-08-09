@@ -67,6 +67,7 @@ class OthersProfileActivity : AppCompatActivity(), PostListener, CommentsBottomS
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_others_profile)
 
+
         picasso = Picasso.get()
         notificationsHandler = NotificationsHandler(
             othersProfileActivityViewModel = othersProfileActivityViewModel,

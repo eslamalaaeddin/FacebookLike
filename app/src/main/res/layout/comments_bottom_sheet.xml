@@ -149,23 +149,19 @@
             android:src="@drawable/ic_attachment"
             app:tint="@color/medium_gray" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginStart="8dp"
-            android:background="@drawable/round_background"
-            android:backgroundTint="#EFEFEF"
-            android:gravity="center"
-            android:orientation="horizontal">
+
 
             <EditText
                 android:id="@+id/commentEditText"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:layout_marginEnd="4dp"
                 android:layout_weight="1"
                 android:background="@null"
+                android:inputType="textCapSentences|textMultiLine"
+                android:maxLength="2000"
+                android:maxLines="4"
                 android:hint="Write a comment..."
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp"
@@ -179,9 +175,6 @@
                 android:src="@drawable/ic_comment_send" />
 
         </LinearLayout>
-
-    </LinearLayout>
-
 
     <androidx.cardview.widget.CardView
         android:id="@+id/mediaCommentLayoutPrev"

@@ -38,14 +38,19 @@ class ImageViewerDialog() : DialogFragment(), MediaUrlProvider {
         val photoView = view.findViewById<PhotoView>(R.id.photoView)
         //Image
         //When i check if it is null, it crashes
-        scope.launch {
-            val bitmap = Picasso.get()
-                .load(imageUrl.toString())
-                .get()
-            if (bitmap != null) {
-                //Only the original thread that created a view hierarchy can touch its views.
-                CoroutineScope(Dispatchers.Main).launch {
-                    photoView.setImageBitmap(bitmap)
+        if (imageUrl?.isEmpty() == true){
+
+        }
+        else{
+            scope.launch {
+                val bitmap = Picasso.get()
+                    .load(imageUrl.toString())
+                    .get()
+                if (bitmap != null) {
+                    //Only the original thread that created a view hierarchy can touch its views.
+                    CoroutineScope(Dispatchers.Main).launch {
+                        photoView.setImageBitmap(bitmap)
+                    }
                 }
             }
         }

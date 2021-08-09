@@ -193,25 +193,31 @@ class UsersRepository(
         token
     }
 
-    fun getUsersLiveDataAfterSearchingByName(query: String): LiveData<List<User>> {
-        val liveData = MutableLiveData<List<User>>()
-        database.collection(USERS_COLLECTION)
-            .addSnapshotListener { usersSnapshot, error ->
-                if (error != null) {
-                    return@addSnapshotListener
-                } else {
-                    liveData.postValue(
-                        usersSnapshot?.toObjects(User::class.java)?.filterIndexed { _, user ->
-                            Log.i(TAG, "JJJJ getUsersLiveDataAfterSearchingByName: $user")
-                            user.name?.contains(query.toLowerCase())!!
-                                    || user.name?.contains(query.toUpperCase())!!
-                                    || user.name?.contains(query)!!
-                        }
-                    )
-                }
-            }
+//    fun getUsersLiveDataAfterSearchingByName(query: String): LiveData<List<User>> {
+//        val liveData = MutableLiveData<List<User>>()
+//        database.collection(USERS_COLLECTION)
+//            .addSnapshotListener { usersSnapshot, error ->
+//                if (error != null) {
+//                    return@addSnapshotListener
+//                } else {
+//                    liveData.postValue(
+//                        usersSnapshot?.toObjects(User::class.java)?.filterIndexed { _, user ->
+//                            Log.i(TAG, "JJJJ Not Filtered: $user")
+//                            user.name?.contains(query.toLowerCase())!!
+//                                    || user.name?.contains(query.toUpperCase())!!
+//                                    || user.name?.contains(query)!!
+//                        }
+//                    )
+//                    Log.i(TAG, "JJJJ Filtered: ${liveData.value}")
+//                }
+//            }
+//
+//        Log.i(TAG, "JJJJ Filtered 2: ${liveData.value}")
+//        return liveData
+//    }
 
-        return liveData
+    fun searchForUsers(): Task<QuerySnapshot> {
+        return database.collection(USERS_COLLECTION).get()
     }
 
     //DeletingFriendRequests

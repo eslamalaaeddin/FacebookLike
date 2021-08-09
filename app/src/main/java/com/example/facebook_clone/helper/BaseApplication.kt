@@ -96,8 +96,6 @@ class BaseApplication : Application() {
             notificationManager?.createNotificationChannel(channel)
         }
     }
-
-
     //Notification provider
     companion object {
         var singletonUser: User? = null

@@ -56,7 +56,8 @@ class PostCreatorDialog(
     private val groupPostsCreatorLstnr: GroupPostsCreatorListener? = null,
     private val currentGroup: Group? = null,
     private val currentPage: Page? = null,
-    private val currentUser: User? = null
+    private val currentUser: User? = null,
+    private val postToBeEdited: Post? = null
 ) : DialogFragment(), AdapterView.OnItemSelectedListener, NameImageProvider,
     PostAttachmentListener {
     private val auth: FirebaseAuth by inject()
@@ -91,6 +92,11 @@ class PostCreatorDialog(
         }
 
         playImageView.visibility = View.GONE
+
+        // TODO: 8/4/2021 --> get all the data from the post and update it
+        postToBeEdited?.let {
+
+        }
 
         setUpPostCreatorUI()
         addToPostButton.setOnClickListener { showPostAttachmentBottomSheet() }

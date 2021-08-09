@@ -3,6 +3,7 @@ package com.example.facebook_clone.ui.bottomsheet
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.app.ProgressDialog
+import android.content.DialogInterface.OnShowListener
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -14,13 +15,14 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.FrameLayout
 import android.widget.Toast
+import androidx.fragment.app.DialogFragment
 import com.example.facebook_clone.R
 import com.example.facebook_clone.adapter.CommentsAdapter
-import com.example.facebook_clone.helper.listener.CommentClickListener
-import com.example.facebook_clone.helper.listener.ReactClickListener
 import com.example.facebook_clone.helper.Utils
+import com.example.facebook_clone.helper.listener.CommentClickListener
 import com.example.facebook_clone.helper.listener.CommentsBottomSheetListener
 import com.example.facebook_clone.helper.listener.PostAttachmentListener
+import com.example.facebook_clone.helper.listener.ReactClickListener
 import com.example.facebook_clone.helper.notification.NotificationsHandler
 import com.example.facebook_clone.helper.provider.ReplyOnCommentDataProvider
 import com.example.facebook_clone.model.post.Post
@@ -31,23 +33,20 @@ import com.example.facebook_clone.model.post.react.ReactDocument
 import com.example.facebook_clone.ui.activity.NewsFeedActivity
 import com.example.facebook_clone.ui.activity.VideoPlayerActivity
 import com.example.facebook_clone.ui.dialog.ImageViewerDialog
-import com.example.facebook_clone.viewmodel.fragment.NotificationsFragmentViewModel
-import com.example.facebook_clone.viewmodel.activity.OthersProfileActivityViewModel
 import com.example.facebook_clone.viewmodel.PostViewModel
+import com.example.facebook_clone.viewmodel.activity.OthersProfileActivityViewModel
 import com.example.facebook_clone.viewmodel.activity.ProfileActivityViewModel
+import com.example.facebook_clone.viewmodel.fragment.NotificationsFragmentViewModel
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.comments_bottom_sheet.*
-import kotlinx.android.synthetic.main.comments_bottom_sheet.addAttachmentToComment
-import kotlinx.android.synthetic.main.comments_bottom_sheet.commentEditText
-import kotlinx.android.synthetic.main.comments_bottom_sheet.myReactPlaceHolder
-import kotlinx.android.synthetic.main.comments_bottom_sheet.sendCommentImageView
 import kotlinx.android.synthetic.main.long_clicked_reacts_button.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+
 
 private const val TAG = "CommentsBottomSheet"
 
@@ -87,6 +86,11 @@ class CommentsBottomSheet(
     private var reactClicked = false
     //private lateinit var comments: List<Comment>
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle)
+    }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
 
@@ -108,6 +112,9 @@ class CommentsBottomSheet(
         if (commentsBottomSheetListener != null) {
             comBottomSheetListener = commentsBottomSheetListener
         }
+
+
+
         return layoutInflater.inflate(R.layout.comments_bottom_sheet, container, false)
     }
 
@@ -169,7 +176,11 @@ class CommentsBottomSheet(
                                         val comment = if (textComment.isEmpty()) {
                                             createComment(commentAttachmentUrl!!, null, "image")
                                         } else {
-                                            createComment(commentAttachmentUrl!!, commentContent, "textWithImage")
+                                            createComment(
+                                                commentAttachmentUrl!!,
+                                                commentContent,
+                                                "textWithImage"
+                                            )
                                         }
 //                                        change 1
 
@@ -189,7 +200,9 @@ class CommentsBottomSheet(
                                                 mediaCommentLayoutPrev.visibility = View.GONE
                                                 commentData = null
                                                 if (interactorId != postPublisherId) {
-                                                    val userToBeNotified = profileActivityViewModel.getAnotherUser(postPublisherId)
+                                                    val userToBeNotified = profileActivityViewModel.getAnotherUser(
+                                                        postPublisherId
+                                                    )
                                                     userToBeNotified?.observe(viewLifecycleOwner){ user ->
                                                         val token = user.token.orEmpty()
                                                         comBottomSheetListener.onAnotherUserCommented(
@@ -206,7 +219,9 @@ class CommentsBottomSheet(
                                                             secondCollectionType = post.secondCollectionType,
                                                             commentId = comment.id.orEmpty()
                                                         )
-                                                        userToBeNotified.removeObservers(viewLifecycleOwner)
+                                                        userToBeNotified.removeObservers(
+                                                            viewLifecycleOwner
+                                                        )
                                                     }
                                                 }
                                                 commentData = null
@@ -263,7 +278,9 @@ class CommentsBottomSheet(
                                                 mediaCommentLayoutPrev.visibility = View.GONE
                                                 commentData = null
                                                 if (interactorId != postPublisherId) {
-                                                    val userToBeNotified = profileActivityViewModel.getAnotherUser(postPublisherId)
+                                                    val userToBeNotified = profileActivityViewModel.getAnotherUser(
+                                                        postPublisherId
+                                                    )
                                                     userToBeNotified?.observe(viewLifecycleOwner){ user ->
                                                         val token = user.token.orEmpty()
                                                         comBottomSheetListener.onAnotherUserCommented(
@@ -280,7 +297,9 @@ class CommentsBottomSheet(
                                                             secondCollectionType = post.secondCollectionType,
                                                             commentId = comment.id.orEmpty()
                                                         )
-                                                        userToBeNotified.removeObservers(viewLifecycleOwner)
+                                                        userToBeNotified.removeObservers(
+                                                            viewLifecycleOwner
+                                                        )
                                                     }
                                                 }
                                                 commentData = null
@@ -327,8 +346,10 @@ class CommentsBottomSheet(
                                 //if you are not the commenter
                                 //commenterId
                                 if (comment.commenterId != postPublisherId) {
-                                    val userToBeNotified = profileActivityViewModel.getAnotherUser(postPublisherId)
-                                    userToBeNotified?.observe(viewLifecycleOwner){user ->
+                                    val userToBeNotified = profileActivityViewModel.getAnotherUser(
+                                        postPublisherId
+                                    )
+                                    userToBeNotified?.observe(viewLifecycleOwner){ user ->
                                         val token = user.token.orEmpty()
                                         comBottomSheetListener.onAnotherUserCommented(
                                             notifierId = interactorId,

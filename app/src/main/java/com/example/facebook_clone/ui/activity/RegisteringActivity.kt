@@ -52,8 +52,6 @@ class RegisteringActivity : AppCompatActivity() {
 
     }
 
-
-
     private fun showStopCreatingAccountDialog() {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)

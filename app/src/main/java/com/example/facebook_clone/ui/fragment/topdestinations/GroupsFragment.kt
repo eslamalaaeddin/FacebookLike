@@ -3,6 +3,7 @@ package com.example.facebook_clone.ui.fragment.topdestinations
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.Window
 import android.widget.TextView
@@ -56,7 +57,8 @@ class GroupsFragment : Fragment(R.layout.fragment_groups), GroupsItemListener {
 
         allGroupsTask.addOnCompleteListener {
             if (it.isSuccessful){
-                val groups = it.result?.toObject(SemiGroupDocument::class.java)?.groups.orEmpty()
+                val groups = it.result?.toObject(SemiGroupDocument::class.java)?.groups.orEmpty().reversed().distinctBy { g -> g.id }
+                Log.i(TAG, "onViewCreated XXXXX: $groups")
                 groupsAdapter = GroupsAdapter(groups, this)
                 groupsRecyclerView.adapter = groupsAdapter
                 val layoutManager = LinearLayoutManager(requireContext())
